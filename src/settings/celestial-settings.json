@@ -32,6 +32,32 @@
     "orbitTiltb": 0
   },
   {
+    "name": "Moon Node",
+    "size": 0,
+    "startPos": -26.5,
+    "speed": -0.3378,
+    "tilt": 0,
+    "orbitRadius": 0,
+    "orbitCentera": 0,
+    "orbitCenterb": 0,
+    "orbitCenterc": 0,
+    "orbitTilta": 0,
+    "orbitTiltb": 0
+  },
+  {
+    "name": "Moon Plane",
+    "size": 0,
+    "startPos": 0,
+    "speed": 0,
+    "tilt": 0,
+    "orbitRadius": 0,
+    "orbitCentera": 0,
+    "orbitCenterb": 0,
+    "orbitCenterc": 0,
+    "orbitTilta": 5.151,
+    "orbitTiltb": 0
+  },
+  {
     "name": "Moon deferent A",
     "size": 0.6,
     "startPos": 226.4,
@@ -41,8 +67,8 @@
     "orbitCentera": 0,
     "orbitCenterb": 0,
     "orbitCenterc": 0,
-    "orbitTilta": -0.2,
-    "orbitTiltb": 0.5
+    "orbitTilta": 0,
+    "orbitTiltb": 0
   },
   {
     "name": "Moon deferent B",
@@ -54,8 +80,8 @@
     "orbitCentera": -0.009691949050954147,
     "orbitCenterb": 0.005611128397920822,
     "orbitCenterc": 0,
-    "orbitTilta": 2.3,
-    "orbitTiltb": 2.6
+    "orbitTilta": 0,
+    "orbitTiltb": 0
   },
   {
     "name": "Moon",
@@ -70,8 +96,8 @@
     "orbitCentera": 0.020404103265166628,
     "orbitCenterb": -0.02065915455598121,
     "orbitCenterc": -0.00178535903570208,
-    "orbitTilta": -1.8,
-    "orbitTiltb": -2.6
+    "orbitTilta": 0,
+    "orbitTiltb": 0
   },
   {
     "name": "Sun deferent",

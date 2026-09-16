@@ -1,0 +1,55 @@
+{
+  "input_file": "edits\\data\\derived\\moon_comparison_2000-2026_6h.csv",
+  "reference": "JPL ICRF astrometric RA/Dec",
+  "ecliptic_rotation": "fixed J2000 obliquity 23.439291111 deg",
+  "n_samples": 37985,
+  "start": "2000-06-21 00:00:00",
+  "stop": "2026-06-21 00:00:00",
+  "cadence_hours_median": 6.0,
+  "declination_residual": {
+    "mean_deg": -0.3875421742436342,
+    "rms_deg": 0.6796029742261731,
+    "median_abs_deg": 0.46781177222222325,
+    "p95_abs_deg": 1.3730112122222227,
+    "max_abs_deg": 2.186650713888889
+  },
+  "angular_separation": {
+    "mean_deg": 1.5957401978137138,
+    "rms_deg": 1.8520060665706375,
+    "median_abs_deg": 1.3986373668129566,
+    "p95_abs_deg": 3.3263882209200273,
+    "max_abs_deg": 4.098429336661182
+  },
+  "ecliptic_longitude_residual": {
+    "mean_deg": -0.27978228871449246,
+    "rms_deg": 1.7960992013855852,
+    "median_abs_deg": 1.3267882084098233,
+    "p95_abs_deg": 3.2912958908885437,
+    "max_abs_deg": 4.100816809713251
+  },
+  "ecliptic_latitude_residual": {
+    "mean_deg": -0.39596695357764417,
+    "rms_deg": 0.4657540082894569,
+    "median_abs_deg": 0.3965575397650203,
+    "p95_abs_deg": 0.8082638920939007,
+    "max_abs_deg": 1.1413693926258386
+  },
+  "primary_period_fit": {
+    "periods": [
+      "variation",
+      "anomalistic_month",
+      "evection",
+      "annual"
+    ],
+    "rms_before_deg": 1.7960992013855852,
+    "rms_after_deg": 0.10336383620809346,
+    "variance_explained_percent": 99.66057431517812,
+    "offset_deg": -0.2813422975569576,
+    "linear_trend_deg_per_day": 3.771037766231444e-05
+  },
+  "full_period_fit": {
+    "rms_after_deg": 0.10012383245963516,
+    "offset_deg": -0.28287165574307943,
+    "linear_trend_deg_per_day": 3.78502614543641e-05
+  }
+}
