@@ -1,0 +1,8 @@
+{
+  "bodies": ["moon", "sun", "mars"],
+  "start": "2000-06-21 00:00",
+  "stop": "2026-06-21 00:00",
+  "step": "6 h",
+  "tychos": "edits/data/raw/tychos_ephemerides.txt",
+  "jpl": "edits/data/raw/jpl_ephemerides.txt"
+}

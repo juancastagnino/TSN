@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate a compact Markdown report from analyze_lunar_residuals.py outputs.
+"""Generate a compact Markdown report from analyze_ephemerides.py outputs.
 
 Example:
     py edits/scripts/generate_report.py \
-        --summary edits/reports/lunar_summary.json \
-        --components edits/reports/lunar_periodic_components.csv \
-        --annual edits/reports/lunar_annual_stats.csv \
-        --output edits/reports/lunar_ephemeris_report.md
+        --summary edits/reports/moon_summary.json \
+        --components edits/reports/moon_periodic_components.csv \
+        --annual edits/reports/moon_annual_stats.csv \
+        --output edits/reports/moon_ephemeris_report.md
 
 Optionally provide --baseline-summary to add before/after improvement figures.
 """
@@ -41,15 +41,15 @@ def improvement(old, new):
     return 100.0 * (old - new) / old
 
 
-def main():
+def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--summary", required=True)
     p.add_argument("--components")
     p.add_argument("--annual")
     p.add_argument("--baseline-summary")
-    p.add_argument("--model-label", default="Current TYCHOS lunar-plane branch")
-    p.add_argument("--output", default="edits/reports/lunar_ephemeris_report.md")
-    args = p.parse_args()
+    p.add_argument("--model-label")
+    p.add_argument("--output", default="edits/reports/moon_ephemeris_report.md")
+    args = p.parse_args(argv)
 
     s = load_json(args.summary)
     baseline = load_json(args.baseline_summary) if args.baseline_summary else None
@@ -57,9 +57,10 @@ def main():
     annual = load_csv(args.annual)
 
     lines = []
-    lines.append("# TYCHOS Lunar Ephemeris Audit")
+    body = s.get("body", "moon")
+    lines.append(f"# TYCHOS {body.title()} Ephemeris Audit")
     lines.append("")
-    lines.append(f"**Model:** {args.model_label}")
+    lines.append(f"**Model:** {args.model_label or ('Current TYCHOS lunar-plane branch' if body == 'moon' else 'TYCHOS ' + body)}")
     lines.append("")
     lines.append("## Dataset")
     lines.append("")
@@ -68,13 +69,18 @@ def main():
     lines.append(f"- Median cadence: **{fmt(s.get('cadence_hours_median'), 3)} h**")
     lines.append(f"- Reference: **{s['reference']}**")
     lines.append(f"- Ecliptic residual analysis: {s['ecliptic_rotation']}")
+    provenance = s.get("provenance")
+    if provenance:
+        lines.append(f"- Analysis generated (UTC): {provenance['analyzed_at_utc']}")
+        lines.append(f"- Export configuration: {provenance['export_label']}")
+        lines.append("- Input hashes and any explicitly supplied export settings are recorded in the summary JSON.")
     lines.append("")
 
     lines.append("## Current residuals")
     lines.append("")
-    lines.append("| Metric | RMS | P95 abs. | Max abs. |")
-    lines.append("|---|---:|---:|---:|")
-    for label, key in [
+    lines.append("| Metric | Mean | RMS | P95 abs. | Max abs. |")
+    lines.append("|---|---:|---:|---:|---:|")
+    for label, key in ([('RA (coordinate)', 'ra_residual')] if 'ra_residual' in s else []) + [
         ("Declination", "declination_residual"),
         ("Angular separation", "angular_separation"),
         ("Ecliptic longitude", "ecliptic_longitude_residual"),
@@ -82,7 +88,7 @@ def main():
     ]:
         d = s[key]
         lines.append(
-            f"| {label} | {fmt(d['rms_deg'])}° | {fmt(d['p95_abs_deg'])}° | {fmt(d['max_abs_deg'])}° |"
+            f"| {label} | {fmt(d['mean_deg'])}° | {fmt(d['rms_deg'])}° | {fmt(d['p95_abs_deg'])}° | {fmt(d['max_abs_deg'])}° |"
         )
     lines.append("")
 
@@ -143,6 +149,15 @@ def main():
 
     lines.append("## Interpretation notes")
     lines.append("")
+    if body != "moon":
+        lines.append("- No lunar periodic terms are fitted to this body.")
+        lines.append("- Compare shared-frame changes across bodies using the same epochs and declared export configuration.")
+        lines.append("- Ecliptic coordinates use a common fixed rotation; this does not establish the simulator's reference-frame accuracy.")
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"Report written to: {output}")
+        return
     lines.append(
         "- The periodic labels above identify frequencies present in the TYCHOS-minus-JPL residual. "
         "They should not by themselves be interpreted as proof of a particular physical mechanism."

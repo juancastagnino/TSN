@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare TYCHOS lunar ephemerides with NASA/JPL Horizons.
+"""Compare a selected body from TYCHOS and NASA/JPL Horizons exports.
 
 Expected TYCHOS format (one position per line):
     YYYY-MM-DD | HH:MM:SS | 21h08m20.6s | -18°16'33.9"
@@ -9,18 +9,21 @@ CSV columns for ICRF and apparent RA/Dec (QUANTITIES='1,2').
 
 Example to run the ephemerides comparison:
     py edits/scripts/compare_ephemerides.py \
-        edits/data/raw/tychos_moon_2000-2026_6h.txt \
-        edits/data/raw/jpl_moon_de441_2000-2026_6h.txt \
-        -o edits/data/derived/moon_comparison_2000-2026_6h.csv
+        edits/data/raw/tychos_ephemerides.txt \
+        edits/data/raw/jpl_ephemerides.txt --body moon --target-id 301 \
+        -o edits/data/derived/moon_comparison.csv
 """
 
 import argparse
 import csv
+import io
 import math
 import re
 from datetime import datetime
 from pathlib import Path
 from statistics import median
+
+from ephemeris_io import tychos_blocks, jpl_blocks, select_block
 
 TY_RA_RE = re.compile(r"^\s*(\d+)h(\d+)m([\d.]+)s\s*$")
 TY_DEC_RE = re.compile(r"^\s*([+-]?)(\d+)°(\d+)'([\d.]+)\"\s*$")
@@ -65,6 +68,12 @@ def wrap_deg(delta):
     return (delta + 180.0) % 360.0 - 180.0
 
 
+def validate_coordinates(ra, dec):
+    # TYCHOS can round to 23h59m60s (360 degrees, equivalent to zero).
+    if not math.isfinite(ra) or not math.isfinite(dec) or not 0 <= ra <= 360 or not -90 <= dec <= 90:
+        raise ValueError("Invalid RA/Dec coordinates")
+
+
 def angular_separation_deg(ra1, dec1, ra2, dec2):
     r1, d1, r2, d2 = map(math.radians, (ra1, dec1, ra2, dec2))
     c = (
@@ -75,29 +84,54 @@ def angular_separation_deg(ra1, dec1, ra2, dec2):
     return math.degrees(math.acos(c))
 
 
-def read_tychos(path):
+def read_tychos(path, strict=False, body=None):
+    text = Path(path).read_text(encoding="utf-8-sig")
+    if "PLANET:" in text or body is not None:
+        text = select_block(tychos_blocks(text), body, "TYCHOS")
+    return parse_tychos(text, strict=strict)
+
+
+def parse_tychos(text, strict=False):
     data = {}
-    with open(path, "r", encoding="utf-8-sig") as f:
+    with io.StringIO(text) as f:
         for line in f:
             if "|" not in line:
+                if strict and re.match(r"^\s*\d{4}-\d{2}-\d{2}", line):
+                    raise ValueError(f"Malformed TYCHOS row: {line.strip()}")
                 continue
             parts = [p.strip() for p in line.split("|")]
+            is_data = bool(re.match(r"^\d{4}-\d{2}-\d{2}", parts[0]))
             if len(parts) < 4:
+                if strict and is_data:
+                    raise ValueError("Incomplete TYCHOS data row")
                 continue
             try:
                 dt = datetime.strptime(parts[0] + " " + parts[1], "%Y-%m-%d %H:%M:%S")
                 ra = parse_ty_ra(parts[2])
                 dec = parse_ty_dec(parts[3])
+                if strict:
+                    validate_coordinates(ra, dec)
             except (ValueError, IndexError):
+                if strict and is_data:
+                    raise ValueError(f"Malformed TYCHOS row: {line.strip()}")
                 continue
+            if strict and dt in data:
+                raise ValueError(f"Duplicate TYCHOS timestamp: {dt}")
             data[dt] = {"ra": ra, "dec": dec}
     return data
 
 
-def read_jpl(path):
+def read_jpl(path, strict=False, target_id=None):
+    text = Path(path).read_text(encoding="utf-8-sig")
+    if "Target body name:" in text or target_id is not None:
+        text = select_block(jpl_blocks(text), target_id, "JPL")
+    return parse_jpl(text, strict=strict)
+
+
+def parse_jpl(text, strict=False):
     data = {}
     inside = False
-    with open(path, "r", encoding="utf-8-sig") as f:
+    with io.StringIO(text) as f:
         for raw in f:
             line = raw.strip()
             if line == "$$SOE":
@@ -110,6 +144,8 @@ def read_jpl(path):
 
             cols = [c.strip() for c in raw.split(",")]
             if len(cols) < 7:
+                if strict:
+                    raise ValueError("Incomplete JPL data row")
                 continue
             try:
                 dt = datetime.strptime(cols[0], "%Y-%b-%d %H:%M:%S")
@@ -117,8 +153,16 @@ def read_jpl(path):
                 dec_icrf = parse_jpl_dec(cols[4])
                 ra_app = parse_jpl_ra(cols[5])
                 dec_app = parse_jpl_dec(cols[6])
+                if strict:
+                    validate_coordinates(ra_icrf, dec_icrf)
+                    validate_coordinates(ra_app, dec_app)
             except (ValueError, IndexError):
+                if strict:
+                    raise ValueError(f"Malformed JPL row: {line}")
                 continue
+
+            if strict and dt in data:
+                raise ValueError(f"Duplicate JPL timestamp: {dt}")
 
             data[dt] = {
                 "ra_icrf": ra_icrf,
@@ -167,17 +211,22 @@ def print_summary(rows, label, prefix):
     print(f"  date                       : {worst_sep['date']}")
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("tychos", help="TYCHOS ephemeris text file")
     parser.add_argument("jpl", help="JPL Horizons text file")
     parser.add_argument(
         "-o", "--output", default="moon_comparison.csv", help="Output CSV path"
     )
-    args = parser.parse_args()
+    parser.add_argument("--strict", action="store_true", help="Reject malformed rows, duplicates and unmatched timestamps")
+    parser.add_argument("--body", help="TYCHOS body section, e.g. moon")
+    parser.add_argument("--target-id", help="Horizons numeric target, e.g. 301")
+    args = parser.parse_args(argv)
 
-    ty = read_tychos(args.tychos)
-    jp = read_jpl(args.jpl)
+    ty = read_tychos(args.tychos, strict=args.strict, body=args.body)
+    jp = read_jpl(args.jpl, strict=args.strict, target_id=args.target_id)
+    if args.strict and set(ty) != set(jp):
+        raise ValueError("TYCHOS and JPL timestamps differ; use matching intervals and cadence")
     common = sorted(set(ty) & set(jp))
 
     print(f"TYCHOS positions parsed : {len(ty)}")
