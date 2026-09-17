@@ -93,7 +93,6 @@ The combined Moon/Sun/Mars run reproduces the historical lunar metrics above.
 All three bodies have 37,985 matching six-hour samples over 2000-2026; input hashes
 and coordinates were checked against the raw exports. Angular separation RMS is
 1.8520 degrees for the Moon, 0.3414 for the Sun and 0.7334 for Mars.
-The export label still contains the README example text rather than actual settings.
 
 An additional in-memory diagnostic fitted the Sun's longitude residual with a
 365.256363-day sinusoid, constant and linear trend over the full interval. RMS fell
@@ -101,6 +100,58 @@ from 0.33878 to 0.00420 degrees, with a slope of 49.20 arcseconds/year, near the
 Moon's 49.59 from its four-period fit. This solar fit is not part of the automatic
 reports or out-of-sample validation. The similarity motivates a shared-frame or
 geometry investigation; it does not identify the cause.
+
+## Earth-frame audit: JPL compatibility remains unresolved
+
+The current TYCHOS export is **not established to use the same frame as the JPL
+ICRF reference**. Its residuals may include differences in coordinate conventions;
+do not interpret them purely as orbital errors or declare the TYCHOS frame wrong.
+
+In [plotModelFunctions.js](../src/utils/plotModelFunctions.js), `worldToLocal`
+expresses target positions in Earth's `cSphereRef` at each sample date.
+[Pobj.jsx](../src/components/Pobj.jsx) puts `tilt` and `tiltb` on that frame, while
+child orbits sit outside the tilted group. The shared Earth orbital transform
+cancels in local planetary coordinates. In contrast, `Stars.jsx` and `BSCStars.jsx`
+anchor catalog orientation at J2000. Checks against Three.js found consistent
+cardinal axes and origin subtraction; this does not establish celestial alignment.
+
+`Earth.speed = -2*pi/25344` exactly encodes the book's PVP period and 51.13636
+arcseconds per model year (365.2425 days). The online book's
+[Chapter 11, section 11.4](https://book.tychos.space/chapters/11-earths-pvp-orbit),
+[Chapter 12, section 12.1](https://book.tychos.space/chapters/12-sun-earth-rel-motion)
+and [Chapter 19, sections 19.1-19.3](https://book.tychos.space/chapters/19-the-tychos-great-year)
+provide the proposed distinction between equinoctial and stellar directions.
+This may explain the intended frame convention; the book's physical explanation
+and its implementation still need to be distinguished. Translation along PVP and
+rotation of coordinate axes are separate operations.
+
+An exploratory re-expression of the 2000-2026 baseline (`Earth.tiltb = 0.26`)
+using Earth's J2000 orientation changed fitted Sun/Moon longitude trends from
++49.20/+49.59 to -1.94/-1.55 arcseconds per Julian year. Lunar separation RMS
+nevertheless increased from 1.852 to 1.887 degrees. This shows sensitivity to the
+frame, not a validated TYCHOS-to-ICRF conversion. That diagnostic is not part of
+the reporting workflow; retain these figures only as exploratory context.
+
+**Suggested TYCHOS work, pending verification:**
+
+1. Define the exported axes with the authors: origin, pole, zero-RA direction,
+   epoch, time scale and their evolution relative to the star catalog. Do not
+   assume the current axes equal a standard astronomical equator/equinox of date.
+2. Test known directions at J2000 and later dates, separating observer translation
+   from orientation. A pure change of axes must preserve distances and pairwise
+   angular separations. If fixed celestial axes are intended, prototype an explicit
+   export convention using the established alignment, leaving orbital motions intact.
+3. Compare equivalent observables. TYCHOS currently exports instantaneous geometric
+   positions; JPL quantity 1 includes light-time. For a geometry audit, obtain JPL
+   geocentric geometric vectors in the agreed frame. Selecting JPL apparent RA/Dec
+   alone does not resolve this mismatch; see the
+   [Horizons definitions](https://ssd.jpl.nasa.gov/horizons/manual.html#general-definitions).
+4. Preserve numeric precision before formatting: `radToRa` rounds to a second of
+   time (15 angular arcseconds), and `radToDec` to one arcsecond. Normalize any
+   seconds-to-minutes carry. These export refinements require no perturbations.
+
+Do not tune planetary speeds, remove PVP motion or apply a fitted drift correction
+to force agreement. Establish the coordinate contract before changing the model.
 
 ## Next investigations
 
@@ -140,6 +191,13 @@ Reproduce the baseline, change one geometric element, re-export, then compare al
 coordinate metrics and residual structure over the same timestamps. A lower error
 in one coordinate can coexist with a worse error in another. Treat the settings
 label and input hashes as provenance, not automatic proof of the export settings.
+
+When a trial needs a before/after comparison, optionally preserve the full current
+`reports/` directory in `data/pretest/reports/` before overwriting results. Save
+the matching inputs and known export settings as described in the
+[pre-test backup workflow](README.md#optional-pre-test-backup) when reproducibility
+is needed. This manual backup is not updated by the scripts and does not require
+a new experiment document or a handoff update for every trial.
 
 Keep only operational scripts, two maintained documents and regenerated outputs.
 Before pushing, record the retained parameters, which comparisons support a change,

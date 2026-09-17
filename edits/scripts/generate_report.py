@@ -168,7 +168,7 @@ def main(argv=None):
     )
     lines.append(
         "- Remaining longitudinal structure can then be investigated within the geometry proposed by TYCHOS "
-        "before introducing any additional empirical correction terms."
+        "without introducing perturbations or empirical correction terms."
     )
     lines.append("")
 

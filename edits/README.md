@@ -16,13 +16,16 @@ python.exe -B edits/scripts/download_jpl.py
 # edits/data/raw/tychos_ephemerides.txt
 
 # Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "Describe the settings used for this export"
+python.exe -B edits/scripts/run_analysis.py --label "baseline analysis including sun, moon, mercury and mars."
 ```
 
 Open `edits/reports/ephemeris_overview.md` for results and
 `edits/reports/analysis_notes.md` for diagnostic observations.
 For an existing pair of exports, only the last command is needed.
 No virtual-environment activation is required.
+
+Before a comparison trial, optionally [save the current results](#optional-pre-test-backup)
+in `edits/data/pretest/` before replacing exports or running the analysis again.
 
 ## Configure an analysis
 
@@ -106,6 +109,28 @@ Reports and derived CSVs can be regenerated. A clean `reports/` directory is val
 Do not manually maintain scientific conclusions inside generated files: record
 accepted conclusions in [README_handoff.md](README_handoff.md).
 
+## Optional pre-test backup
+
+Use `data/pretest/` when you want to compare a new trial with the previous run.
+Copy the complete `reports/` directory to `data/pretest/reports/` before rerunning
+the analysis. Include the JSON and CSV files, not just the Markdown summaries.
+The overview identifies which bodies belong to the saved run; older outputs for
+other bodies may also be present.
+
+For a reproducible comparison, also preserve the two input TXT files under
+`data/pretest/raw/`, plus `analysis_config.json`, `bodies.json` and the settings
+snapshot actually used for that export. Save these before changing settings or
+replacing the inputs. A copy of today's settings is evidence of the export
+configuration only if you know that export used them. Derived comparison CSVs
+are optional because they can be regenerated from the saved inputs.
+
+This is a manual, optional backup of one comparison baseline. The scripts neither
+read nor update `data/pretest/` automatically. Keep its contents together from
+the same run; replace the backup deliberately when choosing a new baseline, or
+archive it elsewhere if it must be retained. No separate trial document or backup
+for every run is required. Compare the same bodies, timestamps and reference
+conventions, and describe the changed parameter with `--label` in the new run.
+
 ## Purpose and interpretation
 
 This workflow evaluates the compact TYCHOS geometry against reference ephemerides.
@@ -135,6 +160,7 @@ samples. Out-of-sample validation remains a separate pending investigation.
 - **[README_handoff.md](README_handoff.md):** retained baseline, reasoning constraints and next investigations; review before pushing branch changes.
 - **[data/docs/](data/docs/):** the TYCHOS book and other source material; cite edition and chapter/page when using it.
 - **`reports/`:** generated evidence for each run, not a development diary.
+- **`data/pretest/` (optional):** manually saved results and inputs for a before/after comparison.
 
 The operational scripts are `download_jpl.py`, `ephemeris_io.py`,
 `compare_ephemerides.py`, `analyze_ephemerides.py`, `generate_report.py` and

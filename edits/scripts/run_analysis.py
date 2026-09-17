@@ -96,7 +96,7 @@ def write_notes(summaries):
     lines += ["## Questions to investigate", "",
               "- Test whether biases and fitted coefficients transfer to a separate time interval.",
               "- Before interpreting a longitude drift as an orbital-speed error or precession, verify the reference frames and look for shared behavior across bodies. Similar numerical rates alone do not establish a cause.",
-              "- Compare global coordinate changes using the same epochs and export settings for Moon, Sun and Mars.", ""]
+              "- Compare global coordinate changes using the same epochs and export settings for all bodies in this run.", ""]
     (REPORTS/'analysis_notes.md').write_text('\n'.join(lines), encoding='utf-8')
 
 
