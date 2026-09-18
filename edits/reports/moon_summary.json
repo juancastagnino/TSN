@@ -1,0 +1,85 @@
+{
+  "body": "moon",
+  "profile": "lunar",
+  "input_file": "edits/data/derived/moon_comparison.csv",
+  "reference": "JPL ICRF astrometric RA/Dec",
+  "ecliptic_rotation": "fixed J2000 obliquity 23.439291111 deg",
+  "n_samples": 37985,
+  "start": "2000-06-21 00:00:00",
+  "stop": "2026-06-21 00:00:00",
+  "cadence_hours_median": 6.0,
+  "cadence_regular": true,
+  "fft_period_range_days": [
+    1.0,
+    500.0
+  ],
+  "ra_residual": {
+    "mean_deg": -0.3320665012635471,
+    "rms_deg": 1.8116489990622533,
+    "median_abs_deg": 1.3312206749999689,
+    "p95_abs_deg": 3.351007406666672,
+    "max_abs_deg": 4.544667233333314
+  },
+  "declination_residual": {
+    "mean_deg": -0.3875421742436342,
+    "rms_deg": 0.6796029742261731,
+    "median_abs_deg": 0.46781177222222325,
+    "p95_abs_deg": 1.3730112122222227,
+    "max_abs_deg": 2.186650713888889
+  },
+  "angular_separation": {
+    "mean_deg": 1.5957401978137138,
+    "rms_deg": 1.8520060665706375,
+    "median_abs_deg": 1.3986373668129566,
+    "p95_abs_deg": 3.3263882209200273,
+    "max_abs_deg": 4.098429336661182
+  },
+  "ecliptic_longitude_residual": {
+    "mean_deg": -0.27978228871449246,
+    "rms_deg": 1.7960992013855852,
+    "median_abs_deg": 1.3267882084098233,
+    "p95_abs_deg": 3.2912958908885437,
+    "max_abs_deg": 4.100816809713251
+  },
+  "ecliptic_latitude_residual": {
+    "mean_deg": -0.39596695357764417,
+    "rms_deg": 0.4657540082894569,
+    "median_abs_deg": 0.3965575397650203,
+    "p95_abs_deg": 0.8082638920939007,
+    "max_abs_deg": 1.1413693926258386
+  },
+  "primary_period_fit": {
+    "periods": [
+      "variation",
+      "anomalistic_month",
+      "evection",
+      "annual"
+    ],
+    "rms_before_deg": 1.7960992013855852,
+    "rms_after_deg": 0.10336383620809346,
+    "variance_explained_percent": 99.66057431517812,
+    "offset_deg": -0.2813422975569576,
+    "linear_trend_deg_per_day": 3.771037766231444e-05
+  },
+  "full_period_fit": {
+    "rms_after_deg": 0.10012383245963516,
+    "offset_deg": -0.28287165574307943,
+    "linear_trend_deg_per_day": 3.78502614543641e-05
+  },
+  "provenance": {
+    "analyzed_at_utc": "2026-09-18T04:02:38.042076+00:00",
+    "inputs": {
+      "tychos": {
+        "path": "edits/data/raw/tychos_ephemerides.txt",
+        "sha256": "4c11a0d557accb27f953fe171c41843c5e1071057e38164fea058537e967d16f"
+      },
+      "jpl": {
+        "path": "edits/data/raw/jpl_ephemerides.txt",
+        "sha256": "26415f8702c808d2a45790611e2e79eadd0ad40c117e49b2bef06a83fccb75df"
+      }
+    },
+    "export_label": "baseline analysis all planets 6hr 26 years",
+    "declared_export_settings": null,
+    "settings_note": "User-declared, not embedded or verified by the TYCHOS export"
+  }
+}

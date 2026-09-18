@@ -166,3 +166,8 @@ The operational scripts are `download_jpl.py`, `ephemeris_io.py`,
 `compare_ephemerides.py`, `analyze_ephemerides.py`, `generate_report.py` and
 `run_analysis.py`. NumPy is the only additional Python dependency.
 Use either command-line entry point with `--help` for its options.
+
+## Research tools
+
+- [Machine learning](machine_learning/README.md): temporal residual diagnostics, configuration and generated experiment outputs.
+- [Stellarium](stellarium/README.md): reference export and coordinate comparisons; datasets remain under `data/stellarium*`.

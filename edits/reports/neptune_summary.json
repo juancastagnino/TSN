@@ -1,0 +1,67 @@
+{
+  "body": "neptune",
+  "profile": "none",
+  "input_file": "edits/data/derived/neptune_comparison.csv",
+  "reference": "JPL ICRF astrometric RA/Dec",
+  "ecliptic_rotation": "fixed J2000 obliquity 23.439291111 deg",
+  "n_samples": 37985,
+  "start": "2000-06-21 00:00:00",
+  "stop": "2026-06-21 00:00:00",
+  "cadence_hours_median": 6.0,
+  "cadence_regular": true,
+  "fft_period_range_days": [
+    1.0,
+    500.0
+  ],
+  "ra_residual": {
+    "mean_deg": 0.20677897879469986,
+    "rms_deg": 0.21744605192728655,
+    "median_abs_deg": 0.2195556750000378,
+    "p95_abs_deg": 0.28504874416666437,
+    "max_abs_deg": 0.2936716791667209
+  },
+  "declination_residual": {
+    "mean_deg": -0.008557576475436196,
+    "rms_deg": 0.01597261437989777,
+    "median_abs_deg": 0.0072813500000012965,
+    "p95_abs_deg": 0.035086716666666594,
+    "max_abs_deg": 0.052609216666666736
+  },
+  "angular_separation": {
+    "mean_deg": 0.2040402288724862,
+    "rms_deg": 0.21536048642231753,
+    "median_abs_deg": 0.21579351876108988,
+    "p95_abs_deg": 0.2851861156257528,
+    "max_abs_deg": 0.29325297993858757
+  },
+  "ecliptic_longitude_residual": {
+    "mean_deg": 0.1859975759254172,
+    "rms_deg": 0.19492594185499118,
+    "median_abs_deg": 0.1985384673802173,
+    "p95_abs_deg": 0.2548371114037081,
+    "max_abs_deg": 0.2657041805531435
+  },
+  "ecliptic_latitude_residual": {
+    "mean_deg": -0.08181872790292082,
+    "rms_deg": 0.09162471073956953,
+    "median_abs_deg": 0.08501896169948686,
+    "p95_abs_deg": 0.14042445901140946,
+    "max_abs_deg": 0.1502887999673166
+  },
+  "provenance": {
+    "analyzed_at_utc": "2026-09-18T04:03:07.824912+00:00",
+    "inputs": {
+      "tychos": {
+        "path": "edits/data/raw/tychos_ephemerides.txt",
+        "sha256": "4c11a0d557accb27f953fe171c41843c5e1071057e38164fea058537e967d16f"
+      },
+      "jpl": {
+        "path": "edits/data/raw/jpl_ephemerides.txt",
+        "sha256": "26415f8702c808d2a45790611e2e79eadd0ad40c117e49b2bef06a83fccb75df"
+      }
+    },
+    "export_label": "baseline analysis all planets 6hr 26 years",
+    "declared_export_settings": null,
+    "settings_note": "User-declared, not embedded or verified by the TYCHOS export"
+  }
+}

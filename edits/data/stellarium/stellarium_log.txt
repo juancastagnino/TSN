@@ -1,0 +1,159 @@
+C:\Program Files\Stellarium\stellarium.exe --user-dir C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile --startup-script export.ssc --full-screen no 
+[     0.159][INFO]  -------------------------------------------------------------
+[     0.159][INFO] [ This is Stellarium 26.2 (v26.2.0) - https://stellarium.org/ ]
+[     0.159][INFO] [ Copyright (C) 2000-2026 Stellarium Developers               ]
+[     0.159][INFO]  -------------------------------------------------------------
+[     0.159][INFO] 2026-09-18T16:16:37
+[     0.159][INFO] Operating System: Windows 10 (10.0)
+[     0.159][INFO] Platform: windows
+[     0.159][INFO] Compiled using MSVC 19.16.27035.0
+[     0.159][INFO] Qt runtime version: 5.12.6
+[     0.159][INFO] Qt compilation version: 5.12.6
+[     0.159][INFO] Build ABI: x86_64-little_endian-llp64
+[     0.159][INFO] Addressing mode: 64-bit
+[     0.159][INFO] CPU architecture: x86_64
+[     0.200][INFO] CPU name: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+[     0.201][INFO] CPU maximum speed: 1690 MHz
+[     0.201][INFO] CPU logical cores: 8
+[     0.209][INFO] Total physical memory: 16384 MB
+[     0.245][INFO] GPU name: Intel(R) Iris(R) Xe Graphics
+[     0.245][INFO] GPU RAM: 2047 MB
+[     0.245][INFO] Current resolution: 1920x1080
+[     0.249][INFO] Writing log file to: C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\log.txt
+[     0.249][INFO] File search paths:
+[     0.249][INFO]  [0]: C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile
+[     0.249][INFO]  [1]: C:\Program Files\Stellarium
+[     0.255][INFO] Config file: C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\config.ini
+[     0.255][DBG ] Default surface format:  QSurfaceFormat(version 2.0, options QFlags<QSurfaceFormat::FormatOption>(), depthBufferSize -1, redBufferSize -1, greenBufferSize -1, blueBufferSize -1, alphaBufferSize -1, stencilBufferSize -1, samples -1, swapBehavior QSurfaceFormat::DefaultSwapBehavior, swapInterval 1, colorSpace QSurfaceFormat::DefaultColorSpace, profile  QSurfaceFormat::NoProfile)
+[     0.255][INFO] OpenGL module type: desktop OpenGL
+[     0.255][WARN] Warning: Setting a new default format with a different version or profile after the global shared context is created may cause issues with context sharing.
+[     0.259][INFO] System language (ISO 639 / ISO 3166): en_US
+[     0.341][DBG ] Default surface format:  QSurfaceFormat(version 3.3, options QFlags<QSurfaceFormat::FormatOption>(), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize -1, stencilBufferSize 8, samples -1, swapBehavior QSurfaceFormat::DefaultSwapBehavior, swapInterval 1, colorSpace QSurfaceFormat::DefaultColorSpace, profile  QSurfaceFormat::CoreProfile)
+[     0.341][INFO] OpenGL module type: desktop OpenGL
+[     0.341][DBG ] StelGLWidget constructor
+[     0.341][DBG ] StelGraphicsScene constructor
+[     0.382][DBG ] initializeGL(windowWidth = 1024, windowHeight = 768)
+[     0.382][INFO] OpenGL supported version:  "3.3.0 - Build 32.0.101.7080"
+[     0.382][INFO] Current Format:  QSurfaceFormat(version 3.3, options QFlags<QSurfaceFormat::FormatOption>(), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::DoubleBuffer, swapInterval 1, colorSpace QSurfaceFormat::DefaultColorSpace, profile  QSurfaceFormat::CoreProfile)
+[     0.382][INFO] Initializing StelMainView
+[     0.382][INFO] Luminance textures are not supported
+[     0.382][INFO] Running in High Graphics Mode
+[     0.382][INFO] Maximum texture anisotropy: 16
+[     0.382][INFO] Maximum 2D texture size: 16384
+[     0.382][INFO] Detected: OpenGL 3.3
+[     0.382][INFO] Driver version string: 3.3.0 - Build 32.0.101.7080
+[     0.382][INFO] GL vendor: Intel
+[     0.382][INFO] GL renderer: Intel(R) Iris(R) Xe Graphics
+[     0.383][INFO] GL Shading Language version: 3.30 - Build 32.0.101.7080
+[     0.383][INFO] GLSL Version Number detected: 3.3
+[     0.383][INFO] GLSL version is fine, we should not see a graphics problem.
+[     0.383][INFO] Vertex Array Objects are supported
+[     0.383][INFO] Initial high-DPI scaling factor: 1
+[     1.131][INFO] Application language: en_US
+[     1.133][INFO] Sky language: en_US
+[     1.134][WARN] Empty translation file for language  "en_US" in section "stellarium-planetary-features"
+[     1.134][INFO] Planetary features language: en_US
+[     1.134][INFO] Scripts language: en_US
+[     1.135][INFO] Sky culture description language: en_US
+[     1.169][INFO] Cache directory: C:\Users\admin\AppData\Local\stellarium\stellarium\cache
+[     1.276][INFO] Loaded 252 countries
+[     1.277][INFO] Loaded 193 regions
+[     1.846][INFO] Loading Solar System data (1: planets and moons) ...
+[     1.847][INFO] Loading from: C:\Program Files\Stellarium\data\ssystem_major.ini
+[     1.953][INFO] Loaded 83 Solar System bodies from  C:\Program Files\Stellarium\data\ssystem_major.ini
+[     1.953][INFO] Solar System now has 83 entries.
+[     1.954][INFO] Loading Solar System data (2: minor bodies) ...
+[     1.954][INFO] Loading from: C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\data\ssystem_minor.ini
+[     2.039][WARN] Minor body  (152637) has incomplete data (missing iau_designation or minor_planet_number) in C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\data\ssystem_minor.ini section 152637(152637)
+[     2.041][WARN] Minor body  (66146) has incomplete data (missing iau_designation or minor_planet_number) in C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\data\ssystem_minor.ini section 66146(66146)
+[     2.087][WARN] minor body  "(66146)" has no IAU code in section  "66146(66146)"
+[     2.103][WARN] libpng warning: iCCP: profile 'icc': 'GRAY': Gray color space not permitted on RGB PNG
+[     2.185][WARN] minor body  "(152637)" has no IAU code in section  "152637(152637)"
+[     2.216][INFO] Loaded 477 Solar System bodies from  C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\data\ssystem_minor.ini
+[     2.216][INFO] Solar System now has 560 entries.
+[     2.219][INFO] File ssystem_minor.ini is loaded successfully...
+[     2.230][INFO] ExtendedElements: loaded epoch tables for 4 asteroids from "C:\\Program Files\\Stellarium\\data\\asteroid_elements.json" ( 0 not matched in ssystem_minor.ini)
+[     2.231][INFO] SolarSystem: We have configured 0 threads (plus main thread) for computePositions().
+[     2.243][WARN] libpng warning: iCCP: profile 'ICC profile': 'RGB ': RGB color space not permitted on grayscale PNG
+[     2.268][INFO] Loading nomenclature for Solar system bodies ...
+[     2.540][INFO] Loaded 16058 / 16094 items of planetary surface nomenclature
+[     2.540][INFO] Cannot find these planetary objects to assign nomenclature items: Arrokoth, Dactyl, Didymos, Dimorphos, Dinkinesh, Donaldjohanson
+[     2.545][INFO] Loading star data ...
+[     2.546][INFO] Loading star catalog: C:\Program Files\Stellarium\stars\hip_gaia3\stars_0_0v0_21.cat - 0_0v0_21; 5046 entries
+[     2.546][INFO] Loading star catalog: C:\Program Files\Stellarium\stars\hip_gaia3\stars_1_0v0_16.cat - 1_0v0_16; 21612 entries
+[     2.546][INFO] Loading star catalog: C:\Program Files\Stellarium\stars\hip_gaia3\stars_2_0v0_17.cat - 2_0v0_17; 141738 entries
+[     2.547][INFO] Loading star catalog: C:\Program Files\Stellarium\stars\hip_gaia3\stars_3_0v0_10.cat - 3_0v0_10; 418129 entries
+[     2.566][INFO] Finished loading star catalogue data, max_geodesic_level: 3
+[     2.566][INFO] Loading scientific star designations from C:\Program Files\Stellarium\stars\hip_gaia3\name.fab
+[     2.572][INFO] Loaded 5060 / 5060 scientific designations
+[     2.573][INFO] Loading scientific star designations from C:\Program Files\Stellarium\stars\hip_gaia3\extra_name.fab
+[     2.606][INFO] Loaded 26200 / 26200 scientific designations
+[     2.607][INFO] Loading variable stars data from C:\Program Files\Stellarium\stars\hip_gaia3\gcvs.cat
+[     2.622][INFO] [...] GCVS 5.1-20250615
+[     2.915][INFO] Loaded 47323 / 47323 variable stars
+[     2.915][INFO] Loading double stars from C:\Program Files\Stellarium\stars\hip_gaia3\wds_hip_part.dat
+[     3.006][INFO] Loaded 22992 / 22992 double stars
+[     3.007][INFO] Loading cross-identification data from C:\Program Files\Stellarium\stars\hip_gaia3\cross-id.cat
+[     3.782][INFO] Loaded 327097 / 327097 cross-identification data records for stars
+[     3.782][INFO] Loading orbital parameters data for binary system from C:\Program Files\Stellarium\stars\hip_gaia3\binary_orbitparam.dat
+[     3.782][INFO] Loaded 15 / 15 orbital parameters data for binary system
+[     3.930][INFO] Lists of stars: 118205 HIP stars, 22992 are binaries, 6572 variable (600 Algol-type, 209 Cepheids), 316 Carbon stars, 159 Barium stars, and 220 have PM>1000mas/yr.
+[     4.007][WARN] StelCore: Invalid timezone name: ""  -- not setting timezone.
+[     4.007][INFO] navigation/preset_sky_time is a double - treating as jday: 2451514.25001
+[     4.169][INFO] Loading DSO data ...
+[     4.285][INFO] [...] Stellarium DSO Catalog, version 3.23 (standard edition)
+[     4.708][INFO] Loaded 94899 DSO records
+[     4.709][INFO] Loading DSO name data ...
+[     5.080][INFO] Loaded 1362 / 1389 DSO name records successfully
+[     5.080][WARN] No position data for 27 objects: PGC 2798, PGC 2907, PGC 23521, PGC 28759, PGC 29167, PGC 34658, PGC 42102, PGC 44750, PGC 54559, PGC 59117, PGC 59858, PGC 59953, PGC 69018, PGC 69877, PGC 73957, PGC 95597, PGC 100170, PGC 100170, PGC 119230, PGC 1000714, PGC 1436754, PGC 1694462, PGC 2822840, PGC 2826829, PGC 3098124, SNRG 194.7+00.4, SNRG 201.1+08.3
+[     5.080][INFO] Loading DSO outline data ...
+[     5.090][INFO] Loaded 100 DSO outline records successfully
+[     5.090][INFO] Loading DSO discovery data ...
+[     5.091][INFO] Loaded 183 / 183 DSO discovery records successfully
+[     5.238][INFO] Text to Speech requires Qt6.4 or higher
+[     5.256][INFO] LandscapeMgr: initialized Cache for 100 MB.
+[     5.684][INFO] Loading star names from C:\Program Files\Stellarium\skycultures\common_star_names.fab
+[     5.685][INFO] Loaded 411 / 411 common star names
+[     5.770][INFO] Loaded 88 / 88 constellation records successfully for culture modern
+[     5.770][DBG ] Cultural Sky Partition: Loaded partitions: (12, 3, 2, 5) 12 names,  12 symbols. 0 link stars.  ""
+[     5.771][INFO] Loading constellation boundary data ... 
+[     5.774][INFO] Loaded 781 constellation boundary segments
+[     5.787][WARN] Possible error in asterism "TA4": can't find star Gaia DR3 1233876351043694464... skipping asterism, please install more star catalogs
+[     5.787][WARN] Possible error in asterism "TA6": can't find star Gaia DR3 2569872520258433152... skipping asterism, please install more star catalogs
+[     5.787][WARN] Possible error in asterism "TA9": can't find star Gaia DR3 3530241707454156544... skipping asterism, please install more star catalogs
+[     5.787][WARN] Possible error in asterism "TA12": can't find star Gaia DR3 4472807013960674944... skipping asterism, please install more star catalogs
+[     5.787][INFO] Loaded 88 / 92 asterism records successfully for culture modern
+[     6.063][INFO] Initializing basic GL shaders... 
+[     6.073][INFO] Creating GUI ...
+[     6.680][INFO] Loading style file: :/graphicGui/normalStyle.css
+[     6.726][INFO] Loaded plugin "Oculars"
+[     6.726][INFO] Oculars::validateAndLoadIniFile() ocular.ini exists at: C:\Users\admin\OneDrive\Documentos\00-juan\tychos\TSN\edits\stellarium\profile\modules\Oculars\ocular.ini . Checking version...
+[     6.727][INFO] Oculars::validateAndLoadIniFile() found existing ini file version 3.1
+[     7.552][INFO] Loaded plugin "SolarSystemEditor"
+[     7.582][INFO] Using the ssystem_minor.ini file that already exists in the user directory...
+[    11.255][INFO] Loaded 895910 discovery circumstances records for minor planets...
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "453P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "467P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "465P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "466P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "468P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "470P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "472P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "475P"
+[    11.265][WARN] SSE: Comet cross-index data: Overwriting entry for "477P"
+[    11.266][WARN] SSE: Comet cross-index data: Overwriting entry for "473P"
+[    11.266][WARN] SSE: Comet cross-index data: Overwriting entry for "476P"
+[    11.266][WARN] SSE: Comet cross-index data: Overwriting entry for "479P"
+[    11.266][WARN] SSE: Comet cross-index data: Overwriting entry for "480P"
+[    11.266][WARN] SSE: Comet cross-index data: Overwriting entry for "481P"
+[    11.266][INFO] Loaded 2576 discovery circumstances records for comets...
+[    11.271][DBG ] Position received from OS query: QGeoPositionInfo(QDateTime(2026-09-18 19:16:46.038 UTC Qt::UTC), QGeoCoordinate(-34.758552611, -58.415680987), GroundSpeed=nan, HorizontalAccuracy=206)
+[    11.326][INFO] OpenGL viewport size: 1024 x 768
+[    11.326][INFO] Creating scene FBO with size 1024x768
+[    11.684][WARN] Dubious result: Landscape  "Guereins"  not calibrated. Opacity test represents mathematical horizon only.
+[    48.566][WARN] getPauseScript() is deprecated and will no longer be available in future versions of Stellarium.
+[    48.578][DBG ] Max thread count (Global Pool):  8
+[    48.728][INFO] Unloaded plugin "SolarSystemEditor"
+[    48.763][INFO] Unloaded plugin "Oculars"
+[    48.777][INFO] Downloaded 0 files (0 kbytes) in a session of 48.516 sec (average of 0 kB/s + 0 files from cache (0 kB)).
+[    48.897][INFO] LandscapeMgr: Clearing cache of 0 landscapes totalling about  0 MB.

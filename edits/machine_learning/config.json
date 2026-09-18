@@ -1,0 +1,56 @@
+{
+  "tychos": "edits/data/raw/tychos_ephemerides.txt",
+  "jpl": "edits/data/raw/jpl_ephemerides.txt",
+  "start": "2000-06-21",
+  "validation_start": "2014-01-01",
+  "test_start": "2020-01-01",
+  "stop_exclusive": "2026-01-01",
+  "cadence_hours": 6,
+  "bodies": [
+    "moon",
+    "sun",
+    "mercury",
+    "venus",
+    "mars",
+    "jupiter",
+    "saturn",
+    "uranus",
+    "neptune",
+    "pluto"
+  ],
+  "periods_by_body": {
+    "moon": [
+      14.765294,
+      27.554551,
+      31.811938,
+      365.256363
+    ],
+    "sun": [
+      365.256363
+    ],
+    "mercury": [
+      365.256363
+    ],
+    "venus": [
+      365.256363
+    ],
+    "mars": [
+      365.256363
+    ],
+    "jupiter": [
+      365.256363
+    ],
+    "saturn": [
+      365.256363
+    ],
+    "uranus": [
+      365.256363
+    ],
+    "neptune": [
+      365.256363
+    ],
+    "pluto": [
+      365.256363
+    ]
+  }
+}

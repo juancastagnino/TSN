@@ -1,6 +1,7 @@
 # Dependencies and Python environment
 node_modules/
 /.venv/
+00-backup/
 
 # Python bytecode and caches
 __pycache__/
