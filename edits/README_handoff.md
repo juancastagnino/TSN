@@ -23,6 +23,10 @@ The paired rotations let the plane precess without directly adding node rotation
 to lunar longitude. Existing lunar deferents and orbital speeds are preserved.
 [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) places the lunar
 deferents and Moon inside this orbital-plane component.
+[SolarSystem.jsx](../src/components/SolarSystem.jsx) applies the same plane to
+the displayed Moon and the hidden physical Moon used by the coordinate pin.
+Its `live` mode follows simulation time without registering in the export/trace
+model, so generating ephemerides cannot advance the graphical lunar node.
 
 ## Research approach
 
