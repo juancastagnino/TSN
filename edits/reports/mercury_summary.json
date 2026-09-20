@@ -49,18 +49,18 @@
     "max_abs_deg": 3.149193887927681
   },
   "provenance": {
-    "analyzed_at_utc": "2026-09-18T04:02:48.578382+00:00",
+    "analyzed_at_utc": "2026-09-20T14:56:56.340837+00:00",
     "inputs": {
       "tychos": {
         "path": "edits/data/raw/tychos_ephemerides.txt",
-        "sha256": "4c11a0d557accb27f953fe171c41843c5e1071057e38164fea058537e967d16f"
+        "sha256": "ef643998f81889d0370f0b787e9f42ac6ce8cc94f8f464d879be9a888d7f8674"
       },
       "jpl": {
         "path": "edits/data/raw/jpl_ephemerides.txt",
         "sha256": "26415f8702c808d2a45790611e2e79eadd0ad40c117e49b2bef06a83fccb75df"
       }
     },
-    "export_label": "baseline analysis all planets 6hr 26 years",
+    "export_label": "new analysis with all planets but tweaks to the moon were done only",
     "declared_export_settings": null,
     "settings_note": "User-declared, not embedded or verified by the TYCHOS export"
   }

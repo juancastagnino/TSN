@@ -9,8 +9,8 @@
 - Median cadence: **6.000 h**
 - Reference: **JPL ICRF astrometric RA/Dec**
 - Ecliptic residual analysis: fixed J2000 obliquity 23.439291111 deg
-- Analysis generated (UTC): 2026-09-18T04:02:45.062892+00:00
-- Export configuration: baseline analysis all planets 6hr 26 years
+- Analysis generated (UTC): 2026-09-20T14:56:52.769749+00:00
+- Export configuration: new analysis with all planets but tweaks to the moon were done only
 - Input hashes and any explicitly supplied export settings are recorded in the summary JSON.
 
 ## Current residuals

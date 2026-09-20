@@ -8,14 +8,14 @@ Read the [developer handoff](../README_handoff.md) for the retained baseline and
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
-- Longitude: mean -0.279782 deg; RMS 1.796099 deg.
-- Latitude: mean -0.395967 deg; RMS 0.465754 deg.
-- Longitude trend conditional on the four-period fit: 49.585 arcsec/year (365.25 days/year).
-- In-sample fitted longitude residual RMS: 0.103364 deg. This is not out-of-sample validation.
+- Longitude: mean -0.479625 deg; RMS 1.748696 deg.
+- Latitude: mean 0.003393 deg; RMS 0.247349 deg.
+- Longitude trend conditional on the four-period fit: 49.643 arcsec/year (365.25 days/year).
+- In-sample fitted longitude residual RMS: 0.192461 deg. This is not out-of-sample validation.
 - Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
-  - 27.525 days, approximately 1.8641 deg.
+  - 27.525 days, approximately 1.6955 deg.
   - 31.760 days, approximately 1.0901 deg.
   - 14.769 days, approximately 0.6492 deg.
   - 365.240 days, approximately 0.1851 deg.
@@ -24,7 +24,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean 0.188137 deg; RMS 0.338777 deg.
 - Latitude: mean -0.001484 deg; RMS 0.042584 deg.
@@ -38,7 +38,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean 0.355890 deg; RMS 0.609664 deg.
 - Latitude: mean -0.278761 deg; RMS 0.408211 deg.
@@ -52,7 +52,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean 0.162521 deg; RMS 2.256042 deg.
 - Latitude: mean 0.330021 deg; RMS 1.306029 deg.
@@ -66,7 +66,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean -0.193049 deg; RMS 0.708552 deg.
 - Latitude: mean 0.030282 deg; RMS 0.250803 deg.
@@ -80,7 +80,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean 0.099151 deg; RMS 0.642103 deg.
 - Latitude: mean -0.110508 deg; RMS 0.118806 deg.
@@ -94,7 +94,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean 0.134235 deg; RMS 0.392676 deg.
 - Latitude: mean -0.241099 deg; RMS 0.271844 deg.
@@ -108,7 +108,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean -0.085423 deg; RMS 0.217696 deg.
 - Latitude: mean 0.155817 deg; RMS 0.156367 deg.
@@ -122,7 +122,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean 0.185998 deg; RMS 0.194926 deg.
 - Latitude: mean -0.081819 deg; RMS 0.091625 deg.
@@ -136,7 +136,7 @@ Export configuration: baseline analysis all planets 6hr 26 years
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 37985 samples.
 
-Export configuration: baseline analysis all planets 6hr 26 years
+Export configuration: new analysis with all planets but tweaks to the moon were done only
 
 - Longitude: mean -3.441028 deg; RMS 4.027512 deg.
 - Latitude: mean 3.140388 deg; RMS 3.203408 deg.

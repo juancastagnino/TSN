@@ -14,39 +14,39 @@
     500.0
   ],
   "ra_residual": {
-    "mean_deg": -0.3320665012635471,
-    "rms_deg": 1.8116489990622533,
-    "median_abs_deg": 1.3312206749999689,
-    "p95_abs_deg": 3.351007406666672,
-    "max_abs_deg": 4.544667233333314
+    "mean_deg": -0.5362995318457945,
+    "rms_deg": 1.7681251514694045,
+    "median_abs_deg": 1.3488919541666746,
+    "p95_abs_deg": 3.2522084583333424,
+    "max_abs_deg": 4.368291991666695
   },
   "declination_residual": {
-    "mean_deg": -0.3875421742436342,
-    "rms_deg": 0.6796029742261731,
-    "median_abs_deg": 0.46781177222222325,
-    "p95_abs_deg": 1.3730112122222227,
-    "max_abs_deg": 2.186650713888889
+    "mean_deg": -0.050833736702499535,
+    "rms_deg": 0.5266361138963517,
+    "median_abs_deg": 0.2801162888888893,
+    "p95_abs_deg": 1.1276201022222219,
+    "max_abs_deg": 1.8918379166666668
   },
   "angular_separation": {
-    "mean_deg": 1.5957401978137138,
-    "rms_deg": 1.8520060665706375,
-    "median_abs_deg": 1.3986373668129566,
-    "p95_abs_deg": 3.3263882209200273,
-    "max_abs_deg": 4.098429336661182
+    "mean_deg": 1.4861672384281566,
+    "rms_deg": 1.762641316905759,
+    "median_abs_deg": 1.3525538487266933,
+    "p95_abs_deg": 3.201880937898938,
+    "max_abs_deg": 4.004376721325623
   },
   "ecliptic_longitude_residual": {
-    "mean_deg": -0.27978228871449246,
-    "rms_deg": 1.7960992013855852,
-    "median_abs_deg": 1.3267882084098233,
-    "p95_abs_deg": 3.2912958908885437,
-    "max_abs_deg": 4.100816809713251
+    "mean_deg": -0.4796252822109112,
+    "rms_deg": 1.7486963461046385,
+    "median_abs_deg": 1.333564925277841,
+    "p95_abs_deg": 3.191513048638216,
+    "max_abs_deg": 4.007833825982914
   },
   "ecliptic_latitude_residual": {
-    "mean_deg": -0.39596695357764417,
-    "rms_deg": 0.4657540082894569,
-    "median_abs_deg": 0.3965575397650203,
-    "p95_abs_deg": 0.8082638920939007,
-    "max_abs_deg": 1.1413693926258386
+    "mean_deg": 0.0033932515857758054,
+    "rms_deg": 0.2473491130605099,
+    "median_abs_deg": 0.1788513658969304,
+    "p95_abs_deg": 0.46749329545611734,
+    "max_abs_deg": 0.7291688738978968
   },
   "primary_period_fit": {
     "periods": [
@@ -55,30 +55,30 @@
       "evection",
       "annual"
     ],
-    "rms_before_deg": 1.7960992013855852,
-    "rms_after_deg": 0.10336383620809346,
-    "variance_explained_percent": 99.66057431517812,
-    "offset_deg": -0.2813422975569576,
-    "linear_trend_deg_per_day": 3.771037766231444e-05
+    "rms_before_deg": 1.7486963461046385,
+    "rms_after_deg": 0.19246105556218893,
+    "variance_explained_percent": 98.69014895994013,
+    "offset_deg": -0.48138849492487623,
+    "linear_trend_deg_per_day": 3.7754009102553e-05
   },
   "full_period_fit": {
-    "rms_after_deg": 0.10012383245963516,
-    "offset_deg": -0.28287165574307943,
-    "linear_trend_deg_per_day": 3.78502614543641e-05
+    "rms_after_deg": 0.10049777557264705,
+    "offset_deg": -0.48285050429599324,
+    "linear_trend_deg_per_day": 3.7865527006542346e-05
   },
   "provenance": {
-    "analyzed_at_utc": "2026-09-18T04:02:38.042076+00:00",
+    "analyzed_at_utc": "2026-09-20T14:56:45.520661+00:00",
     "inputs": {
       "tychos": {
         "path": "edits/data/raw/tychos_ephemerides.txt",
-        "sha256": "4c11a0d557accb27f953fe171c41843c5e1071057e38164fea058537e967d16f"
+        "sha256": "ef643998f81889d0370f0b787e9f42ac6ce8cc94f8f464d879be9a888d7f8674"
       },
       "jpl": {
         "path": "edits/data/raw/jpl_ephemerides.txt",
         "sha256": "26415f8702c808d2a45790611e2e79eadd0ad40c117e49b2bef06a83fccb75df"
       }
     },
-    "export_label": "baseline analysis all planets 6hr 26 years",
+    "export_label": "new analysis with all planets but tweaks to the moon were done only",
     "declared_export_settings": null,
     "settings_note": "User-declared, not embedded or verified by the TYCHOS export"
   }

@@ -5,28 +5,99 @@ context and priorities, not the output of every trial. Update it when the accept
 baseline, a supported conclusion or the next priorities change; review it before
 pushing changes to the branch. Generated reports are the evidence for individual runs.
 
-## Retained baseline
+## Current lunar geometry and settings (2026-09-20)
 
 The model adds an independent lunar node and orbital plane. The `Moon Node`
 and `Moon Plane` entries in
 [celestial-settings.json](../src/settings/celestial-settings.json) define their
 parameters, and [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx)
-implements the transformation:
+implements the following transformation at the current zero node/plane offsets,
+zero node/plane radii and zero plane starting angle/speed:
 
 ```text
 Ry(Omega) Rx(i) Ry(-Omega)
 i = 5.151 degrees
-Moon Node startPos = -26.5 degrees; speed = -0.3378 (simulator units)
+Moon Node startPos = -25 degrees; speed = -0.33780566 (simulator units)
 ```
 
 The paired rotations let the plane precess without directly adding node rotation
-to lunar longitude. Existing lunar deferents and orbital speeds are preserved.
+to lunar longitude. The node speed is approximately `-2*pi/18.6`: a clockwise
+18.6-model-year cycle. Do not also put this speed on `Moon deferent B`; that would
+add another rotation rather than configure the existing node.
+
+The author's latest settings replace the earlier deferent geometry:
+
+| Entry | Current orbital settings |
+|---|---|
+| Moon Node | `startPos = -25`, `speed = -0.33780566`; centres, radius and orbital tilts zero |
+| Moon Plane | `orbitTilta = 5.151`; centres, radius, `orbitTiltb`, `startPos` and `speed` zero |
+| Moon deferent A | `startPos = 141`, `speed = 0.71015440177343`, `orbitRadius = 0.00469117647`, `orbitCentera = -0.001`; other centres and orbital tilts zero |
+| Moon deferent B | Identity transformation: centres, radius, starting angle, speed and orbital tilts zero; `size = 0` |
+| Moon | `startPos = 345`, `orbitCentera = 0.012`, `orbitCenterb = 0.012`, `orbitCenterc = 0`; unchanged `speed = 83.28521`, `orbitRadius = 0.25505129081458283` |
+
+This is a geometric revision, not just an algebraic merger of the former deferents.
+The saved JSON contains numeric strings, sometimes with trailing whitespace;
+normalize numerically when comparing settings. It also omits `rotationStart`:
+the Moon's former `3.14159` now defaults to zero, affecting its surface orientation
+separately from its orbital coordinates.
+
 [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) places the lunar
 deferents and Moon inside this orbital-plane component.
 [SolarSystem.jsx](../src/components/SolarSystem.jsx) applies the same plane to
 the displayed Moon and the hidden physical Moon used by the coordinate pin.
 Its `live` mode follows simulation time without registering in the export/trace
 model, so generating ephemerides cannot advance the graphical lunar node.
+
+### Node/plane controls and implementation
+
+`MoonOrbitalPlane.jsx` now applies both entries' centre offsets, radius, orbital
+tilts, starting angle and speed. Each stage follows the existing `Cobj` convention:
+**centre translation -> orbital tilt -> orbital rotation -> radius translation**;
+the inner node counter-rotation remains after the plane stage.
+
+- Node centre offsets are before the node rotation; plane centre offsets inherit
+  that rotation. To explore an offset pivoting with the node, use the plane's
+  centres with plane speed zero. This experiment has not been applied to the settings.
+- `orbitCentera/b/c` map to scene axes `x/z/y`. Yellow guides show centre offsets,
+  and white guides show orbital radius/circle while editing. They do not encode
+  Earth's diameter automatically. `size` and `tilt` affect an editor axis marker;
+  use `orbitTilta/b` for orbital geometry.
+- Live display offsets use the same `39.2078` enlargement as the visible Moon;
+  the hidden Actual Moon retains physical distances. Plot offsets follow `Pobj`'s
+  size mode. Export stepping controls its own outer, plane and inner rotations.
+- Edit Settings skips visibility controls for geometry entries without `visible`,
+  preventing the former Leva `undefined.path` crash while retaining their controls.
+
+Numerical component checks passed for zero-offset equivalence, all orbital controls,
+the 18.6-year cycle, both size modes and live/export isolation. The production build
+passed with existing MediaPipe source-map warnings. Interactive browser verification
+of the new controls remains pending; no new ephemerides were generated for nonzero
+node/plane offsets.
+
+### Latest report findings
+
+The 2026-09-20 run uses the same 37,985 timestamps and JPL input as the previous
+Moon run in local `00-backup/`. Declination RMS improved `0.6796 -> 0.5266` degrees,
+latitude RMS `0.4658 -> 0.2473`, longitude RMS `1.7961 -> 1.7487`, and angular
+separation RMS `1.8520 -> 1.7626`. Other bodies' numerical summaries were unchanged
+from the preceding committed run. See [moon_summary.json](reports/moon_summary.json).
+
+Most latitude improvement is removal of its mean bias (`-0.3960 -> +0.0034` degrees);
+the scatter about the mean is nearly unchanged. The anomalistic-month longitude
+amplitude fell `2.0356 -> 1.8545` degrees, but the sidereal-month amplitude rose
+`0.0036 -> 0.2293`. Consequently, the four-period fit remainder increased
+`0.1034 -> 0.1925` degrees, while the eight-period remainder stayed near `0.1005`.
+The four-period fitted drift remains approximately `49.64` arcseconds/year.
+These are in-sample diagnostics, not corrections or out-of-sample validation.
+
+An in-memory reconstruction matching current exports within their rounding precision
+tested only `Moon deferent A.orbitCentera = 0` instead of `-0.001`. It reduced the
+sidereal-month amplitude to about `0.0046` degrees and predicted separation RMS
+`1.7530` degrees, with latitude RMS still near `0.247`. **This is a candidate for a
+controlled simulator export, not an applied or accepted setting change.** Existing
+reports describe the author's configuration before the controls extension; numerical
+checks establish equivalence at its zero node/plane offsets, not validation of new
+offset geometries.
 
 ## Research approach
 
@@ -91,9 +162,9 @@ The numerical proximity makes a connection worth investigating, but does not
 establish one. Compare the angular quantity, reference frame and sign before
 assigning a cause. Do not tune `Moon.speed` merely to cancel this fitted slope.
 
-## Multi-body baseline review
+## Historical multi-body review (before the latest lunar revision)
 
-The combined Moon/Sun/Mars run reproduces the historical lunar metrics above.
+The earlier combined Moon/Sun/Mars run reproduced the historical lunar metrics above.
 All three bodies have 37,985 matching six-hour samples over 2000-2026; input hashes
 and coordinates were checked against the raw exports. Angular separation RMS is
 1.8520 degrees for the Moon, 0.3414 for the Sun and 0.7334 for Mars.
@@ -174,9 +245,12 @@ to force agreement. Establish the coordinate contract before changing the model.
 3. **Amplitude/phase stability.** Compare shorter windows, particularly the
    31.8-day component, for stable behavior or longer-period modulation. Consult
    the book before assigning a TYCHOS interpretation.
-4. **Latitude bias and remaining longitude structure.** Examine translations and
-   orbital geometry one at a time. `Moon.orbitCenterc` is a candidate to revisit,
-   not a settled correction. Leave the plane and rates fixed during that test.
+4. **Lunar centre geometry.** Confirm the isolated deferent-A offset test described
+   above with a fresh simulator export. Separately investigate the author's proposed
+   node-driven pivot using the now-active node/plane controls. Change one element
+   at a time; preserve the latitude improvement and check raw angular separation,
+   annual statistics and periodic structure. Do not combine these trials or infer
+   that a lower fitted remainder alone improves the model.
 5. **Drift and coordinate conventions.** Check whether similar trends appear in
    other bodies and whether frame conventions or longer-period structure can
    explain the fitted slope before changing the mean orbital rate.
