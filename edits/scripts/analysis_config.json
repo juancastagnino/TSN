@@ -1,6 +1,6 @@
 {
-  "bodies": ["moon", "sun", "mars", "mercury", "venus", "saturn", "jupiter", "uranus", "neptune", "pluto"],
-  "start": "2000-06-21 00:00",
+  "bodies": ["moon"],
+  "start": "1966-06-21 00:00",
   "stop": "2026-06-21 00:00",
   "step": "6 h",
   "tychos": "edits/data/raw/tychos_ephemerides.txt",

@@ -21,6 +21,8 @@ jest.mock("leva", () => {
 const initialSettings = JSON.parse(
   JSON.stringify(useSettingsStore.getState().settings)
 );
+const initialMoonNode = initialSettings.find((s) => s.name === "Moon Node");
+const initialMoonPlane = initialSettings.find((s) => s.name === "Moon Plane");
 let root;
 let container;
 
@@ -54,6 +56,9 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   expect(data["Show / Hide settings.Moonvisible"].value).toBe(true);
   expect(data["Show / Hide settings.Moon Nodevisible"]).toBeUndefined();
   expect(data["Show / Hide settings.Moon Planevisible"]).toBeUndefined();
+  expect(
+    Object.keys(data).some((path) => path.includes("Moon deferent B"))
+  ).toBe(false);
 });
 
 test("edits, resets and reopens lunar controls without losing synchronization", () => {
@@ -79,15 +84,15 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
 
   act(() => useSettingsStore.getState().resetSettings());
   expect(Number(mockLevaStore.get(nodePath).replace(/\u200B/g, ""))).toBe(
-    -0.3378
+    Number(initialMoonNode.speed)
   );
   expect(Number(mockLevaStore.get(planePath).replace(/\u200B/g, ""))).toBe(
-    5.151
+    Number(initialMoonPlane.orbitTilta)
   );
 
   act(() => useStore.setState({ editSettings: false }));
   act(() => useStore.setState({ editSettings: true }));
   expect(Number(mockLevaStore.get(planePath).replace(/\u200B/g, ""))).toBe(
-    5.151
+    Number(initialMoonPlane.orbitTilta)
   );
 });

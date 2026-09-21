@@ -7,46 +7,48 @@ pushing changes to the branch. Generated reports are the evidence for individual
 
 ## Current lunar geometry and settings (2026-09-20)
 
-The model adds an independent lunar node and orbital plane. The `Moon Node`
-and `Moon Plane` entries in
-[celestial-settings.json](../src/settings/celestial-settings.json) define their
-parameters, and [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx)
-implements the following transformation at the current zero node/plane offsets,
-zero node/plane radii and zero plane starting angle/speed:
+The accepted working model has one lunar deferent inside an independently
+precessing node/plane transform:
 
 ```text
-Ry(Omega) Rx(i) Ry(-Omega)
-i = 5.151 degrees
-Moon Node startPos = -25 degrees; speed = -0.33780566 (simulator units)
+Earth
+└─ MoonOrbitalPlane: node outer -> plane -> node counter-rotation
+   └─ Moon deferent A
+      └─ Moon
 ```
 
-The paired rotations let the plane precess without directly adding node rotation
-to lunar longitude. The node speed is approximately `-2*pi/18.6`: a clockwise
-18.6-model-year cycle. Do not also put this speed on `Moon deferent B`; that would
-add another rotation rather than configure the existing node.
+`Moon deferent B` was an all-zero identity layer. It has been removed from
+[celestial-settings.json](../src/settings/celestial-settings.json),
+[misc-settings.json](../src/settings/misc-settings.json), the visible hierarchy and
+the export/trace hierarchy. This is a structural cleanup and must not change lunar
+coordinates. Do not restore it merely to hold the node rate; node precession is
+already implemented by [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx).
 
-The author's latest settings replace the earlier deferent geometry:
+The author's retained settings are:
 
 | Entry | Current orbital settings |
 |---|---|
-| Moon Node | `startPos = -25`, `speed = -0.33780566`; centres, radius and orbital tilts zero |
-| Moon Plane | `orbitTilta = 5.151`; centres, radius, `orbitTiltb`, `startPos` and `speed` zero |
-| Moon deferent A | `startPos = 141`, `speed = 0.71015440177343`, `orbitRadius = 0.00469117647`, `orbitCentera = -0.001`; other centres and orbital tilts zero |
-| Moon deferent B | Identity transformation: centres, radius, starting angle, speed and orbital tilts zero; `size = 0` |
-| Moon | `startPos = 345`, `orbitCentera = 0.012`, `orbitCenterb = 0.012`, `orbitCenterc = 0`; unchanged `speed = 83.28521`, `orbitRadius = 0.25505129081458283` |
+| Moon Node | `startPos = -296`, `speed = -0.33780566`; centres, radius and orbital tilts zero |
+| Moon Plane | `orbitCentera = 0.001`, `orbitCenterb = 0.002`, `orbitCenterc = 0`, `orbitTilta = 0`, `orbitTiltb = -5.15`; radius, `startPos` and `speed` zero |
+| Moon deferent A | `startPos = 177`, `speed = 0.71015440177343`, `orbitRadius = 0.0266`; centres and orbital tilts zero |
+| Moon | `startPos = 309`, `speed = 83.2851946`, `orbitRadius = 0.25505129081458283`; centres and orbital tilts zero |
 
-This is a geometric revision, not just an algebraic merger of the former deferents.
-The saved JSON contains numeric strings, sometimes with trailing whitespace;
-normalize numerically when comparing settings. It also omits `rotationStart`:
-the Moon's former `3.14159` now defaults to zero, affecting its surface orientation
-separately from its orbital coordinates.
+The author independently converged on a deferent-A radius near `0.027`; the retained
+value is `0.0266`. Numerical screening had separately identified approximately
+`0.0270` as the strongest single-parameter candidate, but the current export also
+changes plane offsets/orientation and lunar phases. Reported improvement therefore
+belongs to the complete retained configuration, not to the radius alone.
 
-[PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) places the lunar
-deferents and Moon inside this orbital-plane component.
-[SolarSystem.jsx](../src/components/SolarSystem.jsx) applies the same plane to
-the displayed Moon and the hidden physical Moon used by the coordinate pin.
-Its `live` mode follows simulation time without registering in the export/trace
-model, so generating ephemerides cannot advance the graphical lunar node.
+The node speed is approximately `-2*pi/18.6`, a clockwise 18.6-model-year cycle.
+The outer node rotation and matching counter-rotation precess the plane without
+directly adding the node angle to lunar longitude. Numeric settings are stored as
+strings and can contain whitespace; compare them numerically.
+
+[PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) implements the
+export/trace hierarchy. [SolarSystem.jsx](../src/components/SolarSystem.jsx) applies
+the same hierarchy to both the enlarged displayed Moon and the hidden physical
+`Actual Moon` used for coordinates. `MoonOrbitalPlane` live mode follows displayed
+simulation time without registering duplicate export objects.
 
 ### Node/plane controls and implementation
 
@@ -56,8 +58,7 @@ tilts, starting angle and speed. Each stage follows the existing `Cobj` conventi
 the inner node counter-rotation remains after the plane stage.
 
 - Node centre offsets are before the node rotation; plane centre offsets inherit
-  that rotation. To explore an offset pivoting with the node, use the plane's
-  centres with plane speed zero. This experiment has not been applied to the settings.
+  that rotation. The retained nonzero plane centres therefore pivot with the node.
 - `orbitCentera/b/c` map to scene axes `x/z/y`. Yellow guides show centre offsets,
   and white guides show orbital radius/circle while editing. They do not encode
   Earth's diameter automatically. `size` and `tilt` affect an editor axis marker;
@@ -69,35 +70,65 @@ the inner node counter-rotation remains after the plane stage.
   preventing the former Leva `undefined.path` crash while retaining their controls.
 
 Numerical component checks passed for zero-offset equivalence, all orbital controls,
-the 18.6-year cycle, both size modes and live/export isolation. The production build
-passed with existing MediaPipe source-map warnings. Interactive browser verification
-of the new controls remains pending; no new ephemerides were generated for nonzero
-node/plane offsets.
+the 18.6-year cycle, both size modes and live/export isolation. After deferent B was
+removed, the Edit Settings tests passed and the production build passed with only
+the pre-existing MediaPipe source-map warnings. The test now asserts that deferent B
+does not reappear in the Edit Settings schema and derives reset expectations from
+the loaded settings rather than obsolete hard-coded lunar values.
 
-### Latest report findings
+### Current Moon dataset and report
 
-The 2026-09-20 run uses the same 37,985 timestamps and JPL input as the previous
-Moon run in local `00-backup/`. Declination RMS improved `0.6796 -> 0.5266` degrees,
-latitude RMS `0.4658 -> 0.2473`, longitude RMS `1.7961 -> 1.7487`, and angular
-separation RMS `1.8520 -> 1.7626`. Other bodies' numerical summaries were unchanged
-from the preceding committed run. See [moon_summary.json](reports/moon_summary.json).
+The maintained run is Moon-only: 87,661 samples at six-hour cadence from
+1966-06-21 through 2026-06-21 against geocentric JPL DE441 ICRF astrometric RA/Dec.
+The current configuration is declared and embedded in
+[moon_summary.json](reports/moon_summary.json); the TYCHOS text export itself does
+not encode settings, so this provenance still depends on the user's declaration.
+The current full-interval results are:
 
-Most latitude improvement is removal of its mean bias (`-0.3960 -> +0.0034` degrees);
-the scatter about the mean is nearly unchanged. The anomalistic-month longitude
-amplitude fell `2.0356 -> 1.8545` degrees, but the sidereal-month amplitude rose
-`0.0036 -> 0.2293`. Consequently, the four-period fit remainder increased
-`0.1034 -> 0.1925` degrees, while the eight-period remainder stayed near `0.1005`.
-The four-period fitted drift remains approximately `49.64` arcseconds/year.
-These are in-sample diagnostics, not corrections or out-of-sample validation.
+| Metric | 1966-2026 result |
+|---|---:|
+| RA coordinate RMS | 1.5248 degrees |
+| Declination RMS | 0.4151 degrees |
+| Angular separation RMS | 1.5126 degrees |
+| Ecliptic longitude RMS | 1.4971 degrees |
+| Ecliptic latitude RMS | 0.2359 degrees |
 
-An in-memory reconstruction matching current exports within their rounding precision
-tested only `Moon deferent A.orbitCentera = 0` instead of `-0.001`. It reduced the
-sidereal-month amplitude to about `0.0046` degrees and predicted separation RMS
-`1.7530` degrees, with latitude RMS still near `0.247`. **This is a candidate for a
-controlled simulator export, not an applied or accepted setting change.** Existing
-reports describe the author's configuration before the controls extension; numerical
-checks establish equivalence at its zero node/plane offsets, not validation of new
-offset geometries.
+Only current Moon reports are retained. Deleted reports for other bodies were from a
+different input bundle and must not be presented as current. Regenerate them with
+matching TYCHOS and JPL inputs if a multi-body comparison is needed.
+
+### Controlled improvement over the preceding lunar configuration
+
+The local backup run covers only 2000-06-21 through 2026-06-21, so its headline
+metrics must not be compared directly with the new 60-year headline metrics. A
+controlled calculation over the 37,985 overlapping timestamps gives:
+
+| Metric | Previous | Current | Relative change |
+|---|---:|---:|---:|
+| RA coordinate RMS | 1.4765 | 1.4109 | -4.4% |
+| Declination RMS | 0.5425 | 0.4172 | -23.1% |
+| Angular separation RMS | 1.5076 | 1.4072 | -6.7% |
+| Ecliptic longitude RMS | 1.4801 | 1.3908 | -6.0% |
+| Ecliptic latitude RMS | 0.3012 | 0.2314 | -23.2% |
+
+Maximum separation also fell from `4.1366` to `3.3408` degrees. Across the 26
+complete calendar years 2001-2026, declination improved in 24, latitude in 18,
+separation in 17 and longitude in 16. This supports a real geometric improvement,
+especially in lunar-plane accuracy, rather than a benefit confined to a few dates.
+
+The anomalistic-month diagnostic amplitude fell from `1.3654` to `0.9947` degrees;
+the sidereal-month amplitude fell from `0.1333` to `0.1142`. The four-period
+remainder improved from `0.4332` to `0.3819` degrees and the full eight-period
+remainder from `0.4218` to `0.3721`. Variation, evection and annual amplitudes are
+nearly unchanged. These are in-sample residual fingerprints, not correction terms
+or proof of a physical cause.
+
+The main tradeoff is longitude zero-point alignment. Over the common interval the
+mean longitude residual changed from `+0.1153` to `-0.4914` degrees and mean RA from
+`+0.0520` to `-0.5452`. A future controlled phase test may recover part of that bias,
+but it must preserve the latitude/declination gains. The current 60-year fit also
+retains a longitude trend near 46-47 arcseconds/year; do not tune `Moon.speed` to
+cancel it before the coordinate-frame question is resolved.
 
 ## Research approach
 
@@ -230,38 +261,49 @@ to force agreement. Establish the coordinate contract before changing the model.
 
 ## Next investigations
 
-1. **Improve spectral diagnostics.** Group neighboring FFT bins representing one
-   broad peak: the Sun's reported 351.7, 365.2 and 379.9-day values occupy adjacent
-   frequency bins and should not be treated as three independent periods. Extend
-   the current 500-day search limit when studying longer-period structure in Mars.
-   These are analysis improvements, not model changes.
-2. **Out-of-sample validation - to do.** Fit the four fixed periods, amplitudes,
-   phases, offset and optionally trend on 2000-06-21 through 2013-06-21. Apply the
-   coefficients unchanged to later samples through 2026-06-21; exclude the shared
-   boundary timestamp and preserve the training time origin and trend center.
-   Compare versions with/without trend, and annual validation errors. Since periods
-   were examined on the full historical dataset, this tests coefficient transfer,
-   not a completely independent discovery of frequencies.
-3. **Amplitude/phase stability.** Compare shorter windows, particularly the
-   31.8-day component, for stable behavior or longer-period modulation. Consult
-   the book before assigning a TYCHOS interpretation.
-4. **Lunar centre geometry.** Confirm the isolated deferent-A offset test described
-   above with a fresh simulator export. Separately investigate the author's proposed
-   node-driven pivot using the now-active node/plane controls. Change one element
-   at a time; preserve the latitude improvement and check raw angular separation,
-   annual statistics and periodic structure. Do not combine these trials or infer
-   that a lower fitted remainder alone improves the model.
-5. **Drift and coordinate conventions.** Check whether similar trends appear in
-   other bodies and whether frame conventions or longer-period structure can
-   explain the fitted slope before changing the mean orbital rate.
+1. **Phase/zero-point trial.** The retained geometry has better scatter but a mean
+   2000-2026 longitude residual of `-0.4914` degrees. Change only one phase at a
+   time, beginning with small `Moon.startPos` trials around `309.3-309.5` while
+   holding radius, plane and speeds fixed. Then test deferent-A `startPos` only if
+   needed. Judge raw separation, longitude bias, latitude/declination and annual
+   stability together; do not accept a phase merely because it centres longitude.
+2. **Out-of-sample validation.** The 1966-2026 export permits genuinely separated
+   windows. Choose and record a training cutoff before fitting amplitudes, phases,
+   offset or trend, then apply coefficients unchanged after the cutoff. Preserve the
+   training time origin and trend centre, exclude a duplicated boundary timestamp,
+   and compare variants with and without trend. Fixed periods were historically
+   selected using other full-range data, so coefficient transfer is the claim being
+   tested, not independent frequency discovery.
+3. **Long-term drift and coordinate conventions.** The current lunar longitude fit
+   still yields about 46-47 arcseconds/year and the early decades raise longitude
+   RMS while latitude/declination remain comparatively stable. Establish the export
+   axes and compare equivalent geometric observables before altering `Moon.speed`.
+   Restore a matched multi-body export if testing whether the same drift remains in
+   the Sun and other bodies.
+4. **Plane/centre robustness.** Around the retained values, vary one of
+   `Moon Plane.orbitCentera`, `orbitCenterb`, `orbitTiltb` or node `startPos` at a
+   time. Confirm that the large latitude/declination gain transfers to withheld
+   years. Do not reintroduce deferent B; it contributes no independent geometry.
+5. **Amplitude/phase stability.** Compare shorter windows, particularly the
+   anomalistic and 31.8-day components, for stable amplitude and phase or slow
+   modulation. Consult the book before assigning a TYCHOS interpretation.
+6. **Improve spectral diagnostics.** Group neighboring FFT bins representing one
+   broad peak rather than treating adjacent bins as independent periods. Extend the
+   500-day FFT search only when a longer-period question requires it. These are
+   analysis improvements, not model changes.
 
 ## Where to inspect the implementation
 
 - [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx): node / counter-rotation.
-- [celestial-settings.json](../src/settings/celestial-settings.json): `Moon Node` and `Moon Plane` definitions and model parameters.
+- [celestial-settings.json](../src/settings/celestial-settings.json): retained node,
+  plane, deferent-A and Moon parameters; deferent B is intentionally absent.
 - [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) and [Pobj.jsx](../src/components/Pobj.jsx): hierarchy, local axes, offsets and inherited transformations.
 - [plotModelFunctions.js](../src/utils/plotModelFunctions.js): motion and conversion to exported coordinates.
 - [analyze_ephemerides.py](scripts/analyze_ephemerides.py): reference rotation, fixed periods and diagnostic fits.
+- [investigate_moon_tuning.py](scripts/investigate_moon_tuning.py): exploratory
+  in-memory geometry screening. It reproduces saved exports to about `0.001` degree,
+  but its fitted candidates are not accepted settings without simulator export and
+  held-out validation.
 
 ## Working and handoff discipline
 

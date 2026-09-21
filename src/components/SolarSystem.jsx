@@ -8,14 +8,10 @@ const SolarSystem = () => {
         <Cobj name="Earth">
           <MoonOrbitalPlane live>
             <Cobj name="Moon deferent A">
-              <Cobj name="Moon deferent B">
-                <Cobj name="Moon" />
-              </Cobj>
+              <Cobj name="Moon" />
             </Cobj>
             <Cobj name="Actual Moon deferent A">
-              <Cobj name="Actual Moon deferent B">
-                <Cobj name="Actual Moon" />
-              </Cobj>
+              <Cobj name="Actual Moon" />
             </Cobj>
           </MoonOrbitalPlane>
           <Cobj name="Sun deferent">

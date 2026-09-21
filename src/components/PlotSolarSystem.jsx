@@ -8,9 +8,7 @@ const PlotSolarSystem = () => {
       <Pobj name="Earth">
         <MoonOrbitalPlane>
           <Pobj name="Moon deferent A">
-            <Pobj name="Moon deferent B">
-              <Pobj name="Moon" />
-            </Pobj>
+            <Pobj name="Moon" />
           </Pobj>
         </MoonOrbitalPlane>
 
