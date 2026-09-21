@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / 'edits/scripts'))
 from compare_ephemerides import read_tychos, read_jpl
 from analyze_ephemerides import equatorial_to_ecliptic, wrap_deg
 from ephemeris_io import tychos_blocks, jpl_blocks, validate_jpl_header
+from cross_body import run_cross_body
 
 
 def split_dates(dates, config):
@@ -174,11 +175,15 @@ def run_all(config, output, allow_missing=False):
         local['periods_days'] = config.get('periods_by_body', {}).get(
             body, config.get('periods_days', []) if body == 'moon' else [365.256363])
         reports[body] = run(local, output/body)
+    advanced_config = dict(config, bodies=selected)
+    advanced = run_cross_body(advanced_config, registry, output)
     summary = {'requested': bodies, 'completed': selected, 'missing': missing,
                'complete': not missing,
-               'scope': 'Independent residual diagnostics, not global geometric calibration',
+               'scope': 'Residual diagnostics plus cross-body common-mode and pairwise analysis; not geometric calibration',
                'results': {b: {'selected': r['selected'], 'test': r['test'], 'splits': r['splits']}
-                           for b, r in reports.items()}}
+                           for b, r in reports.items()},
+               'advanced_report': 'cross_body.json',
+               'common_modes': advanced['common_modes']['modes']}
     output.mkdir(parents=True, exist_ok=True)
     (output/'overview.json').write_text(json.dumps(summary, indent=2, allow_nan=False)+'\n', encoding='utf-8')
     lines = ['# Diagnostico por cuerpo', '', 'Estado: '+('PARCIAL' if missing else 'completo'), '',
@@ -189,6 +194,7 @@ def run_all(config, output, allow_missing=False):
     for b, sources in missing.items():
         lines.append(f"| {b} | faltan {' y '.join(sources)} | - | - |")
     lines += ['', 'Cada cuerpo tiene su dataset y reporte en su subcarpeta.',
+              'El análisis conjunto de coordenadas, modos comunes y separaciones está en cross_body.md/json.',
               'No es una optimizacion global ni una mejora aplicada al simulador.',
               'Las subcarpetas de ejecuciones anteriores no incluidas aqui no pertenecen a esta ejecucion.']
     (output/'overview.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')

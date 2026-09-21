@@ -259,6 +259,32 @@ the reporting workflow; retain these figures only as exploratory context.
 Do not tune planetary speeds, remove PVP motion or apply a fitted drift correction
 to force agreement. Establish the coordinate contract before changing the model.
 
+## Multi-body machine-learning diagnostics (2026-09-21)
+
+The laboratory under [machine_learning/](machine_learning/) now matches the current
+three-hour, 2000-2026 ten-body export. The original held-out longitude regression is
+retained, and [cross_body.py](machine_learning/cross_body.py) adds:
+
+- body-specific predeclared physical periods;
+- longitude, latitude and local east/north residuals;
+- ordinary and ridge-regularized harmonic models, selected only on validation
+  tangent-plane RMS;
+- train-standardized SVD/PCA modes shared across bodies; and
+- errors in angular separation for every body pair.
+
+Generated `machine_learning/outputs/` remains ignored by Git. The current complete
+run passed nine tests. Its advanced test results show good transfer for the Sun,
+Venus, Uranus and Neptune, partial transfer for Mercury, Mars and Jupiter, and no
+validated periodic benefit for Saturn (`zero` was selected). Annual eastward phases
+vary substantially by body, so the present evidence does not support one universal
+Earth correction. Common modes and pairwise errors are diagnostic evidence only;
+they do not identify a physical cause or authorize applying fitted residuals.
+
+The laboratory still cannot infer simulator parameter changes from a single export.
+That requires a general geometric evaluator and controlled finite differences or a
+Jacobian across settings, extending the lunar screening approach. Keep that separate
+from residual prediction and validate any proposed geometry on withheld years.
+
 ## Next investigations
 
 1. **Phase/zero-point trial.** The retained geometry has better scatter but a mean

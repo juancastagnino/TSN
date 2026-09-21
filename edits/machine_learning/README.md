@@ -1,7 +1,8 @@
 # Machine learning para investigar TYCHOS
 
-Experimento inicial, ahora disponible por cuerpo: **¿los patrones del residuo lunar aprendidos en años anteriores
-permiten anticipar las diferencias TYCHOS–JPL en años posteriores?**
+Laboratorio temporal y multi-cuerpo: **¿qué parte de las diferencias TYCHOS–JPL
+es estable por planeta y qué parte aparece como un modo común compatible con una
+geometría Tierra–Sol, una traslación del observador o un problema de ejes?**
 Es regresión supervisada interpretable por mínimos cuadrados, implementada con
 NumPy. No requiere GPU, redes neuronales ni un dataset nuevo. El modelo aprende
 coeficientes de funciones periódicas y, opcionalmente, una tendencia.
@@ -34,16 +35,16 @@ El overview indica exactamente qu? cuerpos pertenecen a esta ejecuci?n.
 ### Completar los datos
 
 En TYCHOS exportar los diez cuerpos marcados, desde **2000-06-21 00:00 UTC**
-hasta **2026-01-01 00:00 UTC**, cada **6 horas**, y guardar el TXT combinado en
+hasta **2026-06-21 00:00 UTC**, cada **3 horas**, y guardar el TXT combinado en
 `edits/data/raw/tychos_ephemerides.txt`. Preservar primero el export anterior si se
 quiere conservar la comparaci?n. Mantener la misma configuraci?n geom?trica en
 el export completo y registrar los ajustes usados. No concatenar versiones distintas.
-El ML descarta el timestamp final del 1 de enero de 2026, por su l?mite exclusivo.
+El ML descarta el timestamp final del 21 de junio de 2026, por su límite exclusivo.
 
 Para obtener la referencia correspondiente, el comando existente es:
 
 ```powershell
-.venv/Scripts/python.exe -B edits/scripts/download_jpl.py moon sun mercury venus mars jupiter saturn uranus neptune pluto --start "2000-06-21 00:00" --stop "2026-01-01 00:00" --step "6 h"
+.venv/Scripts/python.exe -B edits/scripts/download_jpl.py moon sun mercury venus mars jupiter saturn uranus neptune pluto --start "2000-06-21 00:00" --stop "2026-06-21 00:00" --step "3 h"
 .venv/Scripts/python.exe -B edits/machine_learning/run.py
 ```
 
@@ -53,17 +54,17 @@ cuerpos. No se ejecuta autom?ticamente al entrenar. No hace falta modificar
 
 ### Qu? aprende para cada planeta
 
-Se entrena y selecciona un modelo separado por cuerpo, con el mismo protocolo
-train/validaci?n/test. `periods_by_body` fija las caracter?sticas antes del ajuste:
+Se conservan diagnósticos separados por cuerpo y se añade un segundo nivel conjunto
+con el mismo protocolo train/validación/test. `periods_by_body` fija las
+características antes del ajuste:
 
 - Luna: las cuatro componentes hist?ricas del experimento inicial.
-- Sol y dem?s planetas: una componente de 365.256363 d?as, con/sin tendencia,
-  adem?s de controles cero y media. Es un baseline anual deliberadamente limitado,
-  no una estimaci?n del periodo orbital del planeta ni un modelo completo de su error.
+- Sol y planetas: hipótesis físicas predeclaradas anuales, semianuales, orbitales
+  y/o sinódicas según el cuerpo, con controles cero/media, tendencia y ridge.
 
-No se buscan periodos en test. Las ocho caracter?sticas peri?dicas descritas abajo
-son espec?ficas de la Luna; el baseline anual tiene dos. Los planetas exteriores
-necesitar?n una ventana m?s larga para estudiar su comportamiento orbital lento.
+No se buscan períodos en test. Los planetas exteriores necesitan una ventana más
+larga para identificar su movimiento orbital lento; sus períodos orbitales completos
+no se estiman con esta ventana de 26 años.
 La selecci?n por validaci?n puede empeorar en test; el reporte lo conserva.
 No se promedian estos resultados como si fueran una calibraci?n geom?trica global.
 
@@ -101,10 +102,10 @@ exports disponibles; no se inventan los meses anteriores.
 |---|---|---|---|
 | Train | 2000-06-21 | 2014-01-01 | Ajustar coeficientes |
 | Validación | 2014-01-01 | 2020-01-01 | Elegir una de cuatro alternativas |
-| Test | 2020-01-01 | 2026-01-01 | Evaluar la alternativa congelada |
+| Test | 2020-01-01 | 2026-06-21 | Evaluar la alternativa congelada |
 
-La cadencia es de seis horas. Los registros posteriores a 2025 se excluyen
-deliberadamente. No hay mezcla aleatoria ni timestamps compartidos entre particiones.
+La cadencia configurada es de tres horas. No hay mezcla aleatoria ni timestamps
+compartidos entre particiones.
 No se usan ventanas móviles ni etiquetas retrasadas, por lo que no hay ventanas
 que crucen los cortes. Los registros cercanos están correlacionados: el número de
 filas no equivale al número de observaciones independientes.
@@ -124,11 +125,14 @@ filas no equivale al número de observaciones independientes.
 Las columnas de etiqueta, predicción y evaluación no son entradas. El dataset
 incluye todas las características para inspección; cada candidato selecciona las suyas.
 
-El objetivo es `wrap(longitud_TYCHOS - longitud_JPL)` en [-180°, 180°).
-Las longitudes se calculan rotando ambos conjuntos de RA/Dec con la misma
-oblicuidad J2000, reutilizando el análisis existente. Esta rotación común **no
-resuelve** una incompatibilidad entre marcos de origen. Se rechazan residuos
-de magnitud >=90°: este experimento lineal no está diseñado para saltos de envoltura.
+El experimento histórico conserva como objetivo
+`wrap(longitud_TYCHOS - longitud_JPL)` en [-180°, 180°). El diagnóstico avanzado
+añade latitud eclíptica y componentes locales este-oeste/norte-sur. La selección
+avanzada minimiza el RMS combinado del plano tangente en validación; así no puede
+declarar una mejora solamente por reducir longitud mientras empeora latitud.
+
+Las coordenadas eclípticas aplican la misma oblicuidad J2000 a TYCHOS y JPL. Esta
+rotación común **no resuelve** una incompatibilidad entre marcos de origen.
 
 Periodos fijados antes de esta ejecución: 14.765294, 27.554551, 31.811938 y
 365.256363 días. Provienen de los diagnósticos históricos del repositorio, no de
@@ -160,6 +164,23 @@ Archivos generados:
   características, coeficientes, centro temporal, métricas y limitaciones.
 - `dataset.csv`: entradas, etiquetas, particiones y predicción diagnóstica.
 - `annual_metrics.csv`: RMSE original y no explicado por año y partición.
+- `cross_body.md/json`: modelos multi-coordenada, modos comunes y separaciones
+  angulares entre todos los pares de cuerpos.
+
+### Diagnóstico avanzado
+
+`cross_body.py` ajusta por cuerpo controles cero/media y regresiones armónicas
+con/sin tendencia para varios valores de regularización ridge. El valor de ridge y
+el modelo se eligen exclusivamente por RMS este-oeste/norte-sur de validación. Se
+publican métricas separadas de longitud, latitud, este y norte para train,
+validación y test.
+
+El mismo módulo estandariza usando solo train los residuos este/norte de todos los
+cuerpos y calcula hasta tres modos comunes mediante SVD/PCA. Esto detecta estructura
+temporal compartida, pero no demuestra que su causa sea la Tierra. También calcula
+el error de separación angular de cada par de cuerpos. Una rotación global pura
+preserva esas separaciones; una traslación incorrecta del observador no tiene por
+qué hacerlo.
 
 Los ajustes utilizados para producir los TXT se registran como desconocidos.
 El JSON actual de parámetros no acredita cómo se generó un export anterior.
@@ -204,11 +225,10 @@ Esta primera fase aborda una pregunta más pequeña y comprobable.
    satélites y el marco local terrestre; no basta con igualar posiciones.
 3. Establecer origen, ejes, época, escala temporal y tratamiento de tiempo de luz
    para comparar observables equivalentes antes de optimizar geometría.
-4. Exportar primero un mes de Luna, Sol, Mercurio, Venus, Marte, Júpiter y Saturno.
-   Verificar identidades, precisión y fechas; luego ampliar al intervalo común.
-   Para 2000-01-01–2026-01-01 cada seis horas serían unas 266.000 filas en total.
-   Aplicar los mismos cortes temporales a todos los cuerpos. No usar periodos
-   lunares automáticamente para otros planetas.
+4. Antes de cada nueva geometría, exportar primero un intervalo corto de los cuerpos
+   afectados para verificar identidades, precisión y fechas; luego ampliar al
+   intervalo común de tres horas. Aplicar los mismos cortes temporales a todos los
+   cuerpos. No usar períodos lunares automáticamente para otros planetas.
 5. Medir sensibilidad de parámetros existentes con pequeñas variaciones,
    evaluando todos los cuerpos. Mantener congelados los parámetros de referencia
    y velocidades hasta resolver el contrato de coordenadas. Examinar degeneraciones
