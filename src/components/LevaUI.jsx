@@ -2,6 +2,9 @@ import { useRef, useEffect } from "react";
 import { useControls, useCreateStore, Leva, folder } from "leva";
 import { useStore } from "../store";
 import { speedFactOpts } from "../utils/time-date-functions";
+import { posToDate, posToTime } from "../utils/time-date-functions";
+import { useObserverStore } from "./Observer/observerStore";
+import { formatGlobalPosition } from "./Observer/observerPosition";
 import {
   useMainControlsConfig,
   useTraceConfig,
@@ -33,6 +36,14 @@ const LevaUI = () => {
   const traceControls = useTraceConfig();
   const planetOrbitsControls = usePlanetOrbitsConfig();
   const starsHelpersControls = useStarsHelpersConfig();
+  const currentGlobalPosition = useObserverStore(
+    (s) => s.currentGlobalPosition
+  );
+  const referenceGlobalPosition = useObserverStore(
+    (s) => s.referenceGlobalPosition
+  );
+  const referenceTime = useObserverStore((s) => s.referenceTime);
+  const displacementKm = useObserverStore((s) => s.displacementKm);
 
   const [, set1] = useControls(
     () => ({
@@ -73,6 +84,25 @@ const LevaUI = () => {
     ephimerides,
     showPositions,
     searchStars,
+    set2,
+  ]);
+
+  // Leva initializes nested configuration values only once. Keep the
+  // observer's live/read-only measurements synchronized explicitly.
+  useEffect(() => {
+    set2({
+      "Global XYZ": formatGlobalPosition(currentGlobalPosition),
+      "Reference date":
+        referenceGlobalPosition && referenceTime !== null
+          ? `${posToDate(referenceTime)} ${posToTime(referenceTime)}`
+          : "not set",
+      "Displacement (km)": Math.round(displacementKm).toLocaleString(),
+    });
+  }, [
+    currentGlobalPosition,
+    referenceGlobalPosition,
+    referenceTime,
+    displacementKm,
     set2,
   ]);
 

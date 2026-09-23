@@ -16,7 +16,7 @@ python.exe -B edits/scripts/download_jpl.py
 # edits/data/raw/tychos_ephemerides.txt
 
 # Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "baseline analysis including sun, moon, mercury and mars."
+python.exe -B edits/scripts/run_analysis.py --label "Simon sept 21 moon update. Only moon analyzed"
 ```
 
 Open `edits/reports/ephemeris_overview.md` for results and
