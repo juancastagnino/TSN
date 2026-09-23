@@ -141,7 +141,7 @@ export const useTraceConfig = () => {
               editable: false,
             },
             "Displacement (km)": {
-              value: Math.round(displacementKm).toLocaleString(),
+              value: Number(displacementKm.toFixed(2)),
               editable: false,
             },
           },

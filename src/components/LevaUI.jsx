@@ -96,7 +96,7 @@ const LevaUI = () => {
         referenceGlobalPosition && referenceTime !== null
           ? `${posToDate(referenceTime)} ${posToTime(referenceTime)}`
           : "not set",
-      "Displacement (km)": Math.round(displacementKm).toLocaleString(),
+      "Displacement (km)": Number(displacementKm.toFixed(2)),
     });
   }, [
     currentGlobalPosition,

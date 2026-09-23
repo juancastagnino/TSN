@@ -120,7 +120,7 @@ export default function ObserverMarker() {
           <sprite
             ref={markerRef}
             material={material}
-            scale={[0.005, 0.005, 0.005]}
+            scale={[0.0025, 0.0025, 0.0025]}
             renderOrder={1000}
             raycast={() => null}
           />
