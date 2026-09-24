@@ -8,6 +8,7 @@ const REFERENCE_COLOR = "#ff2020";
 
 export default function ObserverReferenceMarker() {
   const reference = useObserverStore((s) => s.referenceGlobalPosition);
+  const seeds = useObserverStore((s) => s.seeds);
   const texture = useMemo(() => createCircleTexture(REFERENCE_COLOR), []);
   const material = useMemo(
     () =>
@@ -29,19 +30,32 @@ export default function ObserverReferenceMarker() {
     [material, texture]
   );
 
-  if (!reference) return null;
+  const markers = [
+    ...(reference ? [{ id: "reference", position: reference }] : []),
+    ...seeds,
+  ];
+
+  if (markers.length === 0) return null;
 
   return (
-    <sprite
-      position={[
-        kmToUnits(reference.x),
-        kmToUnits(reference.y),
-        kmToUnits(reference.z),
-      ]}
-      material={material}
-      scale={[0.0025, 0.0025, 0.0025]}
-      renderOrder={1001}
-      raycast={() => null}
-    />
+    <group>
+      {markers.map((marker) => {
+        const position = marker.position;
+        return (
+          <sprite
+            key={marker.id}
+            position={[
+              kmToUnits(position.x),
+              kmToUnits(position.y),
+              kmToUnits(position.z),
+            ]}
+            material={material}
+            scale={[0.0015, 0.0015, 0.0015]}
+            renderOrder={1001}
+            raycast={() => null}
+          />
+        );
+      })}
+    </group>
   );
 }

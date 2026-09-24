@@ -33,6 +33,7 @@ export default function ObserverMarker() {
   const longitude = useObserverStore((s) => s.longitude);
   const getSetting = useSettingsStore((s) => s.getSetting);
   const actualPlanetSizes = useStore((s) => s.actualPlanetSizes);
+  const posRef = useStore((s) => s.posRef);
 
   const targetSettings = getSetting("Earth");
   const physicalRadius = Number(targetSettings?.actualSize || 0.00426);
@@ -87,7 +88,8 @@ export default function ObserverMarker() {
 
   useFrame(({ clock }) => {
     const target = targetRef.current;
-    if (!target || clock.elapsedTime - lastPositionUpdate.current < 0.2) return;
+    if (!target || clock.elapsedTime - lastPositionUpdate.current < 0.05)
+      return;
     lastPositionUpdate.current = clock.elapsedTime;
 
     target.updateWorldMatrix(true, false);
@@ -106,11 +108,14 @@ export default function ObserverMarker() {
       .copy(surfaceOffset)
       .applyQuaternion(worldQuaternion)
       .add(center);
-    setCurrentGlobalPosition({
-      x: unitsToKm(worldOffset.x),
-      y: unitsToKm(worldOffset.y),
-      z: unitsToKm(worldOffset.z),
-    });
+    setCurrentGlobalPosition(
+      {
+        x: unitsToKm(worldOffset.x),
+        y: unitsToKm(worldOffset.y),
+        z: unitsToKm(worldOffset.z),
+      },
+      posRef.current
+    );
   });
 
   return (

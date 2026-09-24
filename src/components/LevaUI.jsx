@@ -91,7 +91,7 @@ const LevaUI = () => {
   // observer's live/read-only measurements synchronized explicitly.
   useEffect(() => {
     set2({
-      "Global XYZ": formatGlobalPosition(currentGlobalPosition),
+      "PVP XYZ (km)": formatGlobalPosition(currentGlobalPosition),
       "Reference date":
         referenceGlobalPosition && referenceTime !== null
           ? `${posToDate(referenceTime)} ${posToTime(referenceTime)}`

@@ -82,6 +82,8 @@ export const useTraceConfig = () => {
     displacementKm,
     captureReference,
     clearReference,
+    addSeed,
+    clearSeeds,
   } = useObserverStore();
 
   const tracedPlanetsCheckboxes = {};
@@ -123,9 +125,11 @@ export const useTraceConfig = () => {
           step: 0.01,
           onChange: setLongitude,
         },
+        "Add seed": button(() => addSeed(posRef.current)),
+        "Clear seeds": button(clearSeeds),
         "Position measurement": folder(
           {
-            "Global XYZ": {
+            "PVP XYZ (km)": {
               value: formatGlobalPosition(currentGlobalPosition),
               editable: false,
             },

@@ -20,10 +20,13 @@ export const useObserverStore = create((set, get) => ({
   traceColor: "#00ffff",
   setTraceColor: (value) => set({ traceColor: value }),
   currentGlobalPosition: emptyPosition,
+  currentPositionTime: null,
   referenceGlobalPosition: null,
   referenceTime: null,
+  seeds: [],
+  nextSeedId: 1,
   displacementKm: 0,
-  setCurrentGlobalPosition: (position) => {
+  setCurrentGlobalPosition: (position, time = null) => {
     const reference = get().referenceGlobalPosition;
     const displacementKm = reference
       ? Math.hypot(
@@ -32,7 +35,11 @@ export const useObserverStore = create((set, get) => ({
           position.z - reference.z
         )
       : 0;
-    set({ currentGlobalPosition: position, displacementKm });
+    set({
+      currentGlobalPosition: position,
+      currentPositionTime: time,
+      displacementKm,
+    });
   },
   captureReference: (time = null) => {
     const current = get().currentGlobalPosition;
@@ -48,4 +55,17 @@ export const useObserverStore = create((set, get) => ({
       referenceTime: null,
       displacementKm: 0,
     }),
+  addSeed: (time = null) => {
+    const { currentGlobalPosition, seeds, nextSeedId } = get();
+    const seed = {
+      id: nextSeedId,
+      time,
+      position: { ...currentGlobalPosition },
+    };
+    set({
+      seeds: [...seeds, seed],
+      nextSeedId: nextSeedId + 1,
+    });
+  },
+  clearSeeds: () => set({ seeds: [] }),
 }));
