@@ -1,0 +1,85 @@
+{
+  "body": "moon",
+  "profile": "lunar",
+  "input_file": "edits/data/derived/moon_comparison.csv",
+  "reference": "JPL ICRF astrometric RA/Dec",
+  "ecliptic_rotation": "fixed J2000 obliquity 23.439291111 deg",
+  "n_samples": 75969,
+  "start": "2000-06-21 00:00:00",
+  "stop": "2026-06-21 00:00:00",
+  "cadence_hours_median": 3.0,
+  "cadence_regular": true,
+  "fft_period_range_days": [
+    1.0,
+    500.0
+  ],
+  "ra_residual": {
+    "mean_deg": -0.054099958282435384,
+    "rms_deg": 1.136883078420421,
+    "median_abs_deg": 0.8287595583332745,
+    "p95_abs_deg": 2.181169135000004,
+    "max_abs_deg": 3.5233252166667057
+  },
+  "declination_residual": {
+    "mean_deg": -0.02162137747878886,
+    "rms_deg": 0.42160410234607104,
+    "median_abs_deg": 0.26554020277777823,
+    "p95_abs_deg": 0.8604884444444448,
+    "max_abs_deg": 1.4570819805555564
+  },
+  "angular_separation": {
+    "mean_deg": 0.9789747550732961,
+    "rms_deg": 1.1596951258534882,
+    "median_abs_deg": 0.8705772694091465,
+    "p95_abs_deg": 2.1895479059238143,
+    "max_abs_deg": 3.119381648061749
+  },
+  "ecliptic_longitude_residual": {
+    "mean_deg": -0.011461015672092735,
+    "rms_deg": 1.1305351835390736,
+    "median_abs_deg": 0.8275983100022017,
+    "p95_abs_deg": 2.1680726596540234,
+    "max_abs_deg": 3.1266097693756194
+  },
+  "ecliptic_latitude_residual": {
+    "mean_deg": -0.021697653349010165,
+    "rms_deg": 0.2683529369211674,
+    "median_abs_deg": 0.18057178389543505,
+    "p95_abs_deg": 0.5315035290960376,
+    "max_abs_deg": 0.83494920827198
+  },
+  "primary_period_fit": {
+    "periods": [
+      "variation",
+      "anomalistic_month",
+      "evection",
+      "annual"
+    ],
+    "rms_before_deg": 1.1305351835390736,
+    "rms_after_deg": 0.47119570684823947,
+    "variance_explained_percent": 82.62682795721959,
+    "offset_deg": -0.012005562373965394,
+    "linear_trend_deg_per_day": 3.5478489219253895e-05
+  },
+  "full_period_fit": {
+    "rms_after_deg": 0.4602237084319792,
+    "offset_deg": -0.013638019481995264,
+    "linear_trend_deg_per_day": 3.564723518595207e-05
+  },
+  "provenance": {
+    "analyzed_at_utc": "2026-09-25T14:22:16.239737+00:00",
+    "inputs": {
+      "tychos": {
+        "path": "edits/data/raw/tychos_ephemerides.txt",
+        "sha256": "26a06d8bb9ad84412fef8f2bf5b466a8bc99efa808232fe543ad0f6e467878f0"
+      },
+      "jpl": {
+        "path": "edits/data/raw/jpl_ephemerides.txt",
+        "sha256": "ee4ef47b172ac5b356fbb2d3769c0685a90bdb847762efd69c83f380da92fd7f"
+      }
+    },
+    "export_label": "ia agents tests. Only moon analyzed",
+    "declared_export_settings": null,
+    "settings_note": "User-declared, not embedded or verified by the TYCHOS export"
+  }
+}
