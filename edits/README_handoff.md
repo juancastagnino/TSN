@@ -5,7 +5,7 @@ context and priorities, not the output of every trial. Update it when the accept
 baseline, a supported conclusion or the next priorities change; review it before
 pushing changes to the branch. Generated reports are the evidence for individual runs.
 
-## Current lunar geometry and settings (2026-09-20)
+## Current lunar geometry and settings (2026-09-25)
 
 The accepted working model has one lunar deferent inside an independently
 precessing node/plane transform:
@@ -24,20 +24,23 @@ the export/trace hierarchy. This is a structural cleanup and must not change lun
 coordinates. Do not restore it merely to hold the node rate; node precession is
 already implemented by [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx).
 
-The author's retained settings are:
+The accepted working settings are:
 
 | Entry | Current orbital settings |
 |---|---|
 | Moon Node | `startPos = -296`, `speed = -0.33780566`; centres, radius and orbital tilts zero |
 | Moon Plane | `orbitCentera = 0.001`, `orbitCenterb = 0.002`, `orbitCenterc = 0`, `orbitTilta = 0`, `orbitTiltb = -5.15`; radius, `startPos` and `speed` zero |
-| Moon deferent A | `startPos = 177`, `speed = 0.71015440177343`, `orbitRadius = 0.0266`; centres and orbital tilts zero |
-| Moon | `startPos = 309`, `speed = 83.2851946`, `orbitRadius = 0.25505129081458283`; centres and orbital tilts zero |
+| Moon deferent A | `startPos = 167.51`, `speed = 0.71015440177343`, `orbitRadius = 0.02786`; centres and orbital tilts zero |
+| Moon | `startPos = 318.0`, `speed = 83.2851946`, `orbitRadius = 0.25505129081458283`; centres and orbital tilts zero |
 
-The author independently converged on a deferent-A radius near `0.027`; the retained
-value is `0.0266`. Numerical screening had separately identified approximately
-`0.0270` as the strongest single-parameter candidate, but the current export also
-changes plane offsets/orientation and lunar phases. Reported improvement therefore
-belongs to the complete retained configuration, not to the radius alone.
+The final values came from controlled simulator exports. Deferent-A radius was
+screened first, then `Moon deferent A.startPos` and `Moon.startPos` were moved in
+opposite directions while keeping their sum near `485.51` degrees. This preserved
+the longitude zero point while changing their relative phase. A final complex-vector
+interpolation refined the radius to `0.02786`. The resulting 27.554551-day fitted
+residual is about `0.0059` degrees; do not resume blind deferent tuning unless a new
+dataset or geometric hypothesis justifies it. See
+[moon_adjustment_report.md](reports/moon_adjustment_report.md).
 
 The node speed is approximately `-2*pi/18.6`, a clockwise 18.6-model-year cycle.
 The outer node rotation and matching counter-rotation precess the plane without
@@ -78,57 +81,57 @@ the loaded settings rather than obsolete hard-coded lunar values.
 
 ### Current Moon dataset and report
 
-The maintained run is Moon-only: 87,661 samples at six-hour cadence from
-1966-06-21 through 2026-06-21 against geocentric JPL DE441 ICRF astrometric RA/Dec.
-The current configuration is declared and embedded in
-[moon_summary.json](reports/moon_summary.json); the TYCHOS text export itself does
-not encode settings, so this provenance still depends on the user's declaration.
-The current full-interval results are:
+The accepted comparison is Moon-only: 75,969 samples at three-hour cadence from
+2000-06-21 through 2026-06-21 against geocentric JPL ICRF astrometric RA/Dec. The
+TYCHOS text export does not encode its settings, so provenance depends on preserving
+the matching JSON and recording the run label. The accepted results are:
 
-| Metric | 1966-2026 result |
+| Metric | Accepted result |
 |---|---:|
-| RA coordinate RMS | 1.5248 degrees |
-| Declination RMS | 0.4151 degrees |
-| Angular separation RMS | 1.5126 degrees |
-| Ecliptic longitude RMS | 1.4971 degrees |
-| Ecliptic latitude RMS | 0.2359 degrees |
+| RA coordinate RMS | 1.098461 degrees |
+| Declination RMS | 0.391893 degrees |
+| Angular separation RMS | 1.115662 degrees |
+| Ecliptic longitude RMS | 1.094302 degrees |
+| Ecliptic latitude RMS | 0.228328 degrees |
 
-Only current Moon reports are retained. Deleted reports for other bodies were from a
-different input bundle and must not be presented as current. Regenerate them with
-matching TYCHOS and JPL inputs if a multi-body comparison is needed.
+The accepted result is summarized in
+[moon_adjustment_report.md](reports/moon_adjustment_report.md). Generated files in
+`reports/` are overwritten by every analysis. If they describe a later rejected
+trial, rerun the accepted settings before treating them as the baseline evidence.
 
 ### Controlled improvement over the preceding lunar configuration
 
-The local backup run covers only 2000-06-21 through 2026-06-21, so its headline
-metrics must not be compared directly with the new 60-year headline metrics. A
-controlled calculation over the 37,985 overlapping timestamps gives:
+The preceding accepted configuration used the same 75,969 timestamps and JPL
+coordinates, with `Moon deferent A.startPos = 177`, `orbitRadius = 0.0266` and
+`Moon.startPos = 309`. The controlled comparison is:
 
 | Metric | Previous | Current | Relative change |
 |---|---:|---:|---:|
-| RA coordinate RMS | 1.4765 | 1.4109 | -4.4% |
-| Declination RMS | 0.5425 | 0.4172 | -23.1% |
-| Angular separation RMS | 1.5076 | 1.4072 | -6.7% |
-| Ecliptic longitude RMS | 1.4801 | 1.3908 | -6.0% |
-| Ecliptic latitude RMS | 0.3012 | 0.2314 | -23.2% |
+| RA coordinate RMS | 1.410884 | 1.098461 | -22.1% |
+| Declination RMS | 0.417194 | 0.391893 | -6.1% |
+| Angular separation RMS | 1.407164 | 1.115662 | -20.7% |
+| Ecliptic longitude RMS | 1.390850 | 1.094302 | -21.3% |
+| Ecliptic latitude RMS | 0.231405 | 0.228328 | -1.3% |
 
-Maximum separation also fell from `4.1366` to `3.3408` degrees. Across the 26
-complete calendar years 2001-2026, declination improved in 24, latitude in 18,
-separation in 17 and longitude in 16. This supports a real geometric improvement,
-especially in lunar-plane accuracy, rather than a benefit confined to a few dates.
+Mean angular error improved by 23.2%, median angular error by 29.3%, angular P95
+by 14.0% and maximum angular error by 10.4%. Mean longitude residual changed from
+`-0.491413` to `-0.002219` degrees, effectively removing the zero-point bias.
 
-The anomalistic-month diagnostic amplitude fell from `1.3654` to `0.9947` degrees;
-the sidereal-month amplitude fell from `0.1333` to `0.1142`. The four-period
-remainder improved from `0.4332` to `0.3819` degrees and the full eight-period
-remainder from `0.4218` to `0.3721`. Variation, evection and annual amplitudes are
-nearly unchanged. These are in-sample residual fingerprints, not correction terms
-or proof of a physical cause.
+The anomalistic-month diagnostic amplitude fell from `0.994726` to `0.005853`
+degrees, a 99.4% reduction. Variation (`~0.6574` degrees), the evection-frequency
+component (`~1.2705` degrees) and the annual component (`~0.1849` degrees) were
+nearly unchanged. The remaining 27.21-day FFT component is about `0.5023` degrees.
+These are residual fingerprints, not correction terms or proof of physical cause.
 
-The main tradeoff is longitude zero-point alignment. Over the common interval the
-mean longitude residual changed from `+0.1153` to `-0.4914` degrees and mean RA from
-`+0.0520` to `-0.5452`. A future controlled phase test may recover part of that bias,
-but it must preserve the latitude/declination gains. The current 60-year fit also
-retains a longitude trend near 46-47 arcseconds/year; do not tune `Moon.speed` to
-cancel it before the coordinate-frame question is resolved.
+A later combined plane trial changed `Moon Plane.orbitCentera` from `0.001` to
+`-0.002`, `orbitTilta` from `0` to `-0.2` and `orbitTiltb` from `-5.15` to `-5.3`.
+It was rejected: longitude RMS worsened 3.3%, angular RMS 3.9%, declination RMS
+7.6%, latitude RMS 17.5% and the post-fit longitude remainder 23.2%. If the author's
+plane hypothesis is revisited, test each parameter independently.
+
+The accepted fit still has a longitude trend near 46-47 arcseconds/year. Do not
+tune `Moon.speed` merely to cancel it before resolving the coordinate-frame and
+observable-definition questions.
 
 ## Research approach
 
@@ -287,32 +290,35 @@ from residual prediction and validate any proposed geometry on withheld years.
 
 ## Next investigations
 
-1. **Phase/zero-point trial.** The retained geometry has better scatter but a mean
-   2000-2026 longitude residual of `-0.4914` degrees. Change only one phase at a
-   time, beginning with small `Moon.startPos` trials around `309.3-309.5` while
-   holding radius, plane and speeds fixed. Then test deferent-A `startPos` only if
-   needed. Judge raw separation, longitude bias, latitude/declination and annual
-   stability together; do not accept a phase merely because it centres longitude.
-2. **Out-of-sample validation.** The 1966-2026 export permits genuinely separated
-   windows. Choose and record a training cutoff before fitting amplitudes, phases,
-   offset or trend, then apply coefficients unchanged after the cutoff. Preserve the
-   training time origin and trend centre, exclude a duplicated boundary timestamp,
-   and compare variants with and without trend. Fixed periods were historically
-   selected using other full-range data, so coefficient transfer is the claim being
-   tested, not independent frequency discovery.
+1. **Resolve the evection/variation interpretation.** The largest residual terms
+   are approximately `1.2705` degrees at 31.811938 days and `0.6574` degrees at
+   14.765294 days. Their similarity to standard evection and variation coefficients
+   is suggestive but not proof that TYCHOS omits them. The current script fits only
+   fixed time periods to `TYCHOS - JPL`; it does not measure the term generated by
+   either system. Export matching Sun data and fit TYCHOS and JPL separately against
+   the physical arguments `2D-M` and `2D`, reporting amplitude and phase. Distinguish
+   the book's geometric explanation, the implemented mechanism and measured output.
+2. **Out-of-sample validation.** The accepted parameters were selected on the full
+   2000-2026 interval. Obtain a separate interval, or predeclare chronological
+   train/validation/test blocks before any more tuning. Preserve the time origin,
+   exclude duplicated boundaries and apply chosen parameters unchanged to the held-
+   out block. The current gains are strong in-sample evidence, not independent
+   confirmation.
 3. **Long-term drift and coordinate conventions.** The current lunar longitude fit
    still yields about 46-47 arcseconds/year and the early decades raise longitude
    RMS while latitude/declination remain comparatively stable. Establish the export
    axes and compare equivalent geometric observables before altering `Moon.speed`.
    Restore a matched multi-body export if testing whether the same drift remains in
    the Sun and other bodies.
-4. **Plane/centre robustness.** Around the retained values, vary one of
-   `Moon Plane.orbitCentera`, `orbitCenterb`, `orbitTiltb` or node `startPos` at a
-   time. Confirm that the large latitude/declination gain transfers to withheld
-   years. Do not reintroduce deferent B; it contributes no independent geometry.
+4. **Plane/centre robustness.** Keep the retained plane values unless a controlled
+   one-parameter test improves latitude and declination without degrading longitude.
+   The rejected three-parameter author trial is not evidence against each value
+   individually. Confirm any candidate on withheld years. Do not reintroduce
+   deferent B; it contributes no independent geometry.
 5. **Amplitude/phase stability.** Compare shorter windows, particularly the
-   anomalistic and 31.8-day components, for stable amplitude and phase or slow
-   modulation. Consult the book before assigning a TYCHOS interpretation.
+   nearly eliminated anomalistic component and the 31.8-day component, for stable
+   amplitude and phase or slow modulation. Consult the book before assigning a
+   TYCHOS interpretation.
 6. **Improve spectral diagnostics.** Group neighboring FFT bins representing one
    broad peak rather than treating adjacent bins as independent periods. Extend the
    500-day FFT search only when a longer-period question requires it. These are
