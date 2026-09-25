@@ -5,22 +5,6 @@
 ![React](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react&logoColor=black)
 ![Three.js](https://img.shields.io/badge/Three.js-r162-black.svg?logo=three.js&logoColor=white)
 
-This repository is a fork of the original [Tychosium simulator by pholmq](https://github.com/pholmq/TSN). It began as an investigation into the Moon's declination errors, introducing an independent lunar node and precessing orbital plane while preserving the existing lunar deferents and orbital speeds.
-
-The work has since grown into a development baseline for investigating other aspects of TYCHOS. The `edits/` folder provides a reproducible workflow for comparing simulator exports with JPL Horizons ephemerides, analyzing residuals across multiple bodies, and generating reports. Moon, Sun and Mars are the initial focus; additional bodies can be included.
-
-**The guiding principle is geometric compactness.** Improvements must emerge from the system's simple geometry and its correct implementation. Perturbation terms and empirical corrections must never be added to the model or its exported ephemerides. Periodic fits are diagnostic tools for understanding residuals and identifying questions to explore within the TYCHOS framework.
-
-For work on this fork, start with:
-
-- **[Analysis quick start](edits/README.md):** Python setup, configuration, ephemeris downloads and report generation.
-- **[Developer / AI handoff](edits/README_handoff.md):** the retained model changes, research approach, findings and pending investigations.
-- **[Reference material](edits/data/docs/):** the TYCHOS book and supporting sources for interpreting the geometry.
-
-The original project overview and usage instructions follow below.
-
----
-
 **The Tychosium** is an interactive 3D astronomical simulation implementing the **TYCHOS model** of our solar system. It offers a unique perspective on celestial mechanics, featuring real-time orbital calculations, a comprehensive star catalog, and immersive visualization.
 
 Built with modern web technologies to ensure performance and accuracy, this project aims to visualize the binary solar system concepts proposed by the Tychos model.
