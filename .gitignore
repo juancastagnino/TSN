@@ -2,6 +2,7 @@
 node_modules/
 /.venv/
 00-backup/
+edits/*
 
 # Python bytecode and caches
 __pycache__/
