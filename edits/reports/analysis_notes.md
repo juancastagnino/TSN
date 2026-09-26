@@ -4,21 +4,33 @@ Diagnostics from the bodies processed in this run; hypotheses are not physical c
 
 Read the [developer handoff](../README_handoff.md) for the retained baseline and geometric research approach. Update that document only when a supported conclusion or development priority changes.
 
-## Moon
+## Mercury
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: ia agents tests. Only moon analyzed
+Export configuration: Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75
 
-- Longitude: mean -0.011461 deg; RMS 1.130535 deg.
-- Latitude: mean -0.021698 deg; RMS 0.268353 deg.
-- Longitude trend conditional on the four-period fit: 46.651 arcsec/year (365.25 days/year).
-- In-sample fitted longitude residual RMS: 0.471196 deg. This is not out-of-sample validation.
+- Longitude: mean 0.162084 deg; RMS 1.835098 deg.
+- Latitude: mean 0.324952 deg; RMS 0.608923 deg.
 - Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
-  - 31.760 days, approximately 1.0873 deg.
-  - 14.768 days, approximately 0.6502 deg.
-  - 27.210 days, approximately 0.6365 deg.
-  - 365.236 days, approximately 0.1851 deg.
+  - 49.980 days, approximately 2.1360 deg.
+  - 34.912 days, approximately 0.7703 deg.
+  - 365.236 days, approximately 0.7476 deg.
+  - 115.806 days, approximately 0.4380 deg.
+
+## Pluto
+
+Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+
+Export configuration: Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75
+
+- Longitude: mean -0.160491 deg; RMS 0.505200 deg.
+- Latitude: mean -0.013802 deg; RMS 0.265224 deg.
+- Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
+  - 365.236 days, approximately 0.3267 deg.
+  - 379.845 days, approximately 0.1952 deg.
+  - 351.708 days, approximately 0.1409 deg.
+  - 182.618 days, approximately 0.0252 deg.
 
 ## Questions to investigate
 

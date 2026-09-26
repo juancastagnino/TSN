@@ -5,6 +5,32 @@ context and priorities, not the output of every trial. Update it when the accept
 baseline, a supported conclusion or the next priorities change; review it before
 pushing changes to the branch. Generated reports are the evidence for individual runs.
 
+## Working branch and repository scope
+
+The main working branch is **`observer-trace`**. It intentionally contains both:
+
+- the accepted Moon, Mercury and Pluto geometry/settings work described below; and
+- the separate Observer Trace feature.
+
+Do not remove Observer Trace changes from this branch when preparing routine work.
+If an orbital-only contribution is needed for the upstream TYCHOS repository, make
+that separation on a dedicated release branch rather than stripping this working
+branch.
+
+Observer Trace has its own menu controls for observer latitude/longitude, marker and
+trace visibility, reference/seed markers, PVP-relative coordinates and displacement,
+and Earth opacity. During Play, its line is sampled only when the continuously moving
+model crosses the exact discrete step dates selected in the main time controls;
+month/year sampling follows calendar steps. This avoids recording intermediate render
+timestamps as spurious zigzags. Relevant files include
+[ObserverTrace.jsx](../src/components/Observer/ObserverTrace.jsx),
+[ObserverMarker.jsx](../src/components/Observer/ObserverMarker.jsx),
+[ObserverReferenceMarker.jsx](../src/components/Observer/ObserverReferenceMarker.jsx),
+[observerStore.js](../src/components/Observer/observerStore.js),
+[menuConfigs.js](../src/components/Menus/menuConfigs.js) and
+[Planet.jsx](../src/components/Planet.jsx). The Observer tests and production build
+passed; the build retained only the pre-existing MediaPipe source-map warnings.
+
 ## Current lunar geometry and settings (2026-09-25)
 
 The accepted working model has one lunar deferent inside an independently
@@ -132,6 +158,62 @@ plane hypothesis is revisited, test each parameter independently.
 The accepted fit still has a longitude trend near 46-47 arcseconds/year. Do not
 tune `Moon.speed` merely to cancel it before resolving the coordinate-frame and
 observable-definition questions.
+
+## Current Mercury and Pluto settings (2026-09-26)
+
+The accepted Mercury/Pluto candidate was developed from the same 75,969 timestamps
+at three-hour cadence, 2000-06-21 through 2026-06-21, against geocentric JPL ICRF
+astrometric RA/Dec. Earth, Moon and both planets' orbital speeds remained fixed.
+Only existing geometric parameters were changed; no perturbation or fitted residual
+term was added.
+
+The retained settings are:
+
+| Entry | Retained changes from the original multi-body baseline |
+|---|---|
+| Mercury deferent B | `startPos: 33 -> 37`; `orbitRadius: 0.6 -> 0` |
+| Mercury | `startPos: -180.8 -> -183`; `orbitCenterb: 3 -> 0.7`; `orbitTilta: 3 -> 6.9` |
+| Pluto | `startPos: 200 -> 198`; `orbitCentera: 877 -> 1287.5`; `orbitCenterb: 667 -> 604.5`; `orbitCenterc: -333 -> -495.5`; `orbitTilta: 15 -> 14.75` |
+
+All unlisted Mercury/Pluto parameters retain their previous values. In particular,
+`Mercury.speed = 26.08763045` and `Pluto.speed = 0.0253303` were not tuned. Pluto's
+mean speed was deliberately held fixed because a short-window speed fit implied an
+implausible orbital period and was more likely to conceal a geometry problem.
+
+### Controlled Mercury and Pluto results
+
+The original reports and final reports use identical timestamps and JPL coordinates.
+Original reports are preserved in `00-backup/`; the current generated reports are in
+`edits/reports/`. The measured comparison is:
+
+| Body / metric | Original | Current | Relative change |
+|---|---:|---:|---:|
+| Mercury RA RMS | 2.279213 deg | 1.788433 deg | -21.5% |
+| Mercury declination RMS | 1.439953 deg | 0.889728 deg | -38.2% |
+| Mercury separation RMS | 2.605186 deg | 1.931459 deg | -25.9% |
+| Mercury longitude RMS | 2.256057 deg | 1.835098 deg | -18.7% |
+| Mercury latitude RMS | 1.306036 deg | 0.608923 deg | -53.4% |
+| Pluto RA RMS | 4.646249 deg | 0.547823 deg | -88.2% |
+| Pluto declination RMS | 2.740124 deg | 0.246666 deg | -91.0% |
+| Pluto separation RMS | 5.141106 deg | 0.568651 deg | -88.9% |
+| Pluto longitude RMS | 4.027498 deg | 0.505200 deg | -87.5% |
+| Pluto latitude RMS | 3.203408 deg | 0.265224 deg | -91.7% |
+
+Pluto should be treated as ready and frozen pending an independent interval. Mercury
+also improved materially, but its dominant longitude residual remains near 49.98 days
+with an FFT amplitude of about `2.1360` degrees. That component barely responded to
+the tested phase, centre, inclination and deferent-radius changes. Further blind
+Mercury tuning is not recommended; identify which geometric mechanism could generate
+that period before changing more settings.
+
+[investigate_planet_tuning.py](scripts/investigate_planet_tuning.py) reconstructs the
+Mercury and Pluto export hierarchy in memory and matches saved simulator exports to
+about `0.0012` degrees before a settings change. It performs geometry-only sensitivity
+screens and never writes `celestial-settings.json`. The script used pre-2020 and
+2020-2026 chronological blocks to reject candidates that transferred poorly. Because
+both blocks were inspected repeatedly during iteration, the latter is a robustness
+diagnostic, **not** untouched out-of-sample validation. Test the retained configuration
+unchanged on a genuinely independent interval before calling it final externally.
 
 ## Research approach
 
@@ -283,10 +365,11 @@ vary substantially by body, so the present evidence does not support one univers
 Earth correction. Common modes and pairwise errors are diagnostic evidence only;
 they do not identify a physical cause or authorize applying fitted residuals.
 
-The laboratory still cannot infer simulator parameter changes from a single export.
-That requires a general geometric evaluator and controlled finite differences or a
-Jacobian across settings, extending the lunar screening approach. Keep that separate
-from residual prediction and validate any proposed geometry on withheld years.
+The ML laboratory still cannot infer simulator parameter changes from a single export.
+Specialized deterministic evaluators now exist for the Moon and for Mercury/Pluto,
+but there is no general hierarchy evaluator or Jacobian covering every body. Keep
+geometric parameter screening separate from residual prediction and validate any
+proposed geometry on an independent interval.
 
 ## Next investigations
 
@@ -298,8 +381,9 @@ from residual prediction and validate any proposed geometry on withheld years.
    either system. Export matching Sun data and fit TYCHOS and JPL separately against
    the physical arguments `2D-M` and `2D`, reporting amplitude and phase. Distinguish
    the book's geometric explanation, the implemented mechanism and measured output.
-2. **Out-of-sample validation.** The accepted parameters were selected on the full
-   2000-2026 interval. Obtain a separate interval, or predeclare chronological
+2. **Out-of-sample validation.** The accepted Moon, Mercury and Pluto parameters were
+   selected with repeated inspection of the 2000-2026 interval. Obtain a separate
+   interval, or predeclare chronological
    train/validation/test blocks before any more tuning. Preserve the time origin,
    exclude duplicated boundaries and apply chosen parameters unchanged to the held-
    out block. The current gains are strong in-sample evidence, not independent
@@ -323,6 +407,10 @@ from residual prediction and validate any proposed geometry on withheld years.
    broad peak rather than treating adjacent bins as independent periods. Extend the
    500-day FFT search only when a longer-period question requires it. These are
    analysis improvements, not model changes.
+7. **Mercury's 49.98-day residual.** Preserve the retained Mercury settings while
+   investigating which nested geometric motion can generate this period. Its amplitude
+   remained near `2.136` degrees while other Mercury metrics improved, so more blind
+   changes to centres, phase or inclination are unlikely to remove it.
 
 ## Where to inspect the implementation
 
@@ -336,6 +424,9 @@ from residual prediction and validate any proposed geometry on withheld years.
   in-memory geometry screening. It reproduces saved exports to about `0.001` degree,
   but its fitted candidates are not accepted settings without simulator export and
   held-out validation.
+- [investigate_planet_tuning.py](scripts/investigate_planet_tuning.py): analysis-only
+  Mercury/Pluto hierarchy reconstruction, sensitivity screens and chronological
+  transfer diagnostics. It does not edit simulator settings.
 
 ## Working and handoff discipline
 

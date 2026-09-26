@@ -19,6 +19,9 @@ export const useObserverStore = create((set, get) => ({
   setMarkerColor: (value) => set({ markerColor: value }),
   traceColor: "#00ffff",
   setTraceColor: (value) => set({ traceColor: value }),
+  earthOpacity: 1,
+  setEarthOpacity: (value) =>
+    set({ earthOpacity: Math.max(0, Math.min(1, Number(value))) }),
   currentGlobalPosition: emptyPosition,
   currentPositionTime: null,
   referenceGlobalPosition: null,

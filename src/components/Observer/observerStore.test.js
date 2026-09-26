@@ -55,3 +55,16 @@ describe("observer seeds", () => {
     });
   });
 });
+
+describe("observer Earth opacity", () => {
+  test("clamps opacity to the visible range", () => {
+    useObserverStore.getState().setEarthOpacity(0.35);
+    expect(useObserverStore.getState().earthOpacity).toBe(0.35);
+
+    useObserverStore.getState().setEarthOpacity(-1);
+    expect(useObserverStore.getState().earthOpacity).toBe(0);
+
+    useObserverStore.getState().setEarthOpacity(2);
+    expect(useObserverStore.getState().earthOpacity).toBe(1);
+  });
+});

@@ -16,7 +16,7 @@ python.exe -B edits/scripts/download_jpl.py
 # edits/data/raw/tychos_ephemerides.txt
 
 # Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "Simon sept 21 moon update. Only moon analyzed"
+python.exe -B edits/scripts/run_analysis.py --label "Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75"
 ```
 
 Open `edits/reports/ephemeris_overview.md` for results and

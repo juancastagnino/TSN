@@ -84,6 +84,8 @@ export const useTraceConfig = () => {
     clearReference,
     addSeed,
     clearSeeds,
+    earthOpacity,
+    setEarthOpacity,
   } = useObserverStore();
 
   const tracedPlanetsCheckboxes = {};
@@ -124,6 +126,13 @@ export const useTraceConfig = () => {
           max: 180,
           step: 0.01,
           onChange: setLongitude,
+        },
+        "Earth opacity": {
+          value: earthOpacity,
+          min: 0,
+          max: 1,
+          step: 0.05,
+          onChange: setEarthOpacity,
         },
         "Add seed": button(() => addSeed(posRef.current)),
         "Clear seeds": button(clearSeeds),
