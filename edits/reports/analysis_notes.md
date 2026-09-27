@@ -4,33 +4,47 @@ Diagnostics from the bodies processed in this run; hypotheses are not physical c
 
 Read the [developer handoff](../README_handoff.md) for the retained baseline and geometric research approach. Update that document only when a supported conclusion or development priority changes.
 
+## Sun
+
+Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+
+Export configuration: Explicit Mercury/Venus with eccentricity
+
+- Longitude: mean 0.188138 deg; RMS 0.338777 deg.
+- Latitude: mean -0.001484 deg; RMS 0.042585 deg.
+- Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
+  - 365.236 days, approximately 0.3756 deg.
+  - 379.845 days, approximately 0.1891 deg.
+  - 351.708 days, approximately 0.1859 deg.
+  - 29.491 days, approximately 0.0016 deg.
+
 ## Mercury
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75
+Export configuration: Explicit Mercury/Venus with eccentricity
 
-- Longitude: mean 0.162084 deg; RMS 1.835098 deg.
-- Latitude: mean 0.324952 deg; RMS 0.608923 deg.
+- Longitude: mean 0.165775 deg; RMS 0.788866 deg.
+- Latitude: mean 0.368318 deg; RMS 0.484796 deg.
 - Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
-  - 49.980 days, approximately 2.1360 deg.
-  - 34.912 days, approximately 0.7703 deg.
-  - 365.236 days, approximately 0.7476 deg.
-  - 115.806 days, approximately 0.4380 deg.
+  - 365.236 days, approximately 0.7357 deg.
+  - 115.806 days, approximately 0.4397 deg.
+  - 169.574 days, approximately 0.3840 deg.
+  - 379.845 days, approximately 0.3725 deg.
 
-## Pluto
+## Venus
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75
+Export configuration: Explicit Mercury/Venus with eccentricity
 
-- Longitude: mean -0.160491 deg; RMS 0.505200 deg.
-- Latitude: mean -0.013802 deg; RMS 0.265224 deg.
+- Longitude: mean -0.173665 deg; RMS 0.444675 deg.
+- Latitude: mean 0.031958 deg; RMS 0.192897 deg.
 - Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
-  - 365.236 days, approximately 0.3267 deg.
-  - 379.845 days, approximately 0.1952 deg.
-  - 351.708 days, approximately 0.1409 deg.
-  - 182.618 days, approximately 0.0252 deg.
+  - 365.236 days, approximately 0.3307 deg.
+  - 226.098 days, approximately 0.3303 deg.
+  - 220.840 days, approximately 0.2394 deg.
+  - 379.845 days, approximately 0.1645 deg.
 
 ## Questions to investigate
 

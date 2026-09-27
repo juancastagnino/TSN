@@ -1,0 +1,67 @@
+{
+  "body": "sun",
+  "profile": "none",
+  "input_file": "edits/data/derived/sun_comparison.csv",
+  "reference": "JPL ICRF astrometric RA/Dec",
+  "ecliptic_rotation": "fixed J2000 obliquity 23.439291111 deg",
+  "n_samples": 75969,
+  "start": "2000-06-21 00:00:00",
+  "stop": "2026-06-21 00:00:00",
+  "cadence_hours_median": 3.0,
+  "cadence_regular": true,
+  "fft_period_range_days": [
+    1.0,
+    500.0
+  ],
+  "ra_residual": {
+    "mean_deg": 0.17542602401264548,
+    "rms_deg": 0.32345779628022747,
+    "median_abs_deg": 0.2568815541667959,
+    "p95_abs_deg": 0.578569369166655,
+    "max_abs_deg": 0.6484046333333708
+  },
+  "declination_residual": {
+    "mean_deg": -0.0767101154376566,
+    "rms_deg": 0.13557826480322305,
+    "median_abs_deg": 0.050198427777779386,
+    "p95_abs_deg": 0.28918494944444395,
+    "max_abs_deg": 0.3451189333333333
+  },
+  "angular_separation": {
+    "mean_deg": 0.28382029772766776,
+    "rms_deg": 0.3414430881936673,
+    "median_abs_deg": 0.2502937516818218,
+    "p95_abs_deg": 0.6325147250606827,
+    "max_abs_deg": 0.729875408046642
+  },
+  "ecliptic_longitude_residual": {
+    "mean_deg": 0.18813752006600512,
+    "rms_deg": 0.33877716827823057,
+    "median_abs_deg": 0.2471121593663952,
+    "p95_abs_deg": 0.6300257462454847,
+    "max_abs_deg": 0.7273567416953313
+  },
+  "ecliptic_latitude_residual": {
+    "mean_deg": -0.00148363401827247,
+    "rms_deg": 0.042584517614956054,
+    "median_abs_deg": 0.0425714819790804,
+    "p95_abs_deg": 0.06062297168368451,
+    "max_abs_deg": 0.06264041037530664
+  },
+  "provenance": {
+    "analyzed_at_utc": "2026-09-27T14:27:05.227435+00:00",
+    "inputs": {
+      "tychos": {
+        "path": "edits/data/raw/tychos_ephemerides.txt",
+        "sha256": "7c46d020ee275cacaca97ee4123ee3a87b09b247424e22e4b2af50e833d72252"
+      },
+      "jpl": {
+        "path": "edits/data/raw/jpl_ephemerides.txt",
+        "sha256": "6b01cffc2da4ea09ddd8d6c12360e359eb6b4192a5e1b18020556e8ba09b5cae"
+      }
+    },
+    "export_label": "Explicit Mercury/Venus with eccentricity",
+    "declared_export_settings": null,
+    "settings_note": "User-declared, not embedded or verified by the TYCHOS export"
+  }
+}

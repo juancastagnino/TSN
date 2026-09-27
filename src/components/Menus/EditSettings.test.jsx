@@ -23,6 +23,12 @@ const initialSettings = JSON.parse(
 );
 const initialMoonNode = initialSettings.find((s) => s.name === "Moon Node");
 const initialMoonPlane = initialSettings.find((s) => s.name === "Moon Plane");
+const initialMercury = initialSettings.find((s) => s.name === "Mercury");
+const initialMercuryPlane = initialSettings.find(
+  (s) => s.name === "Mercury Plane"
+);
+const initialVenus = initialSettings.find((s) => s.name === "Venus");
+const initialVenusPlane = initialSettings.find((s) => s.name === "Venus Plane");
 let root;
 let container;
 
@@ -95,4 +101,39 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
   expect(Number(mockLevaStore.get(planePath).replace(/\u200B/g, ""))).toBe(
     Number(initialMoonPlane.orbitTilta)
   );
+});
+
+test("exposes fixed solar-satellite planes without visibility toggles", () => {
+  act(() => root.render(<EditSettings />));
+
+  const data = mockLevaStore.getData();
+  expect(
+    data["Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTilta"]
+  ).toBeDefined();
+  expect(
+    data["Settings.Venus Plane.Main Orbit.Venus PlaneorbitTilta"]
+  ).toBeDefined();
+  expect(
+    data["Settings.Mercury Eccentric.Main Orbit.Mercury EccentricorbitRadius"]
+  ).toBeDefined();
+  expect(data["Show / Hide settings.Mercury Planevisible"]).toBeUndefined();
+  expect(data["Show / Hide settings.Venus Planevisible"]).toBeUndefined();
+  expect(data["Show / Hide settings.Mercury Eccentricvisible"]).toBeUndefined();
+
+  // The refactor transfers the complete pre-orbit transform to each plane.
+  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(0.7);
+  expect(Number(initialMercuryPlane.orbitCenterc)).toBe(-0.1);
+  expect(Number(initialMercuryPlane.orbitTilta)).toBe(7);
+  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(0.6);
+  expect(Number(initialMercury.orbitCenterb)).toBe(0);
+  expect(Number(initialMercury.orbitCenterc)).toBe(0);
+  expect(Number(initialMercury.orbitTilta)).toBe(0);
+  expect(Number(initialMercury.orbitTiltb)).toBe(0);
+
+  expect(Number(initialVenusPlane.orbitCenterb)).toBe(-0.9);
+  expect(Number(initialVenusPlane.orbitTilta)).toBe(3.4);
+  expect(Number(initialVenusPlane.orbitTiltb)).toBe(-0.2);
+  expect(Number(initialVenus.orbitCenterb)).toBe(0);
+  expect(Number(initialVenus.orbitTilta)).toBe(0);
+  expect(Number(initialVenus.orbitTiltb)).toBe(0);
 });

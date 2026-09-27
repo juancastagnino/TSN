@@ -1,5 +1,6 @@
 import Pobj from "./Pobj";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
+import CounterRotatedOrbit from "./CounterRotatedOrbit";
 
 const PlotSolarSystem = () => {
   return (
@@ -37,12 +38,18 @@ const PlotSolarSystem = () => {
           </Pobj>
           <Pobj name="Venus deferent A">
             <Pobj name="Venus deferent B">
-              <Pobj name="Venus" />
+              <Pobj name="Venus Plane">
+                <Pobj name="Venus" />
+              </Pobj>
             </Pobj>
           </Pobj>
           <Pobj name="Mercury deferent A">
             <Pobj name="Mercury deferent B">
-              <Pobj name="Mercury" />
+              <CounterRotatedOrbit name="Mercury Eccentric">
+                <Pobj name="Mercury Plane">
+                  <Pobj name="Mercury" />
+                </Pobj>
+              </CounterRotatedOrbit>
             </Pobj>
           </Pobj>
           <Pobj name="Mars deferent E">

@@ -7,12 +7,12 @@ Input status compares file hashes only; it does not verify which simulator setti
 | Body | Input status | Samples | Interval | RMS Dec | RMS separation | RMS longitude | RMS latitude | Export configuration |
 |---|---|---:|---|---:|---:|---:|---:|---|
 | moon | No analysis | — | — | — | — | — | — | — |
-| sun | No analysis | — | — | — | — | — | — | — |
-| [mercury](mercury_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.889728° | 1.931459° | 1.835098° | 0.608923° | Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75 |
-| venus | No analysis | — | — | — | — | — | — | — |
+| [sun](sun_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.135578° | 0.341443° | 0.338777° | 0.042585° | Explicit Mercury/Venus with eccentricity |
+| [mercury](mercury_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.635581° | 0.925254° | 0.788866° | 0.484796° | Explicit Mercury/Venus with eccentricity |
+| [venus](venus_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.165022° | 0.483987° | 0.444675° | 0.192897° | Explicit Mercury/Venus with eccentricity |
 | mars | No analysis | — | — | — | — | — | — | — |
 | jupiter | No analysis | — | — | — | — | — | — | — |
 | saturn | No analysis | — | — | — | — | — | — | — |
 | uranus | No analysis | — | — | — | — | — | — | — |
 | neptune | No analysis | — | — | — | — | — | — | — |
-| [pluto](pluto_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.246666° | 0.568651° | 0.505200° | 0.265224° | Mercury phases -183 and 37; Pluto startPos 198 centers 1287.5 604.5 -495.5 orbitTilta 14.75 |
+| pluto | No analysis | — | — | — | — | — | — | — |

@@ -1,4 +1,4 @@
-"""Screen Pluto and Mercury geometry against the saved ephemeris comparisons.
+"""Screen planet geometry against the saved ephemeris comparisons.
 
 This is an analysis aid. It never edits celestial-settings.json. Simulator
 exports remain the authoritative validation for any candidate parameter.
@@ -22,7 +22,14 @@ YEAR_DAYS = 365.2425
 
 CHAINS = {
     "pluto": ["Sun deferent", "Sun", "Pluto deferent", "Pluto"],
-    "mercury": ["Mercury deferent A", "Mercury deferent B", "Mercury"],
+    "mercury": [
+        "Mercury deferent A",
+        "Mercury deferent B",
+        "Mercury Eccentric",
+        "Mercury Plane",
+        "Mercury",
+    ],
+    "venus": ["Venus deferent A", "Venus deferent B", "Venus Plane", "Venus"],
 }
 
 
@@ -98,6 +105,10 @@ def model(settings, body, positions):
     for name in reversed(CHAINS[body]):
         setting = settings[name]
         angle = number(setting, "speed") * positions - number(setting, "startPos") * D2R
+        if name == "Mercury Eccentric":
+            # Match CounterRotatedOrbit: rotate the child frame back before
+            # applying the outer rotating displacement.
+            vectors = apply(ry(-angle), vectors)
         radius = np.column_stack((np.full(len(positions), number(setting, "orbitRadius")), zeros, zeros))
         center = np.array(
             (
@@ -153,17 +164,33 @@ def candidate_dimensions(body):
             ("Pluto", "orbitTiltb", 2.0),
             ("Pluto deferent", "startPos", 2.0),
         ]
+    if body == "mercury":
+        return [
+            ("Mercury", "startPos", 1.0),
+            ("Mercury", "speed", 0.002),
+            ("Mercury Plane", "orbitCenterb", 0.5),
+            ("Mercury Plane", "orbitCenterc", 0.2),
+            ("Mercury Plane", "orbitTilta", 0.5),
+            ("Mercury Plane", "orbitTiltb", 0.5),
+            ("Mercury Eccentric", "startPos", 2.0),
+            ("Mercury Eccentric", "speed", 0.01),
+            ("Mercury Eccentric", "orbitRadius", 0.2),
+            ("Mercury deferent B", "startPos", 1.0),
+            ("Mercury deferent B", "orbitRadius", 0.2),
+            ("Mercury deferent B", "orbitTilta", 0.5),
+            ("Mercury deferent B", "orbitTiltb", 0.5),
+        ]
     return [
-        ("Mercury", "startPos", 1.0),
-        ("Mercury", "speed", 0.002),
-        ("Mercury", "orbitCenterb", 0.5),
-        ("Mercury", "orbitCenterc", 0.2),
-        ("Mercury", "orbitTilta", 0.5),
-        ("Mercury", "orbitTiltb", 0.5),
-        ("Mercury deferent B", "startPos", 1.0),
-        ("Mercury deferent B", "orbitRadius", 0.2),
-        ("Mercury deferent B", "orbitTilta", 0.5),
-        ("Mercury deferent B", "orbitTiltb", 0.5),
+        ("Venus", "startPos", 1.0),
+        ("Venus", "speed", 0.001),
+        ("Venus Plane", "orbitCenterb", 0.2),
+        ("Venus Plane", "orbitCenterc", 0.2),
+        ("Venus Plane", "orbitTilta", 0.25),
+        ("Venus Plane", "orbitTiltb", 0.25),
+        ("Venus deferent B", "startPos", 1.0),
+        ("Venus deferent B", "orbitRadius", 0.2),
+        ("Venus deferent B", "orbitCenterb", 0.2),
+        ("Venus deferent B", "orbitCenterc", 0.2),
     ]
 
 
@@ -246,12 +273,12 @@ def main():
              "all": metrics(model(candidate, args.body, positions), reference),
              "test": metrics(model(candidate, args.body, positions[test]), reference[test])},
         )
-    else:
+    elif args.body == "mercury":
         for key, low, high in (("orbitCenterb", -1.0, 4.0), ("orbitTilta", 2.0, 10.0)):
             results = []
             for value in np.linspace(low, high, 81):
                 candidate = copy.deepcopy(settings)
-                candidate["Mercury"][key] = float(value)
+                candidate["Mercury Plane"][key] = float(value)
                 train_score = metrics(model(candidate, args.body, positions[train]), reference[train])
                 test_score = metrics(model(candidate, args.body, positions[test]), reference[test])
                 results.append((train_score["separation_rms"], float(value), test_score["separation_rms"]))
@@ -292,6 +319,16 @@ def main():
              "all": metrics(model(candidate, args.body, positions), reference),
              "test": metrics(model(candidate, args.body, positions[test]), reference[test])},
         )
+    else:
+        for key, low, high in (("orbitTilta", 0.0, 8.0), ("orbitTiltb", -5.0, 5.0)):
+            results = []
+            for value in np.linspace(low, high, 81):
+                candidate = copy.deepcopy(settings)
+                candidate["Venus Plane"][key] = float(value)
+                train_score = metrics(model(candidate, args.body, positions[train]), reference[train])
+                test_score = metrics(model(candidate, args.body, positions[test]), reference[test])
+                results.append((train_score["separation_rms"], float(value), test_score["separation_rms"]))
+            print(f"fine_Venus.{key}", min(results, key=lambda item: item[0]))
 
     for round_number in range(args.rounds):
         for name, key, initial_step in dimensions:
