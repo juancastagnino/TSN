@@ -8,7 +8,7 @@ Read the [developer handoff](../README_handoff.md) for the retained baseline and
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Explicit Mercury/Venus with eccentricity
+Export configuration: baseline planes for mercury and venus
 
 - Longitude: mean 0.188138 deg; RMS 0.338777 deg.
 - Latitude: mean -0.001484 deg; RMS 0.042585 deg.
@@ -22,29 +22,43 @@ Export configuration: Explicit Mercury/Venus with eccentricity
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Explicit Mercury/Venus with eccentricity
+Export configuration: baseline planes for mercury and venus
 
-- Longitude: mean 0.165775 deg; RMS 0.788866 deg.
-- Latitude: mean 0.368318 deg; RMS 0.484796 deg.
+- Longitude: mean 0.162524 deg; RMS 2.256057 deg.
+- Latitude: mean 0.330030 deg; RMS 1.306036 deg.
 - Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
-  - 365.236 days, approximately 0.7357 deg.
-  - 115.806 days, approximately 0.4397 deg.
-  - 169.574 days, approximately 0.3840 deg.
-  - 379.845 days, approximately 0.3725 deg.
+  - 49.980 days, approximately 2.1311 deg.
+  - 365.236 days, approximately 1.7312 deg.
+  - 379.845 days, approximately 0.8681 deg.
+  - 351.708 days, approximately 0.8625 deg.
 
 ## Venus
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Explicit Mercury/Venus with eccentricity
+Export configuration: baseline planes for mercury and venus
 
-- Longitude: mean -0.173665 deg; RMS 0.444675 deg.
-- Latitude: mean 0.031958 deg; RMS 0.192897 deg.
+- Longitude: mean -0.193046 deg; RMS 0.708558 deg.
+- Latitude: mean 0.030284 deg; RMS 0.250802 deg.
 - Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
-  - 365.236 days, approximately 0.3307 deg.
-  - 226.098 days, approximately 0.3303 deg.
-  - 220.840 days, approximately 0.2394 deg.
-  - 379.845 days, approximately 0.1645 deg.
+  - 365.236 days, approximately 0.7873 deg.
+  - 379.845 days, approximately 0.3980 deg.
+  - 351.708 days, approximately 0.3919 deg.
+  - 226.098 days, approximately 0.3307 deg.
+
+## Pluto
+
+Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+
+Export configuration: baseline planes for mercury and venus
+
+- Longitude: mean -0.160491 deg; RMS 0.505200 deg.
+- Latitude: mean -0.013802 deg; RMS 0.265224 deg.
+- Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):
+  - 365.236 days, approximately 0.3267 deg.
+  - 379.845 days, approximately 0.1952 deg.
+  - 351.708 days, approximately 0.1409 deg.
+  - 182.618 days, approximately 0.0252 deg.
 
 ## Questions to investigate
 

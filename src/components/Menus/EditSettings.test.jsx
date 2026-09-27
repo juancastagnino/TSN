@@ -113,26 +113,28 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   expect(
     data["Settings.Venus Plane.Main Orbit.Venus PlaneorbitTilta"]
   ).toBeDefined();
-  expect(
-    data["Settings.Mercury Eccentric.Main Orbit.Mercury EccentricorbitRadius"]
-  ).toBeDefined();
   expect(data["Show / Hide settings.Mercury Planevisible"]).toBeUndefined();
   expect(data["Show / Hide settings.Venus Planevisible"]).toBeUndefined();
-  expect(data["Show / Hide settings.Mercury Eccentricvisible"]).toBeUndefined();
+  expect(
+    Object.keys(data).some((path) => path.includes("Mercury Eccentric"))
+  ).toBe(false);
+  expect(
+    Object.keys(data).some((path) => path.includes("Mercury Synodic"))
+  ).toBe(false);
 
   // The refactor transfers the complete pre-orbit transform to each plane.
-  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(0.7);
+  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(3);
   expect(Number(initialMercuryPlane.orbitCenterc)).toBe(-0.1);
-  expect(Number(initialMercuryPlane.orbitTilta)).toBe(7);
-  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(0.6);
+  expect(Number(initialMercuryPlane.orbitTilta)).toBe(3);
+  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(0.5);
   expect(Number(initialMercury.orbitCenterb)).toBe(0);
   expect(Number(initialMercury.orbitCenterc)).toBe(0);
   expect(Number(initialMercury.orbitTilta)).toBe(0);
   expect(Number(initialMercury.orbitTiltb)).toBe(0);
 
   expect(Number(initialVenusPlane.orbitCenterb)).toBe(-0.9);
-  expect(Number(initialVenusPlane.orbitTilta)).toBe(3.4);
-  expect(Number(initialVenusPlane.orbitTiltb)).toBe(-0.2);
+  expect(Number(initialVenusPlane.orbitTilta)).toBe(3.2);
+  expect(Number(initialVenusPlane.orbitTiltb)).toBe(-0.05);
   expect(Number(initialVenus.orbitCenterb)).toBe(0);
   expect(Number(initialVenus.orbitTilta)).toBe(0);
   expect(Number(initialVenus.orbitTiltb)).toBe(0);

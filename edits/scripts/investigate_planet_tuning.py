@@ -25,7 +25,6 @@ CHAINS = {
     "mercury": [
         "Mercury deferent A",
         "Mercury deferent B",
-        "Mercury Eccentric",
         "Mercury Plane",
         "Mercury",
     ],
@@ -99,16 +98,15 @@ def load_comparison(body, stride):
     return dates, positions, jpl, exported
 
 
-def model(settings, body, positions):
+def model(settings, body, positions, chain=None):
+    """Reconstruct a body, optionally using an experimental object chain."""
+    if chain is None:
+        chain = CHAINS[body]
     vectors = np.zeros((len(positions), 3))
     zeros = np.zeros(len(positions))
-    for name in reversed(CHAINS[body]):
+    for name in reversed(chain):
         setting = settings[name]
         angle = number(setting, "speed") * positions - number(setting, "startPos") * D2R
-        if name == "Mercury Eccentric":
-            # Match CounterRotatedOrbit: rotate the child frame back before
-            # applying the outer rotating displacement.
-            vectors = apply(ry(-angle), vectors)
         radius = np.column_stack((np.full(len(positions), number(setting, "orbitRadius")), zeros, zeros))
         center = np.array(
             (
@@ -172,9 +170,6 @@ def candidate_dimensions(body):
             ("Mercury Plane", "orbitCenterc", 0.2),
             ("Mercury Plane", "orbitTilta", 0.5),
             ("Mercury Plane", "orbitTiltb", 0.5),
-            ("Mercury Eccentric", "startPos", 2.0),
-            ("Mercury Eccentric", "speed", 0.01),
-            ("Mercury Eccentric", "orbitRadius", 0.2),
             ("Mercury deferent B", "startPos", 1.0),
             ("Mercury deferent B", "orbitRadius", 0.2),
             ("Mercury deferent B", "orbitTilta", 0.5),

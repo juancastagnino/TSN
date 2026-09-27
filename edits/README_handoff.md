@@ -9,7 +9,9 @@ pushing changes to the branch. Generated reports are the evidence for individual
 
 This handoff describes the **`venus-mercury-planes`** branch. It retains the accepted
 Moon Node/Plane baseline, the direct Pluto refinement, explicit separate fixed planes
-for Mercury and Venus, and the validated `Mercury Eccentric` second-harmonic element.
+for Mercury and Venus, and otherwise restores the original TYCHOS Mercury/Venus
+geometry. The plane objects are an architectural refactor, not a retained ephemeris
+tuning experiment.
 
 This branch intentionally excludes Observer Trace. It also does not add moving
 Mercury or Venus node objects: the current evidence supports separate fixed planes,
@@ -143,80 +145,20 @@ The accepted fit still has a longitude trend near 46-47 arcseconds/year. Do not
 tune `Moon.speed` merely to cancel it before resolving the coordinate-frame and
 observable-definition questions.
 
-## Current Mercury, Venus and Pluto settings (2026-09-27)
+## Current Mercury/Venus plane refactor (2026-09-27)
 
-The accepted Mercury/Venus/Pluto candidate was developed from the same 75,969 timestamps
-at three-hour cadence, 2000-06-21 through 2026-06-21, against geocentric JPL ICRF
-astrometric RA/Dec. Earth, Moon and all three planets' orbital speeds remained fixed.
-Only existing geometric parameters were changed; no perturbation or fitted residual
-term was added.
+This branch now tests one narrow architectural question: can the original TYCHOS
+Mercury and Venus geometry be expressed with explicit plane objects without changing
+its ephemerides? It intentionally contains no Mercury eccentric, synodic or other
+residual-fitted displacement layer.
 
-The retained settings are:
-
-| Entry | Retained changes from the original multi-body baseline |
-|---|---|
-| Mercury deferent B | `startPos: 33 -> 37`; `orbitRadius: 0.6 -> 0`; `orbitTilta: -1.3 -> 0`; `orbitTiltb: 0.5 -> 0` |
-| Mercury Plane | Explicit fixed plane: `orbitCenterb = 0.7`; `orbitCenterc = -0.1`; `orbitTilta = 7`; `orbitTiltb = 0.6` |
-| Mercury Eccentric | Validated second harmonic: `orbitRadius = 3.74`; `speed = 52.1752609` (`2M`); `startPos = 17.4` |
-| Mercury | `startPos: -180.8 -> -183`; centre and orbital-plane fields moved to `Mercury Plane` and reset to zero |
-| Venus deferent B | `startPos: 16.6 -> 16.4`; `orbitRadius: 0.6 -> 1.54` |
-| Venus Plane | Explicit fixed plane: `orbitCenterb = -0.9`; `orbitTilta = 3.4`; `orbitTiltb = -0.2` |
-| Venus | Centre and orbital-plane fields moved to `Venus Plane` and reset to zero |
-| Pluto | `startPos: 200 -> 198`; `orbitCentera: 877 -> 1287.5`; `orbitCenterb: 667 -> 604.5`; `orbitCenterc: -333 -> -495.5`; `orbitTilta: 15 -> 14.75` |
-
-All unlisted Mercury/Venus/Pluto parameters retain their previous values. In particular,
-`Mercury.speed = 26.08763045`, `Venus.speed = 10.21331385` and
-`Pluto.speed = 0.0253303` were not tuned. Pluto's
-mean speed was deliberately held fixed because a short-window speed fit implied an
-implausible orbital period and was more likely to conceal a geometry problem.
-
-### Controlled Mercury, Venus and Pluto results
-
-The original reports and final reports use identical timestamps and JPL coordinates.
-Original reports are preserved in `00-backup/`; the current generated reports are in
-`edits/reports/`. The measured comparison is:
-
-| Body / metric | Original | Current | Relative change |
-|---|---:|---:|---:|
-| Mercury RA RMS | 2.279213 deg | 0.704918 deg | -69.1% |
-| Mercury declination RMS | 1.439953 deg | 0.635581 deg | -55.9% |
-| Mercury separation RMS | 2.605186 deg | 0.925254 deg | -64.5% |
-| Mercury longitude RMS | 2.256057 deg | 0.788866 deg | -65.0% |
-| Mercury latitude RMS | 1.306036 deg | 0.484796 deg | -62.9% |
-| Venus RA RMS | 0.727662 deg | 0.484350 deg | -33.4% |
-| Venus declination RMS | 0.263360 deg | 0.165022 deg | -37.3% |
-| Venus separation RMS | 0.749226 deg | 0.483987 deg | -35.4% |
-| Venus longitude RMS | 0.708558 deg | 0.444675 deg | -37.2% |
-| Venus latitude RMS | 0.250802 deg | 0.192897 deg | -23.1% |
-| Pluto RA RMS | 4.646249 deg | 0.547823 deg | -88.2% |
-| Pluto declination RMS | 2.740124 deg | 0.246666 deg | -91.0% |
-| Pluto separation RMS | 5.141106 deg | 0.568651 deg | -88.9% |
-| Pluto longitude RMS | 4.027498 deg | 0.505200 deg | -87.5% |
-| Pluto latitude RMS | 3.203408 deg | 0.265224 deg | -91.7% |
-
-Pluto should be treated as ready and frozen pending an independent interval. Venus's
-small counter-rotating deferent and explicit fixed plane remain strong candidates: the
-improvement reproduced in the simulator and the explicit-plane refactor left its
-ephemerides unchanged to report precision. Mercury's fixed plane produced most of the
-latitude gain, while the retained `2M` eccentric element subsequently reduced its
-longitude and angular-separation errors. These are in-sample results over a repeatedly
-inspected interval and still require genuinely independent validation.
-
-The fixed-plane experiment supports treating Mercury and Venus as solar satellites in
-a common geometric sense, but not forcing one identical numerical plane. Mercury
-favours a plane near 7 degrees while Venus favours about 3.4 degrees. Forcing the same
-plane raised Mercury's latitude RMS to roughly 1.15 degrees. A shared solar reference
-plane with separate satellite inclinations remains structurally possible, but adding
-that hierarchy alone would re-express the geometry rather than guarantee a better fit.
-
-The code now expresses those fixed planes explicitly:
+The active hierarchies are:
 
 ```text
 Mercury deferent A
 └─ Mercury deferent B
-   └─ Mercury Eccentric (validated `2M` second harmonic)
-      └─ Mercury Plane
-         └─ Mercury
+   └─ Mercury Plane
+      └─ Mercury
 
 Venus deferent A
 └─ Venus deferent B
@@ -224,48 +166,83 @@ Venus deferent A
       └─ Venus
 ```
 
-The former planet centre offsets and tilts were moved together into each plane. Moving
-only the tilts would rotate the centre offsets and would not be equivalent. The offline
-hierarchy reconstruction matched the preceding simulator export to about `0.0012`
-degrees, and a fresh zero-radius simulator export reproduced every Sun, Mercury and
-Venus report metric to six decimal places. The explicit-plane refactor is therefore
-confirmed as numerically equivalent within export precision.
+The settings were restored from the `moon-orbital-plane` branch, which is the
+source of truth for the original Mercury/Venus geometry used here. The complete
+pre-orbit transform formerly stored on each planet was moved into its zero-speed,
+zero-radius plane; the corresponding planet fields were reset to zero.
 
-`Mercury Eccentric` uses an outer rotation and equal inner counter-rotation, allowing
-a displacement phase to vary without rotating Mercury's plane or changing its orbital
-phase. The first simulator trial used speed `2M-S`, radius `0.68` and phase `31.2`.
-It reproduced the predicted modest change (separation RMS `1.8892 -> 1.8647` degrees;
-longitude RMS `1.8276 -> 1.8024` degrees), but the targeted 49.98-day FFT amplitude
-remained `2.1278` degrees. That formulation is rejected because it did not address the
-intended mechanism.
+| Entry | Active settings |
+|---|---|
+| Mercury deferent B | Original: `startPos = 33`, `orbitRadius = 0.6`, `orbitTilta = -1.3`, `orbitTiltb = 0.5` |
+| Mercury Plane | Original Mercury transform: `orbitCenterb = 3`, `orbitCenterc = -0.1`, `orbitTilta = 3`, `orbitTiltb = 0.5` |
+| Mercury | Original `startPos = -180.8`, `speed = 26.08763045`, `orbitRadius = 38.710225`; centre and orbital-plane fields zero |
+| Venus deferent B | Original: `startPos = 16.6`, `orbitRadius = 0.6`, `orbitCenterb = 0.65` |
+| Venus Plane | Original Venus transform: `orbitCenterb = -0.9`, `orbitTilta = 3.2`, `orbitTiltb = -0.05` |
+| Venus | Original `startPos = -23.6`, `speed = 10.21331385`, `orbitRadius = 72.327789`; centre and orbital-plane fields zero |
 
-The retained configuration uses the natural second harmonic of a first-order ellipse:
-`speed = 2 * Mercury.speed = 52.1752609`, `orbitRadius = 3.74`, and `startPos = 17.4`.
-The radius is about 9.7% of Mercury's main orbital radius; under the approximate
-second-harmonic scale `a*e/2`, it corresponds to `e ≈ 0.193`. A fresh simulator export
-confirmed Mercury RA RMS `0.704918`, declination RMS `0.635581`, separation RMS
-`0.925254`, longitude RMS `0.788866` and latitude RMS `0.484796` degrees. Against the
-zero-radius explicit-plane baseline, separation improved by 51.0% and longitude by
-56.8%, while latitude was essentially unchanged. The measured 49.98-day longitude
-amplitude fell from about `2.1278` to `0.01184` degrees, a reduction of approximately
-99.4%. The remaining largest longitude components are near one year (`~0.736` degrees),
-115.8 days (`~0.440` degrees) and 169.6 days (`~0.384` degrees).
+An in-memory comparison across 5,000 dates spanning 26 years found identical RA/Dec
+and ecliptic longitude/latitude for the original hierarchy and the explicit-plane
+hierarchy; the reported angular-separation difference was below `0.000001` degree
+and arose only from floating-point `acos` noise.
 
-The current TYCHOS export hash supporting these results is
-`7c46d020ee275cacaca97ee4123ee3a87b09b247424e22e4b2af50e833d72252`; its recorded
-label is `Explicit Mercury/Venus with eccentricity`. The label is generic, so retain
-the hash and settings together for provenance. The 2020-2026 diagnostic separation RMS
-was about `0.9680` degrees, but that block was inspected during development and is not
-untouched out-of-sample validation.
+`Mercury Eccentric`, `Mercury Synodic` and `CounterRotatedOrbit.jsx` are absent from
+this branch. Their earlier numerical improvements belong to the refinement
+experiments, not to this equivalence-preserving plane branch. Pluto's independent
+direct refinement remains present and is unrelated to the plane refactor.
 
-[investigate_planet_tuning.py](scripts/investigate_planet_tuning.py) reconstructs the
-Mercury, Venus and Pluto export hierarchies in memory and matches saved simulator exports to
-about `0.0012` degrees before a settings change. It performs geometry-only sensitivity
-screens and never writes `celestial-settings.json`. The script used pre-2020 and
-2020-2026 chronological blocks to reject candidates that transferred poorly. Because
-both blocks were inspected repeatedly during iteration, the latter is a robustness
-diagnostic, **not** untouched out-of-sample validation. Test the retained configuration
-unchanged on a genuinely independent interval before calling it final externally.
+The simulator export now confirms the restored baseline over 75,969 three-hour
+samples from 2000-06-21 through 2026-06-21. The offline hierarchy reconstruction
+matches that export to about `0.0012` degree, consistent with export precision.
+
+| Body / metric | Confirmed baseline |
+|---|---:|
+| Mercury RA RMS | `2.279213 deg` |
+| Mercury declination RMS | `1.439953 deg` |
+| Mercury separation RMS | `2.605186 deg` |
+| Mercury longitude RMS | `2.256057 deg` |
+| Mercury latitude RMS | `1.306036 deg` |
+| Venus RA RMS | `0.727662 deg` |
+| Venus declination RMS | `0.263360 deg` |
+| Venus separation RMS | `0.749226 deg` |
+| Venus longitude RMS | `0.708558 deg` |
+| Venus latitude RMS | `0.250802 deg` |
+
+The Mercury report in `00-backup` is not the original baseline: it already contains
+an intermediate refinement (`1.931459` degrees separation RMS). The values above
+match the original TYCHOS settings restored from `moon-orbital-plane`. Venus matches
+its saved original report exactly. Sun and the independently refined Pluto also
+remain unchanged to report precision.
+
+The confirming TYCHOS export hash is
+`52de758f24504a6706e70d68373f3f1b097fbff9734f02e7a1e34d35bce65ad1`; the JPL
+hash is `87ee271ab04c77bc78a24d34e7200651f07051be33052f5cbcc08eca5021d6b5`.
+Its recorded label is `baseline planes for mercury and venus`.
+
+### Transit-oriented baseline
+
+Linear interpolation of the common three-hour Sun/planet export to the catalogued
+greatest-transit times gives the following planet-to-Sun diagnostics. Relative error
+compares the TYCHOS and JPL offsets of the planet from the Sun, so a shared absolute
+Sun displacement does not dominate the result.
+
+| Event | JPL Sun separation | TYCHOS Sun separation | Relative offset error |
+|---|---:|---:|---:|
+| Mercury 2003-05-07 | `11.805 arcmin` | `26.067 arcmin` | `28.151 arcmin` |
+| Mercury 2006-11-08 | `7.048 arcmin` | `29.889 arcmin` | `28.447 arcmin` |
+| Mercury 2016-05-09 | `5.309 arcmin` | `8.357 arcmin` | `7.301 arcmin` |
+| Mercury 2019-11-11 | `1.266 arcmin` | `21.262 arcmin` | `21.594 arcmin` |
+| Venus 2004-06-08 | `10.448 arcmin` | `18.437 arcmin` | `10.373 arcmin` |
+| Venus 2012-06-06 | `9.240 arcmin` | `13.846 arcmin` | `15.065 arcmin` |
+
+The RMS relative offset is `23.029 arcmin` for the four Mercury transits and
+`12.934 arcmin` for the two Venus transits. These values are not yet optimized, but
+they are substantially better transit anchors than the removed all-date refinements.
+This supports keeping the original geometry as the exploratory plane baseline.
+
+A later solar-equator experiment may constrain both plane normals to a common
+orientation and evaluate planet-to-Sun offsets at transit epochs. That would be a new
+geometry experiment, not an equivalence-preserving refactor, and should be recorded
+as a separate controlled trial.
 
 ## Research approach
 
@@ -433,8 +410,8 @@ proposed geometry on an independent interval.
    either system. Export matching Sun data and fit TYCHOS and JPL separately against
    the physical arguments `2D-M` and `2D`, reporting amplitude and phase. Distinguish
    the book's geometric explanation, the implemented mechanism and measured output.
-2. **Out-of-sample validation.** The accepted Moon, Mercury, Venus and Pluto parameters were
-   selected with repeated inspection of the 2000-2026 interval. Obtain a separate
+2. **Out-of-sample validation.** The accepted Moon and Pluto parameters were selected
+   with repeated inspection of the 2000-2026 interval. Obtain a separate
    interval, or predeclare chronological
    train/validation/test blocks before any more tuning. Preserve the time origin,
    exclude duplicated boundaries and apply chosen parameters unchanged to the held-
@@ -459,20 +436,21 @@ proposed geometry on an independent interval.
    broad peak rather than treating adjacent bins as independent periods. Extend the
    500-day FFT search only when a longer-period question requires it. These are
    analysis improvements, not model changes.
-7. **Mercury after the successful 2M term.** Preserve the retained eccentric element
-   while testing it on a genuinely independent interval. The former 49.98-day peak is
-   nearly eliminated; investigate the remaining annual, 115.8-day and 169.6-day
-   components before proposing another geometric element.
+7. **Freeze the explicit-plane baseline.** The source-level and simulator-export
+   equivalence checks are complete. Keep this branch unchanged as the original
+   TYCHOS Mercury/Venus geometry expressed through explicit plane objects.
+8. **Solar-equator and transit experiment.** After equivalence is confirmed, test a
+   separate controlled candidate in which both plane normals share the solar-equator
+   orientation. Evaluate planet-to-Sun relative offsets at known transit epochs as
+   the primary targeted diagnostic and retain all-date JPL RMS as a secondary guard.
+   This experiment must not silently restore the removed eccentric/synodic layers.
 
 ## Where to inspect the implementation
 
 - [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx): node / counter-rotation.
-- [CounterRotatedOrbit.jsx](../src/components/CounterRotatedOrbit.jsx): independently
-  phased outer displacement and inner counter-rotation used by the active Mercury
-  eccentric layer.
 - [celestial-settings.json](../src/settings/celestial-settings.json): retained node,
-  lunar parameters, solar-satellite planes, Mercury eccentric settings and direct
-  Pluto refinement; lunar deferent B is intentionally absent.
+  lunar parameters, equivalence-preserving Mercury/Venus planes and direct Pluto
+  refinement; lunar deferent B is intentionally absent.
 - [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) and [Pobj.jsx](../src/components/Pobj.jsx): hierarchy, local axes, offsets and inherited transformations.
 - [plotModelFunctions.js](../src/utils/plotModelFunctions.js): motion and conversion to exported coordinates.
 - [analyze_ephemerides.py](scripts/analyze_ephemerides.py): reference rotation, fixed periods and diagnostic fits.
@@ -483,8 +461,9 @@ proposed geometry on an independent interval.
 - [investigate_planet_tuning.py](scripts/investigate_planet_tuning.py): analysis-only
   Mercury/Venus/Pluto hierarchy reconstruction, sensitivity screens and chronological
   transfer diagnostics. It does not edit simulator settings.
-- [investigate_solar_moons.py](scripts/investigate_solar_moons.py): read-only tests of
-  fixed and shared solar-satellite planes plus the Mercury/Venus eccentric deferents.
+- [diagnose_solar_satellite_residuals.py](scripts/diagnose_solar_satellite_residuals.py):
+  read-only blockwise mean-motion fits, Sun-residual comparison and extended FFT; it
+  writes the maintained Markdown/JSON residual-attribution report.
 
 ## Working and handoff discipline
 

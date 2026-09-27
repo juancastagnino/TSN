@@ -16,13 +16,23 @@ python.exe -B edits/scripts/download_jpl.py
 # edits/data/raw/tychos_ephemerides.txt
 
 # Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "Mercury Eccentric ellipse candidate: radius 3.74, phase 17.4, speed 2M; explicit planes retained"
+python.exe -B edits/scripts/run_analysis.py --label "baseline planes for mercury and venus"
+
+# Read-only Mercury/Venus residual attribution after a matching Sun run.
+python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py
+
 ```
 
 Open `edits/reports/ephemeris_overview.md` for results and
 `edits/reports/analysis_notes.md` for diagnostic observations.
-For an existing pair of exports, only the last command is needed.
+For an existing pair of exports, only `run_analysis.py` is needed.
 No virtual-environment activation is required.
+
+The residual-attribution command writes
+`edits/reports/solar_satellite_residual_diagnostics.md` and `.json`. It fits
+model-derived annual, orbital, synodic and second-harmonic periods in chronological
+blocks, compares each planet with the simultaneous Sun residual, and searches FFT
+periods through 1000 days. It never modifies simulator settings or ephemerides.
 
 Before a comparison trial, optionally [save the current results](#optional-pre-test-backup)
 in `edits/data/pretest/` before replacing exports or running the analysis again.
