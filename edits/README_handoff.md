@@ -8,10 +8,10 @@ pushing changes to the branch. Generated reports are the evidence for individual
 ## Branch scope
 
 This handoff describes the **`venus-mercury-planes`** branch. It retains the accepted
-Moon Node/Plane baseline, the direct Pluto refinement, explicit separate fixed planes
-for Mercury and Venus, and otherwise restores the original TYCHOS Mercury/Venus
-geometry. The plane objects are an architectural refactor, not a retained ephemeris
-tuning experiment.
+Moon Node/Plane baseline and explicit separate fixed planes for Mercury and Venus.
+Mercury and Venus otherwise reproduce the original TYCHOS geometry, and Pluto uses
+its original TYCHOS settings. The plane objects are an architectural refactor, not a
+retained ephemeris tuning experiment.
 
 This branch intentionally excludes Observer Trace. It also does not add moving
 Mercury or Venus node objects: the current evidence supports separate fixed planes,
@@ -187,8 +187,7 @@ and arose only from floating-point `acos` noise.
 
 `Mercury Eccentric`, `Mercury Synodic` and `CounterRotatedOrbit.jsx` are absent from
 this branch. Their earlier numerical improvements belong to the refinement
-experiments, not to this equivalence-preserving plane branch. Pluto's independent
-direct refinement remains present and is unrelated to the plane refactor.
+experiments, not to this equivalence-preserving plane branch.
 
 The simulator export now confirms the restored baseline over 75,969 three-hour
 samples from 2000-06-21 through 2026-06-21. The offline hierarchy reconstruction
@@ -210,8 +209,7 @@ matches that export to about `0.0012` degree, consistent with export precision.
 The Mercury report in `00-backup` is not the original baseline: it already contains
 an intermediate refinement (`1.931459` degrees separation RMS). The values above
 match the original TYCHOS settings restored from `moon-orbital-plane`. Venus matches
-its saved original report exactly. Sun and the independently refined Pluto also
-remain unchanged to report precision.
+its saved original report exactly. Sun also remains unchanged to report precision.
 
 The confirming TYCHOS export hash is
 `52de758f24504a6706e70d68373f3f1b097fbff9734f02e7a1e34d35bce65ad1`; the JPL
@@ -395,7 +393,7 @@ Earth correction. Common modes and pairwise errors are diagnostic evidence only;
 they do not identify a physical cause or authorize applying fitted residuals.
 
 The ML laboratory still cannot infer simulator parameter changes from a single export.
-Specialized deterministic evaluators now exist for the Moon and for Mercury/Pluto,
+Specialized deterministic evaluators now exist for the Moon and for Mercury/Venus,
 but there is no general hierarchy evaluator or Jacobian covering every body. Keep
 geometric parameter screening separate from residual prediction and validate any
 proposed geometry on an independent interval.
@@ -410,9 +408,9 @@ proposed geometry on an independent interval.
    either system. Export matching Sun data and fit TYCHOS and JPL separately against
    the physical arguments `2D-M` and `2D`, reporting amplitude and phase. Distinguish
    the book's geometric explanation, the implemented mechanism and measured output.
-2. **Out-of-sample validation.** The accepted Moon and Pluto parameters were selected
-   with repeated inspection of the 2000-2026 interval. Obtain a separate
-   interval, or predeclare chronological
+2. **Out-of-sample validation.** The accepted Moon parameters were selected with
+   repeated inspection of the 2000-2026 interval. Obtain a separate interval, or
+   predeclare chronological
    train/validation/test blocks before any more tuning. Preserve the time origin,
    exclude duplicated boundaries and apply chosen parameters unchanged to the held-
    out block. The current gains are strong in-sample evidence, not independent
@@ -449,8 +447,8 @@ proposed geometry on an independent interval.
 
 - [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx): node / counter-rotation.
 - [celestial-settings.json](../src/settings/celestial-settings.json): retained node,
-  lunar parameters, equivalence-preserving Mercury/Venus planes and direct Pluto
-  refinement; lunar deferent B is intentionally absent.
+  lunar parameters and equivalence-preserving Mercury/Venus planes; lunar deferent B
+  is intentionally absent.
 - [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) and [Pobj.jsx](../src/components/Pobj.jsx): hierarchy, local axes, offsets and inherited transformations.
 - [plotModelFunctions.js](../src/utils/plotModelFunctions.js): motion and conversion to exported coordinates.
 - [analyze_ephemerides.py](scripts/analyze_ephemerides.py): reference rotation, fixed periods and diagnostic fits.
@@ -459,8 +457,8 @@ proposed geometry on an independent interval.
   but its fitted candidates are not accepted settings without simulator export and
   held-out validation.
 - [investigate_planet_tuning.py](scripts/investigate_planet_tuning.py): analysis-only
-  Mercury/Venus/Pluto hierarchy reconstruction, sensitivity screens and chronological
-  transfer diagnostics. It does not edit simulator settings.
+  planetary hierarchy reconstruction, sensitivity screens and chronological transfer
+  diagnostics. It does not edit simulator settings.
 - [diagnose_solar_satellite_residuals.py](scripts/diagnose_solar_satellite_residuals.py):
   read-only blockwise mean-motion fits, Sun-residual comparison and extended FFT; it
   writes the maintained Markdown/JSON residual-attribution report.
