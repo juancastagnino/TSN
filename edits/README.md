@@ -12,20 +12,28 @@ python.exe -m pip install -r edits/scripts/requirements.txt
 # Download JPL once for that selection and time grid.
 python.exe -B edits/scripts/download_jpl.py
 
-# In TYCHOS, export the same bodies/dates/step to:
+# In TYCHOS, export the same bodies/dates/step. For the standard comparison,
+# choose "J2000 / ICRF comparison" and save to:
 # edits/data/raw/tychos_ephemerides.txt
 
-# Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "baseline planes for mercury and venus"
+# Standard same-frame comparison and reports.
+python.exe -B edits/scripts/run_analysis.py --label "Mercury/Venus planes, J2000, 1800-2026 1d"
+
+# A native/PVP export can be compared deliberately as a frame diagnostic.
+# The explicit flag prevents this mismatch from happening accidentally.
+python.exe -B edits/scripts/run_analysis.py --allow-native-frame --label "Mercury/Venus planes, native PVP diagnostic, 1800-2026 1d"
 
 # Read-only Mercury/Venus residual attribution after a matching Sun run.
 python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py
+
+# Diagnose any remaining common frame rotation against JPL ICRF.
+python.exe -B edits/scripts/analyze_reference_frame.py
 
 ```
 
 Open `edits/reports/ephemeris_overview.md` for results and
 `edits/reports/analysis_notes.md` for diagnostic observations.
-For an existing pair of exports, only `run_analysis.py` is needed.
+For an existing pair of exports, rerun only the analysis commands you need.
 No virtual-environment activation is required.
 
 The residual-attribution command writes
@@ -154,10 +162,15 @@ point to a geometric or coordinate issue to investigate. Unexplained residuals
 remain open questions, not candidates for compensating perturbation terms.
 
 Primary metrics compare against JPL ICRF astrometric RA/Dec; the CSV also retains
-apparent-coordinate comparisons. Ecliptic diagnostics use a common fixed J2000
-obliquity. RA differences are coordinate differences; angular separation measures
-total directional error. Do not mix frames, intervals or export settings when
-comparing results.
+apparent-coordinate comparisons. Select `J2000 / ICRF comparison` in the TYCHOS
+Ephemerides panel for a standard same-frame analysis. `run_analysis.py` rejects
+native/PVP and legacy unlabelled exports by default. An explicitly labelled native
+export is accepted only with `--allow-native-frame`; its reports are diagnostic and
+combine frame mismatch with model error. TYCHOS coordinates remain instantaneous
+geometric positions, so light-time and aberration are separate observable differences.
+Ecliptic diagnostics use a common fixed J2000 obliquity. RA differences are coordinate
+differences; angular separation measures total directional error. Do not mix frames,
+intervals or export settings when comparing results.
 
 The Moon's periodic fits are in-sample diagnostics, not simulator corrections or
 proof of a physical mechanism. Other bodies do not receive lunar terms. FFT peaks
@@ -173,8 +186,9 @@ samples. Out-of-sample validation remains a separate pending investigation.
 - **`data/pretest/` (optional):** manually saved results and inputs for a before/after comparison.
 
 The operational scripts are `download_jpl.py`, `ephemeris_io.py`,
-`compare_ephemerides.py`, `analyze_ephemerides.py`, `generate_report.py` and
-`run_analysis.py`. NumPy is the only additional Python dependency.
+`compare_ephemerides.py`, `analyze_ephemerides.py`, `analyze_reference_frame.py`,
+`generate_report.py` and `run_analysis.py`. NumPy is the only additional Python
+dependency.
 Use either command-line entry point with `--help` for its options.
 
 ## Research tools

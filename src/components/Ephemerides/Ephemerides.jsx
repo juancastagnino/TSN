@@ -8,6 +8,10 @@ import {
   speedFactOpts,
   sDay,
 } from "../../utils/time-date-functions";
+import {
+  EPHEMERIS_REFERENCE_FRAMES,
+  EPHEMERIS_REFERENCE_FRAME_OPTIONS,
+} from "../../utils/plotModelFunctions";
 import { useEphemeridesStore } from "./ephemeridesStore";
 
 const Ephemerides = () => {
@@ -25,6 +29,7 @@ const Ephemerides = () => {
     "End Date": posToDate(posRef.current),
     "Step size": 1,
     "\u{000D}": sDay,
+    "Reference frame": EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
   });
 
   const checkboxes = {};
@@ -64,6 +69,7 @@ const Ephemerides = () => {
       endDate: formValues["End Date"],
       stepSize: formValues["Step size"],
       stepFactor: formValues["\u{000D}"],
+      referenceFrame: formValues["Reference frame"],
       checkedPlanets,
     });
   };
@@ -187,6 +193,13 @@ const Ephemerides = () => {
         options: speedFactOpts,
         onChange: (v) => {
           valuesRef.current["\u{000D}"] = v;
+        },
+      },
+      "Reference frame": {
+        value: EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
+        options: EPHEMERIS_REFERENCE_FRAME_OPTIONS,
+        onChange: (v) => {
+          valuesRef.current["Reference frame"] = v;
         },
       },
       ...checkboxes,

@@ -23,11 +23,9 @@ const initialSettings = JSON.parse(
 );
 const initialMoonNode = initialSettings.find((s) => s.name === "Moon Node");
 const initialMoonPlane = initialSettings.find((s) => s.name === "Moon Plane");
-const initialMercury = initialSettings.find((s) => s.name === "Mercury");
 const initialMercuryPlane = initialSettings.find(
   (s) => s.name === "Mercury Plane"
 );
-const initialVenus = initialSettings.find((s) => s.name === "Venus");
 const initialVenusPlane = initialSettings.find((s) => s.name === "Venus Plane");
 let root;
 let container;
@@ -122,20 +120,34 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
     Object.keys(data).some((path) => path.includes("Mercury Synodic"))
   ).toBe(false);
 
-  // The refactor transfers the complete pre-orbit transform to each plane.
-  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(3);
-  expect(Number(initialMercuryPlane.orbitCenterc)).toBe(-0.1);
-  expect(Number(initialMercuryPlane.orbitTilta)).toBe(3);
-  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(0.5);
-  expect(Number(initialMercury.orbitCenterb)).toBe(0);
-  expect(Number(initialMercury.orbitCenterc)).toBe(0);
-  expect(Number(initialMercury.orbitTilta)).toBe(0);
-  expect(Number(initialMercury.orbitTiltb)).toBe(0);
+  // Plane controls must reflect the loaded candidate rather than hard-coded
+  // research values; celestial-settings.json legitimately changes between trials.
+  const controlNumber = (path) =>
+    Number(String(data[path].value).replace(/\u200B/g, ""));
+  expect(
+    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitCenterb")
+  ).toBe(Number(initialMercuryPlane.orbitCenterb));
+  expect(
+    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitCenterc")
+  ).toBe(Number(initialMercuryPlane.orbitCenterc));
+  expect(
+    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTilta")
+  ).toBe(Number(initialMercuryPlane.orbitTilta));
+  expect(
+    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTiltb")
+  ).toBe(Number(initialMercuryPlane.orbitTiltb));
+  expect(
+    controlNumber("Settings.Venus Plane.Main Orbit.Venus PlaneorbitCenterb")
+  ).toBe(Number(initialVenusPlane.orbitCenterb));
+  expect(
+    controlNumber("Settings.Venus Plane.Main Orbit.Venus PlaneorbitTilta")
+  ).toBe(Number(initialVenusPlane.orbitTilta));
+  expect(
+    controlNumber("Settings.Venus Plane.Main Orbit.Venus PlaneorbitTiltb")
+  ).toBe(Number(initialVenusPlane.orbitTiltb));
 
-  expect(Number(initialVenusPlane.orbitCenterb)).toBe(-0.9);
-  expect(Number(initialVenusPlane.orbitTilta)).toBe(3.2);
-  expect(Number(initialVenusPlane.orbitTiltb)).toBe(-0.05);
-  expect(Number(initialVenus.orbitCenterb)).toBe(0);
-  expect(Number(initialVenus.orbitTilta)).toBe(0);
-  expect(Number(initialVenus.orbitTiltb)).toBe(0);
+  expect(Number(initialMercuryPlane.speed)).toBe(0);
+  expect(Number(initialMercuryPlane.orbitRadius)).toBe(0);
+  expect(Number(initialVenusPlane.speed)).toBe(0);
+  expect(Number(initialVenusPlane.orbitRadius)).toBe(0);
 });

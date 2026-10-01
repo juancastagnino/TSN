@@ -7,11 +7,16 @@ pushing changes to the branch. Generated reports are the evidence for individual
 
 ## Branch scope
 
-This handoff describes the **`venus-mercury-planes`** branch. It retains the accepted
-Moon Node/Plane baseline and explicit separate fixed planes for Mercury and Venus.
-Mercury and Venus otherwise reproduce the original TYCHOS geometry, and Pluto uses
-its original TYCHOS settings. The plane objects are an architectural refactor, not a
-retained ephemeris tuning experiment.
+This handoff describes the **`venus-mercury-planes-frame`** branch. It retains the
+accepted Moon Node/Plane baseline and explicit separate fixed planes for Mercury and
+Venus, and adds an explicit ephemeris-output choice between the native moving-PVP
+frame and a fixed J2000/ICRF-comparison frame. The frame conversion changes only how
+coordinates are reported; it does not remove PVP motion or change the orbital model.
+
+The active celestial settings are an author-supplied Sun/Mercury candidate and have
+not yet been validated on this branch. The preceding equivalence-preserving plane
+settings are saved in `00-backup/celestial-settings.json` for a controlled comparison.
+Pluto remains at its original TYCHOS settings.
 
 This branch intentionally excludes Observer Trace. It also does not add moving
 Mercury or Venus node objects: the current evidence supports separate fixed planes,
@@ -145,12 +150,10 @@ The accepted fit still has a longitude trend near 46-47 arcseconds/year. Do not
 tune `Moon.speed` merely to cancel it before resolving the coordinate-frame and
 observable-definition questions.
 
-## Current Mercury/Venus plane refactor (2026-09-27)
+## Mercury/Venus plane hierarchy and current candidate (2026-09-30)
 
-This branch now tests one narrow architectural question: can the original TYCHOS
-Mercury and Venus geometry be expressed with explicit plane objects without changing
-its ephemerides? It intentionally contains no Mercury eccentric, synodic or other
-residual-fitted displacement layer.
+The explicit plane hierarchy remains intact. It contains no Mercury eccentric,
+synodic or other residual-fitted displacement layer:
 
 The active hierarchies are:
 
@@ -166,12 +169,12 @@ Venus deferent A
       └─ Venus
 ```
 
-The settings were restored from the `moon-orbital-plane` branch, which is the
-source of truth for the original Mercury/Venus geometry used here. The complete
-pre-orbit transform formerly stored on each planet was moved into its zero-speed,
-zero-radius plane; the corresponding planet fields were reset to zero.
+The preceding saved baseline was an equivalence-preserving refactor of the original
+TYCHOS hierarchy. The complete pre-orbit transform formerly stored on each planet
+was moved into its zero-speed, zero-radius plane, and the corresponding planet fields
+were reset to zero.
 
-| Entry | Active settings |
+| Entry | Saved equivalence baseline |
 |---|---|
 | Mercury deferent B | Original: `startPos = 33`, `orbitRadius = 0.6`, `orbitTilta = -1.3`, `orbitTiltb = 0.5` |
 | Mercury Plane | Original Mercury transform: `orbitCenterb = 3`, `orbitCenterc = -0.1`, `orbitTilta = 3`, `orbitTiltb = 0.5` |
@@ -189,7 +192,7 @@ and arose only from floating-point `acos` noise.
 this branch. Their earlier numerical improvements belong to the refinement
 experiments, not to this equivalence-preserving plane branch.
 
-The simulator export now confirms the restored baseline over 75,969 three-hour
+The previous simulator export confirmed that saved baseline over 75,969 three-hour
 samples from 2000-06-21 through 2026-06-21. The offline hierarchy reconstruction
 matches that export to about `0.0012` degree, consistent with export precision.
 
@@ -216,9 +219,34 @@ The confirming TYCHOS export hash is
 hash is `87ee271ab04c77bc78a24d34e7200651f07051be33052f5cbcc08eca5021d6b5`.
 Its recorded label is `baseline planes for mercury and venus`.
 
+### Author-supplied Sun/Mercury candidate
+
+The active [celestial-settings.json](../src/settings/celestial-settings.json) now
+contains a new author-supplied candidate. Relative to the saved equivalence baseline,
+it changes the Sun deferent and Sun centre/tilt values, and substantially changes
+Mercury deferents A/B, Mercury Plane and Mercury phase/centres. Orbital speeds are
+unchanged. The main Mercury values now include:
+
+| Entry | Active candidate values |
+|---|---|
+| Mercury deferent A | `orbitCentera = 2`, `orbitCenterb = 2`, `orbitCenterc = -0.5`; radius `100` |
+| Mercury deferent B | `startPos = 195.5`, radius `0`, `orbitCentera = 1`, `orbitTiltb = -0.1` |
+| Mercury Plane | centres `11, 4, 0`; tilts `-4, -3` |
+| Mercury | `startPos = 16.7`, centres `-2, -4.9, 0`, `orbitTiltb = 0.5` |
+
+Do not describe this candidate as an improvement until a same-grid J2000 export has
+been compared with both JPL and the saved settings. One setting detail also needs
+author confirmation: the active Venus object repeats `orbitCenterb = -0.9`,
+`orbitTilta = 3.2` and `orbitTiltb = -0.05` even though the explicit Venus Plane
+already contains those same values. In this hierarchy those transforms are applied
+twice; they are no longer merely an equivalence-preserving relocation. Preserve the
+file as received, but distinguish an intentional double transform from an accidental
+carry-over before drawing conclusions about Venus.
+
 ### Transit-oriented baseline
 
-Linear interpolation of the common three-hour Sun/planet export to the catalogued
+These are historical values from the saved equivalence baseline, not results from
+the active author candidate. Linear interpolation of the common three-hour Sun/planet export to the catalogued
 greatest-transit times gives the following planet-to-Sun diagnostics. Relative error
 compares the TYCHOS and JPL offsets of the planet from the Sun, so a shared absolute
 Sun displacement does not dominate the result.
@@ -319,57 +347,57 @@ Moon's 49.59 from its four-period fit. This solar fit is not part of the automat
 reports or out-of-sample validation. The similarity motivates a shared-frame or
 geometry investigation; it does not identify the cause.
 
-## Earth-frame audit: JPL compatibility remains unresolved
+## Dual reference-frame export
 
-The current TYCHOS export is **not established to use the same frame as the JPL
-ICRF reference**. Its residuals may include differences in coordinate conventions;
-do not interpret them purely as orbital errors or declare the TYCHOS frame wrong.
+The ephemerides UI now offers two explicit output conventions:
 
-In [plotModelFunctions.js](../src/utils/plotModelFunctions.js), `worldToLocal`
-expresses target positions in Earth's `cSphereRef` at each sample date.
-[Pobj.jsx](../src/components/Pobj.jsx) puts `tilt` and `tiltb` on that frame, while
-child orbits sit outside the tilted group. The shared Earth orbital transform
-cancels in local planetary coordinates. In contrast, `Stars.jsx` and `BSCStars.jsx`
-anchor catalog orientation at J2000. Checks against Three.js found consistent
-cardinal axes and origin subtraction; this does not establish celestial alignment.
+- **TYCHOS native (moving PVP):** preserves the historical coordinates expressed in
+  Earth's moving local frame.
+- **J2000 / ICRF comparison:** keeps the current modeled Earth as the observer origin
+  but expresses every direction using Earth's orientation at J2000. This is a change
+  of coordinate axes only; the bodies and Earth continue to follow the same TYCHOS
+  geometry, including PVP motion.
 
-`Earth.speed = -2*pi/25344` exactly encodes the book's PVP period and 51.13636
-arcseconds per model year (365.2425 days). The online book's
-[Chapter 11, section 11.4](https://book.tychos.space/chapters/11-earths-pvp-orbit),
-[Chapter 12, section 12.1](https://book.tychos.space/chapters/12-sun-earth-rel-motion)
-and [Chapter 19, sections 19.1-19.3](https://book.tychos.space/chapters/19-the-tychos-great-year)
-provide the proposed distinction between equinoctial and stellar directions.
-This may explain the intended frame convention; the book's physical explanation
-and its implementation still need to be distinguished. Translation along PVP and
-rotation of coordinate axes are separate operations.
+Export headers and filenames identify the selected frame. The Ephemeris Checker uses
+the same convention when evaluating stored rows. The Python comparison workflow
+rejects native or legacy unlabelled exports by default, avoiding an accidental mixture
+of moving and fixed axes. `--allow-native-frame` permits an explicitly labelled native
+export only for a deliberate diagnostic comparison; generated notes carry a frame-
+mismatch warning. TYCHOS output remains instantaneous geometric position; light-time
+and aberration are still separate observable effects.
 
-An exploratory re-expression of the 2000-2026 baseline (`Earth.tiltb = 0.26`)
-using Earth's J2000 orientation changed fitted Sun/Moon longitude trends from
-+49.20/+49.59 to -1.94/-1.55 arcseconds per Julian year. Lunar separation RMS
-nevertheless increased from 1.852 to 1.887 degrees. This shows sensitivity to the
-frame, not a validated TYCHOS-to-ICRF conversion. That diagnostic is not part of
-the reporting workflow; retain these figures only as exploratory context.
+The implementation was validated first on the `reference-frame-audit` branch. Over
+the 1800-2026 audit, switching from native to the fixed J2000 axes changed angular
+separation RMS as follows. These values validate the frame method, not the current
+author-supplied Mercury/Sun settings on this branch:
 
-**Suggested TYCHOS work, pending verification:**
+| Body | Native RMS | J2000 RMS |
+|---|---:|---:|
+| Sun | `1.503522 deg` | `0.287919 deg` |
+| Moon | `1.899346 deg` | `1.122084 deg` |
+| Mercury | `3.030546 deg` | `2.635184 deg` |
+| Venus | `1.926218 deg` | `0.794751 deg` |
+| Mars | `1.553249 deg` | `0.810591 deg` |
+| Jupiter | `1.938540 deg` | `0.631422 deg` |
+| Saturn | `1.142123 deg` | `0.923509 deg` |
+| Uranus | `1.425828 deg` | `0.240804 deg` |
+| Neptune | `1.806686 deg` | `0.447416 deg` |
 
-1. Define the exported axes with the authors: origin, pole, zero-RA direction,
-   epoch, time scale and their evolution relative to the star catalog. Do not
-   assume the current axes equal a standard astronomical equator/equinox of date.
-2. Test known directions at J2000 and later dates, separating observer translation
-   from orientation. A pure change of axes must preserve distances and pairwise
-   angular separations. If fixed celestial axes are intended, prototype an explicit
-   export convention using the established alignment, leaving orbital motions intact.
-3. Compare equivalent observables. TYCHOS currently exports instantaneous geometric
-   positions; JPL quantity 1 includes light-time. For a geometry audit, obtain JPL
-   geocentric geometric vectors in the agreed frame. Selecting JPL apparent RA/Dec
-   alone does not resolve this mismatch; see the
-   [Horizons definitions](https://ssd.jpl.nasa.gov/horizons/manual.html#general-definitions).
-4. Preserve numeric precision before formatting: `radToRa` rounds to a second of
-   time (15 angular arcseconds), and `radToDec` to one arcsecond. Normalize any
-   seconds-to-minutes carry. These export refinements require no perturbations.
+The fitted common ecliptic-pole drift fell from `-45.162` to `+5.974`
+arcseconds/year, an 86.8% reduction. Pairwise angular separations were unchanged,
+as required for a pure coordinate rotation. Pluto worsened in that historical audit
+and remains a separate geometric problem rather than evidence against the conversion.
 
-Do not tune planetary speeds, remove PVP motion or apply a fitted drift correction
-to force agreement. Establish the coordinate contract before changing the model.
+An internal full-PVP-cycle test sampled nine sectors from model year 2000 through
+27344. Native-versus-J2000 orientation differences progressed approximately
+`0, 45, 90, 135, 180, 135, 90, 45, 0` degrees, while all exported distances and
+elongations remained byte-identical across 228,105 rows. This confirms that the new
+mode reports the existing model in fixed axes and returns after one PVP cycle; it is
+not a fitted correction and does not establish which cosmology is physically correct.
+
+This branch must now repeat the same-grid J2000 comparison with the explicit
+Mercury/Venus planes and the new author settings. Do not reuse old report values as
+if they measured this candidate.
 
 ## Multi-body machine-learning diagnostics (2026-09-21)
 
@@ -415,12 +443,11 @@ proposed geometry on an independent interval.
    exclude duplicated boundaries and apply chosen parameters unchanged to the held-
    out block. The current gains are strong in-sample evidence, not independent
    confirmation.
-3. **Long-term drift and coordinate conventions.** The current lunar longitude fit
-   still yields about 46-47 arcseconds/year and the early decades raise longitude
-   RMS while latitude/declination remain comparatively stable. Establish the export
-   axes and compare equivalent geometric observables before altering `Moon.speed`.
-   Restore a matched multi-body export if testing whether the same drift remains in
-   the Sun and other bodies.
+3. **Validate the author candidate in fixed axes.** Export Sun, Moon, Mercury, Venus
+   and the remaining comparison bodies with `J2000 / ICRF comparison`, using exactly
+   the same dates and cadence as JPL. Run the ordinary analysis and the reference-
+   frame audit. Compare the result with a second export made from the saved settings;
+   do not compare results produced in different output frames.
 4. **Plane/centre robustness.** Keep the retained plane values unless a controlled
    one-parameter test improves latitude and declination without degrading longitude.
    The rejected three-parameter author trial is not evidence against each value
@@ -434,24 +461,32 @@ proposed geometry on an independent interval.
    broad peak rather than treating adjacent bins as independent periods. Extend the
    500-day FFT search only when a longer-period question requires it. These are
    analysis improvements, not model changes.
-7. **Freeze the explicit-plane baseline.** The source-level and simulator-export
-   equivalence checks are complete. Keep this branch unchanged as the original
-   TYCHOS Mercury/Venus geometry expressed through explicit plane objects.
-8. **Solar-equator and transit experiment.** After equivalence is confirmed, test a
-   separate controlled candidate in which both plane normals share the solar-equator
-   orientation. Evaluate planet-to-Sun relative offsets at known transit epochs as
-   the primary targeted diagnostic and retain all-date JPL RMS as a secondary guard.
-   This experiment must not silently restore the removed eccentric/synodic layers.
+7. **Resolve the repeated Venus transform.** Confirm whether the author intended the
+   same centre and two tilts on both `Venus Plane` and `Venus`. If not, move them to
+   one layer only and verify equivalence before evaluating any Venus refinement.
+8. **Mercury/Sun targeted validation.** Because the author describes this setting as
+   a major Mercury/Sun improvement, evaluate both absolute J2000 errors and the
+   Mercury-minus-Sun angular offset at known transit epochs. The relative transit
+   diagnostic removes most shared frame error and is therefore the stronger targeted
+   test. Retain all-date RMS as a secondary guard against overfitting a few events.
 
 ## Where to inspect the implementation
 
 - [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx): node / counter-rotation.
 - [celestial-settings.json](../src/settings/celestial-settings.json): retained node,
-  lunar parameters and equivalence-preserving Mercury/Venus planes; lunar deferent B
-  is intentionally absent.
+  lunar parameters, explicit Mercury/Venus planes and the unvalidated author-supplied
+  Sun/Mercury candidate; lunar deferent B is intentionally absent.
 - [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) and [Pobj.jsx](../src/components/Pobj.jsx): hierarchy, local axes, offsets and inherited transformations.
-- [plotModelFunctions.js](../src/utils/plotModelFunctions.js): motion and conversion to exported coordinates.
+- [plotModelFunctions.js](../src/utils/plotModelFunctions.js): model motion and the
+  native/J2000 conversion used by export and checking.
+- [Ephemerides.jsx](../src/components/Ephemerides/Ephemerides.jsx) and
+  [EphemerisChecker.jsx](../src/components/EphemerisChecker/EphemerisChecker.jsx):
+  frame selector, frame-labelled output and consistent checker evaluation.
 - [analyze_ephemerides.py](scripts/analyze_ephemerides.py): reference rotation, fixed periods and diagnostic fits.
+- [analyze_reference_frame.py](scripts/analyze_reference_frame.py): read-only common-
+  rotation, transfer and rotation-invariant pairwise audit against JPL ICRF.
+- [ephemeris_io.py](scripts/ephemeris_io.py): export-header parsing and frame-safety
+  checks used by the analysis workflow.
 - [investigate_moon_tuning.py](scripts/investigate_moon_tuning.py): exploratory
   in-memory geometry screening. It reproduces saved exports to about `0.001` degree,
   but its fitted candidates are not accepted settings without simulator export and

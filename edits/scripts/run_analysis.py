@@ -13,7 +13,13 @@ import analyze_ephemerides
 import compare_ephemerides
 import generate_report
 from download_jpl import load_defaults
-from ephemeris_io import tychos_blocks, jpl_blocks, validate_jpl_header, select_block
+from ephemeris_io import (
+    jpl_blocks,
+    select_block,
+    tychos_blocks,
+    validate_jpl_header,
+    validate_tychos_j2000_header,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 REPORTS = ROOT / "edits/reports"
@@ -24,7 +30,7 @@ def fingerprint(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_inputs(body, config, tychos_path, jpl_path, blocks=None):
+def check_inputs(body, config, tychos_path, jpl_path, blocks=None, tychos_metadata=None):
     if blocks is None:
         blocks = (tychos_blocks(tychos_path.read_text(encoding="utf-8-sig")),
                   jpl_blocks(jpl_path.read_text(encoding="utf-8-sig")))
@@ -40,6 +46,9 @@ def check_inputs(body, config, tychos_path, jpl_path, blocks=None):
         path = path.resolve()
         name = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
         result[key] = {"path": name, "sha256": fingerprint(path)}
+    if tychos_metadata:
+        result["tychos"]["reference_frame"] = tychos_metadata["reference_frame"]
+        result["tychos"]["coordinates"] = tychos_metadata["coordinates"]
     return result
 
 
@@ -75,8 +84,20 @@ def write_notes(summaries):
     lines = ["# Analysis notes", "", "Diagnostics from the bodies processed in this run; hypotheses are not physical conclusions.", "",
              "Read the [developer handoff](../README_handoff.md) for the retained baseline and geometric research approach. Update that document only when a supported conclusion or development priority changes.", ""]
     for body, s in summaries.items():
+        reference_frame = (
+            s.get("provenance", {})
+            .get("inputs", {})
+            .get("tychos", {})
+            .get("reference_frame", "unknown")
+        )
         lines += [f"## {body.title()}", "", f"Interval: {s['start']} to {s['stop']}; {s['n_samples']} samples.", "",
-                  f"Export configuration: {s['provenance']['export_label']}", ""]
+                  f"Export configuration: {s['provenance']['export_label']}",
+                  f"TYCHOS reference frame: `{reference_frame}`.", ""]
+        if reference_frame == "tychos-native":
+            lines += [
+                "- Frame warning: this is an intentional native/PVP-versus-JPL-ICRF diagnostic; residuals combine coordinate-frame and model differences.",
+                "",
+            ]
         for name, key in (("Longitude", "ecliptic_longitude_residual"), ("Latitude", "ecliptic_latitude_residual")):
             v = s[key]
             lines.append(f"- {name}: mean {v['mean_deg']:.6f} deg; RMS {v['rms_deg']:.6f} deg.")
@@ -109,19 +130,36 @@ def main(argv=None):
     parser.add_argument("--jpl", type=Path, default=ROOT/defaults['jpl'])
     parser.add_argument("--label", help="User-declared export configuration, not inferred from current settings")
     parser.add_argument("--export-settings", type=Path, help="Optional JSON settings known to have been used for these exports")
+    parser.add_argument(
+        "--allow-native-frame",
+        action="store_true",
+        help=(
+            "Allow an explicitly labelled native/PVP export as a diagnostic "
+            "frame-mismatched comparison against JPL ICRF"
+        ),
+    )
     parser.add_argument("--overview-only", action="store_true", help="Refresh input freshness statuses without rerunning analyses")
     args = parser.parse_args(argv)
     configs = json.loads(Path(__file__).with_name("bodies.json").read_text(encoding="utf-8"))
     if args.overview_only:
-        if args.bodies or args.all or args.label or args.export_settings:
+        if args.bodies or args.all or args.label or args.export_settings or args.allow_native_frame:
             parser.error("--overview-only cannot be combined with analysis options")
         write_overview(configs)
         return
     if args.bodies and args.all:
         parser.error("Specify body names OR --all")
     tychos_path, jpl_path = args.tychos.resolve(), args.jpl.resolve()
-    blocks = (tychos_blocks(tychos_path.read_text(encoding="utf-8-sig")),
-              jpl_blocks(jpl_path.read_text(encoding="utf-8-sig")))
+    tychos_text = tychos_path.read_text(encoding="utf-8-sig")
+    jpl_text = jpl_path.read_text(encoding="utf-8-sig")
+    tychos_frame = validate_tychos_j2000_header(
+        tychos_text, allow_native=args.allow_native_frame
+    )
+    if tychos_frame["reference_frame"] == "tychos-native":
+        print(
+            "WARNING: diagnostic frame-mismatched comparison: TYCHOS native/PVP "
+            "versus JPL ICRF. Do not interpret the residuals as orbital error alone."
+        )
+    blocks = (tychos_blocks(tychos_text), jpl_blocks(jpl_text))
     bodies = list(dict.fromkeys(args.bodies or defaults['bodies']))
     if args.all:
         bodies = [b for b, c in configs.items() if b in blocks[0] and c['target_id'] in blocks[1]]
@@ -134,7 +172,17 @@ def main(argv=None):
     if unknown:
         parser.error(f"Unknown bodies: {sorted(unknown)}")
     # Validate every requested body before replacing any output.
-    inputs = {body: check_inputs(body, configs[body], tychos_path, jpl_path, blocks) for body in bodies}
+    inputs = {
+        body: check_inputs(
+            body,
+            configs[body],
+            tychos_path,
+            jpl_path,
+            blocks,
+            tychos_frame,
+        )
+        for body in bodies
+    }
     export_settings = json.loads(args.export_settings.read_text(encoding="utf-8")) if args.export_settings else None
     publications = []
     summaries = {}

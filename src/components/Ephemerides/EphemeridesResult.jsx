@@ -3,6 +3,15 @@ import { createPortal } from "react-dom";
 import { useEphemeridesStore } from "./ephemeridesStore";
 import { FaSave, FaExclamationTriangle } from "react-icons/fa";
 import { speedFactOpts } from "../../utils/time-date-functions";
+import {
+  EPHEMERIS_REFERENCE_FRAMES,
+  EPHEMERIS_REFERENCE_FRAME_OPTIONS,
+} from "../../utils/plotModelFunctions";
+
+const getReferenceFrameLabel = (referenceFrame) =>
+  Object.entries(EPHEMERIS_REFERENCE_FRAME_OPTIONS).find(
+    ([, value]) => value === referenceFrame
+  )?.[0] || "TYCHOS native (moving PVP)";
 
 const EphemeridesResult = () => {
   const { showResult, generatedData, generationError, params, closeResult } =
@@ -26,6 +35,10 @@ const EphemeridesResult = () => {
     output += `Start Date: ${parameters.startDate}\n`;
     output += `End Date: ${parameters.endDate}\n`;
     output += `Step Size: ${parameters.stepSize} ${displayUnit}\n`;
+    output += `Reference frame: ${getReferenceFrameLabel(
+      parameters.referenceFrame
+    )}\n`;
+    output += "Coordinates: geometric (no light-time or aberration)\n";
     output += "--------------------------------------\n\n";
 
     Object.keys(data).forEach((planetName) => {
@@ -92,7 +105,11 @@ const EphemeridesResult = () => {
     const url = URL.createObjectURL(blob);
     const safeStart = params.startDate.replace(/[:/]/g, "-");
     const safeEnd = params.endDate.replace(/[:/]/g, "-");
-    const filename = `Ephemerides_${safeStart}_to_${safeEnd}.txt`;
+    const frameSuffix =
+      params.referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF
+        ? "J2000_ICRF"
+        : "TYCHOS_NATIVE";
+    const filename = `Ephemerides_${safeStart}_to_${safeEnd}_${frameSuffix}.txt`;
     const link = document.createElement("a");
     link.href = url;
     link.download = filename;

@@ -12,12 +12,14 @@ import {
   sMonth,
 } from "../../utils/time-date-functions";
 import {
+  EPHEMERIS_REFERENCE_FRAMES,
+  getJ2000EarthFrameQuaternion,
   movePlotModel,
   getPlotModelRaDecDistance,
 } from "../../utils/plotModelFunctions";
 
 const EphController = () => {
-  const { scene, invalidate } = useThree(); // invalidate is grabbed here
+  const { invalidate } = useThree(); // invalidate is grabbed here
   const plotObjects = usePlotStore((s) => s.plotObjects);
 
   const {
@@ -38,6 +40,8 @@ const EphController = () => {
     totalSteps: 0,
     increment: 0,
     checkedPlanets: [],
+    referenceFrame: EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
+    j2000Quaternion: null,
     data: {},
     lastProgress: 0,
   });
@@ -58,6 +62,23 @@ const EphController = () => {
       }
 
       const totalSteps = Math.round((endPos - startPos) / increment);
+      const referenceFrame =
+        params.referenceFrame || EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE;
+      const j2000Quaternion =
+        referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF
+          ? getJ2000EarthFrameQuaternion(plotObjects)
+          : null;
+
+      if (
+        referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF &&
+        !j2000Quaternion
+      ) {
+        setGenerationError(
+          "Unable to construct the J2000 Earth reference frame.\nPlease wait for the plot model to finish loading and try again."
+        );
+        resetTrigger();
+        return;
+      }
 
       // Initialize Data Structure
       const initialData = {};
@@ -75,6 +96,8 @@ const EphController = () => {
         totalSteps: totalSteps,
         increment: increment,
         checkedPlanets: params.checkedPlanets,
+        referenceFrame,
+        j2000Quaternion,
         data: initialData,
         lastProgress: 0,
       };
@@ -86,6 +109,7 @@ const EphController = () => {
     trigger,
     params,
     resetTrigger,
+    plotObjects,
     setGenerationError,
     setIsGenerating,
     setProgress,
@@ -141,7 +165,10 @@ const EphController = () => {
       movePlotModel(plotObjects, currentPos);
 
       job.checkedPlanets.forEach((name) => {
-        const data = getPlotModelRaDecDistance(name, plotObjects, scene);
+        const data = getPlotModelRaDecDistance(name, plotObjects, {
+          referenceFrame: job.referenceFrame,
+          j2000Quaternion: job.j2000Quaternion,
+        });
         if (data) {
           job.data[name].push({
             date: currentDate,

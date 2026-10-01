@@ -2,7 +2,17 @@
 import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useControls, useCreateStore, Leva, button, folder } from "leva";
-import { useCheckerStore, parseEphemerisText } from "./checkerStore";
+import {
+  useCheckerStore,
+  parseEphemerisText,
+  parseEphemerisReferenceFrame,
+} from "./checkerStore";
+import { EPHEMERIS_REFERENCE_FRAME_OPTIONS } from "../../utils/plotModelFunctions";
+
+const getReferenceFrameLabel = (referenceFrame) =>
+  Object.entries(EPHEMERIS_REFERENCE_FRAME_OPTIONS).find(
+    ([, value]) => value === referenceFrame
+  )?.[0] || "TYCHOS native (moving PVP)";
 
 const EphemerisChecker = () => {
   const {
@@ -12,6 +22,7 @@ const EphemerisChecker = () => {
     progress,
     results,
     parsedData,
+    referenceFrame,
     setParsedData,
     setShowPlot,
     setPlotSize,
@@ -34,8 +45,9 @@ const EphemerisChecker = () => {
 
     const reader = new FileReader();
     reader.onload = (evt) => {
-      const data = parseEphemerisText(evt.target.result);
-      setParsedData(data);
+      const text = evt.target.result;
+      const data = parseEphemerisText(text);
+      setParsedData(data, parseEphemerisReferenceFrame(text));
       e.target.value = null;
     };
     reader.readAsText(file);
@@ -44,6 +56,10 @@ const EphemerisChecker = () => {
   const resultFolders = useMemo(() => {
     const folders = {
       "Upload Ephemerides": button(() => fileInputRef.current?.click()),
+      "Reference frame": {
+        value: getReferenceFrameLabel(referenceFrame),
+        editable: false,
+      },
       "Show Plot": {
         value: true,
         onChange: (v) => setShowPlot(v),
@@ -153,7 +169,13 @@ const EphemerisChecker = () => {
     }
 
     return folders;
-  }, [parsedData, setShowPlot, setPlotSize, setCheckPlotOpacity]);
+  }, [
+    parsedData,
+    referenceFrame,
+    setShowPlot,
+    setPlotSize,
+    setCheckPlotOpacity,
+  ]);
 
   const [, set] = useControls(() => resultFolders, { store: levaStore }, [
     resultFolders,

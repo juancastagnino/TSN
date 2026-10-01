@@ -2,6 +2,56 @@
 import re
 
 
+TYCHOS_REFERENCE_FRAME_RE = re.compile(
+    r"^Reference frame:\s*(.+?)\s*$", re.IGNORECASE | re.MULTILINE
+)
+TYCHOS_COORDINATES_RE = re.compile(
+    r"^Coordinates:\s*(.+?)\s*$", re.IGNORECASE | re.MULTILINE
+)
+
+
+def tychos_metadata(text):
+    """Read explicit export conventions without inferring them from coordinates."""
+    frame_match = TYCHOS_REFERENCE_FRAME_RE.search(text)
+    coordinates_match = TYCHOS_COORDINATES_RE.search(text)
+    frame_label = frame_match.group(1).strip() if frame_match else None
+    coordinates = coordinates_match.group(1).strip() if coordinates_match else None
+
+    if frame_label and re.search(r"J2000|ICRF", frame_label, re.IGNORECASE):
+        frame = "j2000-icrf"
+    elif frame_label:
+        frame = "tychos-native"
+    else:
+        frame = None
+
+    return {
+        "reference_frame": frame,
+        "reference_frame_label": frame_label,
+        "coordinates": coordinates,
+    }
+
+
+def validate_tychos_j2000_header(text, allow_native=False):
+    """Require a labelled frame and normally require fixed J2000 orientation.
+
+    ``allow_native`` is an explicit opt-in for diagnostic comparisons against JPL.
+    It never permits an unlabelled legacy export.
+    """
+    metadata = tychos_metadata(text)
+    if metadata["reference_frame"] is None:
+        raise ValueError(
+            "TYCHOS export does not declare a reference frame; re-export it with "
+            "'J2000 / ICRF comparison' selected"
+        )
+    if metadata["reference_frame"] != "j2000-icrf" and not allow_native:
+        raise ValueError(
+            "TYCHOS export uses the moving native/PVP frame; select "
+            "'J2000 / ICRF comparison' before comparing it with JPL ICRF, or "
+            "pass --allow-native-frame for an intentional diagnostic comparison"
+        )
+    return metadata
+
+
 def tychos_blocks(text):
     matches = list(re.finditer(r"^PLANET:[ \t]*([^\r\n]+)", text, re.MULTILINE))
     if not matches:

@@ -6,13 +6,13 @@ Input status compares file hashes only; it does not verify which simulator setti
 
 | Body | Input status | Samples | Interval | RMS Dec | RMS separation | RMS longitude | RMS latitude | Export configuration |
 |---|---|---:|---|---:|---:|---:|---:|---|
-| moon | No analysis | — | — | — | — | — | — | — |
-| [sun](sun_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.135578° | 0.341443° | 0.338777° | 0.042585° | baseline planes for mercury and venus |
-| [mercury](mercury_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 1.439953° | 2.605186° | 2.256057° | 1.306036° | baseline planes for mercury and venus |
-| [venus](venus_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.263360° | 0.749226° | 0.708558° | 0.250802° | baseline planes for mercury and venus |
-| mars | No analysis | — | — | — | — | — | — | — |
-| jupiter | No analysis | — | — | — | — | — | — | — |
-| saturn | No analysis | — | — | — | — | — | — | — |
-| uranus | No analysis | — | — | — | — | — | — | — |
-| neptune | No analysis | — | — | — | — | — | — | — |
-| [pluto](pluto_ephemeris_report.md) | Current | 75969 | 2000-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.246666° | 0.568651° | 0.505200° | 0.265224° | baseline planes for mercury and venus |
+| [moon](moon_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.386151° | 1.122084° | 1.096453° | 0.248691° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [sun](sun_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.033340° | 0.105076° | 0.103348° | 0.018978° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [mercury](mercury_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 1.029327° | 2.680462° | 2.581364° | 0.732894° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [venus](venus_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 2.091086° | 2.337777° | 0.869059° | 2.172585° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [mars](mars_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.552956° | 0.810591° | 0.665375° | 0.463531° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [jupiter](jupiter_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.326303° | 0.605459° | 0.547378° | 0.258992° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [saturn](saturn_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.232364° | 0.928769° | 0.922223° | 0.114000° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [uranus](uranus_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.080052° | 0.223640° | 0.209646° | 0.077898° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| [neptune](neptune_ephemeris_report.md) | Current | 82546 | 1800-06-21 00:00:00 to 2026-06-21 00:00:00 | 0.230101° | 0.459405° | 0.433193° | 0.153232° | Mercury/Venus planes, J2000, 1800-2026 1d |
+| pluto | No analysis | — | — | — | — | — | — | — |

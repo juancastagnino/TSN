@@ -11,6 +11,9 @@ import {
 } from "./checkerStore";
 import { dateTimeToPos } from "../../utils/time-date-functions";
 import {
+  EPHEMERIS_REFERENCE_FRAMES,
+  earthFrameVectorToWorld,
+  getJ2000EarthFrameQuaternion,
   movePlotModel,
   getPlotModelRaDecDistance,
 } from "../../utils/plotModelFunctions";
@@ -20,12 +23,13 @@ import createCircleTexture from "../../utils/createCircleTexture";
 // MODULE-LEVEL CACHE: Survives React Suspense unmounts/remounts.
 let cachedSettingsHash = null;
 let cachedParsedData = null;
+let cachedReferenceFrame = null;
 
 const CheckerController = () => {
   const pointsRef = useRef();
   const modelPointsRef = useRef();
   const getThreeState = useThree((state) => state.get);
-  const { invalidate, scene } = useThree();
+  const { invalidate } = useThree();
   const plotObjects = usePlotStore((s) => s.plotObjects);
   const settings = useSettingsStore((s) => s.settings);
 
@@ -42,6 +46,7 @@ const CheckerController = () => {
   const {
     showChecker,
     parsedData,
+    referenceFrame,
     triggerCheck,
     setTriggerCheck,
     setIsChecking,
@@ -70,6 +75,8 @@ const CheckerController = () => {
     processedRows: 0,
     rawPoints: [],
     rawModelPoints: [],
+    referenceFrame: EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
+    j2000Quaternion: null,
   });
 
   useEffect(() => {
@@ -79,6 +86,7 @@ const CheckerController = () => {
       setIsChecking(false);
       cachedSettingsHash = null;
       cachedParsedData = null;
+      cachedReferenceFrame = null;
       return;
     }
 
@@ -86,7 +94,8 @@ const CheckerController = () => {
       // 2. Prevent phantom checks from Suspense remounts
       if (
         cachedSettingsHash === physicalSettingsHash &&
-        cachedParsedData === parsedData
+        cachedParsedData === parsedData &&
+        cachedReferenceFrame === referenceFrame
       ) {
         return; // The math and data haven't changed. Do nothing.
       }
@@ -94,6 +103,7 @@ const CheckerController = () => {
       // 3. Update the cache to the new state
       cachedSettingsHash = physicalSettingsHash;
       cachedParsedData = parsedData;
+      cachedReferenceFrame = referenceFrame;
 
       setChecking(false);
       setIsChecking(false);
@@ -103,6 +113,7 @@ const CheckerController = () => {
   }, [
     physicalSettingsHash,
     parsedData,
+    referenceFrame,
     setTriggerCheck,
     setIsChecking,
     showChecker,
@@ -110,6 +121,20 @@ const CheckerController = () => {
 
   useEffect(() => {
     if (triggerCheck && parsedData && showChecker) {
+      const j2000Quaternion =
+        referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF
+          ? getJ2000EarthFrameQuaternion(plotObjects)
+          : null;
+
+      if (
+        referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF &&
+        !j2000Quaternion
+      ) {
+        setIsChecking(false);
+        setTriggerCheck(false);
+        return;
+      }
+
       setIsChecking(true);
       setProgress(0);
       setVisualPoints(null);
@@ -141,6 +166,8 @@ const CheckerController = () => {
         processedRows: 0,
         rawPoints: [],
         rawModelPoints: [],
+        referenceFrame,
+        j2000Quaternion,
       };
 
       setChecking(true);
@@ -149,6 +176,8 @@ const CheckerController = () => {
   }, [
     triggerCheck,
     parsedData,
+    referenceFrame,
+    plotObjects,
     setIsChecking,
     setProgress,
     setTriggerCheck,
@@ -177,7 +206,10 @@ const CheckerController = () => {
         const pos = dateTimeToPos(row.date, row.time);
 
         movePlotModel(plotObjects, pos);
-        const data = getPlotModelRaDecDistance(planetName, plotObjects, scene);
+        const data = getPlotModelRaDecDistance(planetName, plotObjects, {
+          referenceFrame: job.referenceFrame,
+          j2000Quaternion: job.j2000Quaternion,
+        });
         if (!data) return;
 
         const modelRaDeg = raToDeg(data.ra);
@@ -240,9 +272,21 @@ const CheckerController = () => {
         );
 
         const earthObj = plotObjects.find((p) => p.name === "Earth");
-        if (earthObj && earthObj.cSphereRef?.current) {
-          earthObj.cSphereRef.current.localToWorld(ephemerisPos);
-          earthObj.cSphereRef.current.localToWorld(modelPos);
+        if (earthObj) {
+          const ephemerisWorld = earthFrameVectorToWorld(
+            ephemerisPos,
+            earthObj,
+            job.referenceFrame,
+            job.j2000Quaternion
+          );
+          const modelWorld = earthFrameVectorToWorld(
+            modelPos,
+            earthObj,
+            job.referenceFrame,
+            job.j2000Quaternion
+          );
+          if (ephemerisWorld) ephemerisPos.copy(ephemerisWorld);
+          if (modelWorld) modelPos.copy(modelWorld);
         }
 
         job.rawPoints.push({
