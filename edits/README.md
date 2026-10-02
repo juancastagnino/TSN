@@ -17,7 +17,7 @@ python.exe -B edits/scripts/download_jpl.py
 # edits/data/raw/tychos_ephemerides.txt
 
 # Standard same-frame comparison and reports.
-python.exe -B edits/scripts/run_analysis.py --label "Mercury/Venus planes, J2000, 1800-2026 1d"
+python.exe -B edits/scripts/run_analysis.py --label "sun moon venus and mercury, J2000, 2000-2026 3h"
 
 # A native/PVP export can be compared deliberately as a frame diagnostic.
 # The explicit flag prevents this mismatch from happening accidentally.
