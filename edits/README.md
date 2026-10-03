@@ -16,7 +16,7 @@ python.exe -B edits/scripts/download_jpl.py
 # edits/data/raw/tychos_ephemerides.txt
 
 # Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "old tychos test. 2020-2026 3h"
+python.exe -B edits/scripts/run_analysis.py --label "binary tychos overhaul test. 2020-2026 3h"
 
 # Read-only Mercury/Venus residual attribution after a matching Sun run.
 python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py

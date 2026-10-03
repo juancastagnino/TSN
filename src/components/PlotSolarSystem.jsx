@@ -1,5 +1,6 @@
 import Pobj from "./Pobj";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
+import SunMarsBinarySystem from "./SunMarsBinarySystem";
 
 const PlotSolarSystem = () => {
   return (
@@ -12,51 +13,7 @@ const PlotSolarSystem = () => {
           </Pobj>
         </MoonOrbitalPlane>
 
-        <Pobj name="Sun deferent">
-            <Pobj name="Sun">
-              <Pobj name="Halleys deferent">
-                <Pobj name="Halleys" />
-              </Pobj>
-
-              <Pobj name="Jupiter deferent">
-                <Pobj name="Jupiter" />
-              </Pobj>
-              <Pobj name="Saturn deferent">
-                <Pobj name="Saturn" />
-              </Pobj>
-              <Pobj name="Uranus deferent">
-                <Pobj name="Uranus" />
-              </Pobj>
-              <Pobj name="Neptune deferent">
-                <Pobj name="Neptune" />
-              </Pobj>
-              <Pobj name="Pluto deferent">
-                <Pobj name="Pluto" />
-              </Pobj>
-            </Pobj>
-          </Pobj>
-          <Pobj name="Venus deferent A">
-            <Pobj name="Venus deferent B">
-              <Pobj name="Venus Plane">
-                <Pobj name="Venus" />
-              </Pobj>
-            </Pobj>
-          </Pobj>
-          <Pobj name="Mercury deferent A">
-            <Pobj name="Mercury deferent B">
-              <Pobj name="Mercury Plane">
-                <Pobj name="Mercury" />
-              </Pobj>
-            </Pobj>
-          </Pobj>
-          <Pobj name="Mars deferent E">
-            <Pobj name="Mars deferent S">
-              <Pobj name="Mars">
-                <Pobj name="Phobos" />
-                <Pobj name="Deimos" />
-              </Pobj>
-            </Pobj>
-          </Pobj>
+          <SunMarsBinarySystem ObjectComponent={Pobj} />
           <Pobj name="Eros deferent A">
             <Pobj name="Eros deferent B">
               <Pobj name="Eros"></Pobj>
