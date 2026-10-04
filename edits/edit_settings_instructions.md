@@ -109,9 +109,15 @@ For a Mercury/Venus/Sun experiment:
 
 ```powershell
 python.exe -B edits/scripts/run_analysis.py mercury venus sun `
+  --reference apparent-of-date `
   --label "Mercury Plane orbitTilta +0.25 deg; all other settings unchanged" `
   --export-settings src/settings/celestial-settings.json
 ```
+
+The example assumes the normal TYCHOS native/PVP export. Use `--reference icrf`
+instead only when the TYCHOS file was explicitly exported in the J2000 comparison
+frame. Use `--reference both` when auditing both JPL products, remembering that a
+single TYCHOS export does not simultaneously belong to both frames.
 
 The label and snapshot are declarations of what produced the export; the script
 cannot verify them against a previously generated file. Save the settings before
