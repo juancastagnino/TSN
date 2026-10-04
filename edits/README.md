@@ -377,6 +377,7 @@ samples. Out-of-sample validation remains a separate pending investigation.
 - **This README:** setup, commands and output conventions; update when the workflow changes.
 - **[README_handoff.md](README_handoff.md):** retained baseline, reasoning constraints and next investigations; review before pushing branch changes.
 - **[binary_tychos.md](binary_tychos.md):** accepted binary hierarchy, implementation details, validation evidence and hierarchy-aware settings guidance.
+- **[edit_settings_instructions.md](edit_settings_instructions.md):** practical author workflow for controlled settings experiments, including a Mercury-plane example.
 - **[data/docs/](data/docs/):** the TYCHOS book and other source material; cite edition and chapter/page when using it.
 - **`reports/`:** generated evidence for each run, not a development diary.
 - **`data/pretest/` (optional):** manually saved results and inputs for a before/after comparison.

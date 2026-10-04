@@ -372,6 +372,9 @@ simulator exports remain the authoritative end-to-end check.
 
 ## Does editing work differently now?
 
+For the complete author-facing procedure and a worked Mercury-plane experiment,
+see [TYCHOS Edit Settings guide](edit_settings_instructions.md).
+
 ### Short answer
 
 The controls continue displaying the familiar setting names, and changes propagate
