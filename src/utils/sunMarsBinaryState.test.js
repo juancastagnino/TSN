@@ -2,13 +2,16 @@ import { Object3D, Vector3 } from "three";
 import {
   getPlotSunMarsBinaryDiagnostics,
   getPlotSunMarsBinaryState,
+  getPlotSunMarsPrimaryCompanionState,
 } from "./plotModelFunctions";
 import {
   createSunMarsBinaryDiagnostics,
   createSunMarsBinaryState,
+  createSunMarsPrimaryCompanionState,
   deriveSunMarsBinaryState,
   updateSunMarsBinaryDiagnostics,
   updateSunMarsBinaryState,
+  updateSunMarsPrimaryCompanionState,
 } from "./sunMarsBinaryState";
 
 test("reconstructs both companion positions from one common centre", () => {
@@ -118,4 +121,40 @@ test("samples all three centres from the hidden plot model", () => {
   expect(diagnostics.legacyEarthPivot.sunRadius).toBeCloseTo(100, 12);
   expect(diagnostics.pvpSystemCenter.marsRadius).toBeCloseTo(140, 12);
   expect(diagnostics.geometricMidpoint.centerWorld.x).toBeCloseTo(-15, 12);
+});
+
+test("reconstructs Mars exactly from the Sun primary and relative vector", () => {
+  const state = createSunMarsPrimaryCompanionState();
+  const sun = new Vector3(100, -2, 5);
+  const mars = new Vector3(-30, 8, 12);
+
+  updateSunMarsPrimaryCompanionState(state, sun, mars);
+
+  expect(state.relationshipKind).toBe("asymmetric-primary-companion");
+  expect(state.primaryName).toBe("Sun");
+  expect(state.companionName).toBe("Mars");
+  expect(state.primaryWorld.clone().add(state.companionFromPrimary)).toEqual(
+    mars
+  );
+  expect(state.distance).toBeCloseTo(mars.distanceTo(sun), 12);
+});
+
+test("derives the asymmetric relationship from hidden plot pivots", () => {
+  const pivot = (x, y, z) => {
+    const object = new Object3D();
+    object.position.set(x, y, z);
+    return { current: object };
+  };
+  const plotObjects = [
+    { name: "Sun", pivotRef: pivot(100, 0, 0) },
+    { name: "Mars", pivotRef: pivot(-50, 10, 0) },
+  ];
+
+  const state = getPlotSunMarsPrimaryCompanionState(plotObjects);
+
+  expect(state.valid).toBe(true);
+  expect(state.companionFromPrimary).toEqual(new Vector3(-150, 10, 0));
+  expect(state.primaryWorld.clone().add(state.companionFromPrimary)).toEqual(
+    state.companionWorld
+  );
 });

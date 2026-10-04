@@ -1,0 +1,389 @@
+# Binary TYCHOS implementation
+
+## Purpose and status
+
+This branch expresses the TYCHOS model through an explicit asymmetric
+Sun–Mars primary/companion hierarchy. Mercury and Venus are structurally hosted
+by the Sun as its junior and senior solar companions, Eros is a Sun-hosted small
+body, and Phobos and Deimos remain children of Mars.
+
+The change is deliberately **coordinate preserving**. It reorganizes the scene
+and export hierarchy without fitting new orbital parameters or changing
+`celestial-settings.json`. The resulting ephemerides are identical to the
+pre-refactor model at export precision. This proves that the new hierarchy is a
+lossless representation of the accepted geometry; it does not by itself prove a
+physical binary interpretation or improve agreement with JPL.
+
+The implementation and both live/plot paths are complete. The final validation
+status is:
+
+| Check | Result |
+|---|---:|
+| Source tests | 47 tests in 9 suites passed |
+| Production build | Passed; only pre-existing MediaPipe source-map warnings |
+| Scientific summaries | Zero deltas for all 10 analyzed bodies |
+| Numeric analysis artifacts | 31 of 31 byte-identical |
+| Sun–Mars diagnostic | 9,497 of 9,497 rows exactly unchanged |
+| Eros export | 75,969 of 75,969 rows identical in RA, Dec, distance and elongation |
+
+The accepted evidence is in:
+
+- `reports/phase4e_system_equivalence_report.md`
+- `reports/phase4e_eros_equivalence_report.md`
+- `reports/eros_phase4d_report.md`
+- `00-backup/phase4d/` for the immediate full-system baseline
+- `00-backup/phase4c/eros_ephemerides_before.txt` for the pre-Eros export
+
+## Development path and findings
+
+| Phase | Purpose | Retained conclusion |
+|---|---|---|
+| 1–2.5 | Introduce a named Sun–Mars system and export diagnostic world vectors | The wrapper and diagnostics could be added without moving any body. A midpoint calculated from the endpoints is a mathematical control, not evidence for a physical barycentre. |
+| 3A | Screen fixed weighted centres and radius ratios | Any weighted two-point centre produces exact opposition by construction. No mass or radius ratio should be selected from that identity alone. |
+| 3B | Analyze Mars directly relative to the Sun | The existing output supports an asymmetric primary/companion description more naturally than an equal binary construction. |
+| 3D | Expand the complete Mars-minus-Sun transform algebraically | Four existing components reproduce the Sun-relative Mars path exactly. |
+| 3E | Replace the legacy Earth-level Mars prefix with those Sun-relative components | Accepted as coordinate preserving after complete export regression. |
+| 4A | Audit the legacy Mercury and Venus chains relative to the Sun | Both chains admit exact Sun-relative representations while preserving their separate fixed planes. |
+| 4B | Reparent Venus | Accepted with zero system-output differences. |
+| 4C | Reparent Mercury | Accepted with zero system-output differences. |
+| 4D | Audit Eros relative to the Sun | Four components are required; its tilted annual carriers do not cancel completely. |
+| 4E | Reparent Eros and perform the final regression | Accepted with exact formatted Eros output and zero complete-system differences. |
+
+The previously discussed `7:1` ratio refers to the approximate maximum versus
+minimum **Earth-to-Mars distance**, not to Sun/Mars binary radii and not to an
+inferred mass ratio. It should remain an observational/geometric feature to
+explain, not a value imposed on a barycentric construction.
+
+## Resulting hierarchy
+
+The effective model tree is:
+
+```text
+SystemCenter
+└─ Earth
+   ├─ Moon orbital node/plane system
+   │  └─ Moon deferent A
+   │     └─ Moon
+   │
+   └─ Sun–Mars Binary Frame
+      └─ Sun Primary Branch
+         └─ Sun deferent
+            └─ Sun
+               ├─ Halley's deferent
+               │  └─ Halley
+               ├─ Jupiter deferent
+               │  └─ Jupiter
+               ├─ Saturn deferent
+               │  └─ Saturn
+               ├─ Uranus deferent
+               │  └─ Uranus
+               ├─ Neptune deferent
+               │  └─ Neptune
+               ├─ Pluto deferent
+               │  └─ Pluto
+               ├─ Sun-relative Mars components
+               │  └─ Mars Junior Companion Branch
+               │     └─ Mars
+               │        ├─ Phobos
+               │        └─ Deimos
+               ├─ Sun-relative Venus frame
+               │  └─ Venus Senior Solar Companion Branch
+               │     └─ Venus
+               ├─ Sun-relative Mercury frame
+               │  └─ Mercury Junior Solar Companion Branch
+               │     └─ Mercury
+               └─ Sun-relative Eros frame
+                  └─ Eros Solar Asteroid Branch
+                     └─ Eros
+```
+
+The Moon remains Earth-hosted. The already Sun-hosted outer planets and Halley
+did not require a relative-coordinate refactor. Phobos and Deimos automatically
+inherit the final Mars frame.
+
+## Why relative components are necessary
+
+Simply moving a legacy Earth-level branch beneath the Sun would add the Sun's
+translation and rotations a second time and change the ephemerides. Each new
+component therefore reconstructs the old body-minus-Sun vector and places that
+vector at the Sun while retaining the common binary-frame axes.
+
+In simplified form:
+
+```text
+body world position = Sun world position + exact legacy (body - Sun) vector
+```
+
+`updateSunRelativeFrame()` performs the coordinate adaptation. The named
+component vectors then rebuild every translation and orientation from the
+existing settings in their original matrix order. Both the displayed model and
+the hidden plot/export model use the same `SunMarsBinarySystem`, preventing the
+two hierarchies from drifting apart.
+
+### Mars
+
+The exact Mars identity is:
+
+```text
+Mars - Sun = centre difference
+           + annual carrier mismatch
+           + Mars deferent-S harmonic
+           + Mars main-orbit basis and unchanged Mars leaf
+```
+
+The new tree is:
+
+```text
+Sun
+└─ Sun-Relative Mars Frame
+   └─ Sun-Mars Centre Difference
+      └─ Sun-Mars Annual Carrier Mismatch
+         └─ Mars Deferent-S Harmonic
+            └─ Mars Main-Orbit Basis
+               └─ Mars
+                  ├─ Phobos
+                  └─ Deimos
+```
+
+This expresses Mars as an asymmetric companion of the Sun while preserving the
+existing TYCHOS path. It does not impose an equal-mass barycentre, equal radii or
+a conventional two-body dynamical solution. The approximately 687-day
+Sun-relative path emerges from the retained geometry.
+
+### Venus and Mercury
+
+Each solar companion preserves five legacy stages:
+
+```text
+planet - Sun = centre difference
+             + annual carrier mismatch
+             + deferent-B stage
+             + fixed-plane stage
+             + main-orbit basis and unchanged planet leaf
+```
+
+Their fixed planes remain separate. The refactor does not force Mercury and
+Venus onto one numerically identical plane.
+
+Mercury deferent B deserves special attention: its current orbital radius is
+zero, but its centre and orientation are not necessarily inert. The entire stage
+must be retained unless an independent algebraic and export test proves that it
+has become an identity.
+
+### Eros
+
+Eros preserves four stages:
+
+```text
+Eros - Sun = centre difference
+           + annual carrier mismatch
+           + Eros deferent-B stage
+           + main-orbit basis and unchanged Eros leaf
+```
+
+The two annual carriers both have radius 100, but they cancel by only about
+`89.654%` because their planes are tilted differently. The remaining
+`10.345532` model units are part of the existing geometry and cannot be deleted
+merely because the scalar radii match. Eros needs no additional fixed-plane
+object: its deferent-A orientation already defines a fixed orbital basis.
+
+## Main implementation files
+
+| File | Responsibility |
+|---|---|
+| `src/components/SunMarsBinarySystem.jsx` | One shared semantic hierarchy for live and plot/export models |
+| `src/components/SunMarsRelativeOrbit.jsx` | Exact Sun-relative Mars reconstruction and shared frame-placement helper |
+| `src/components/VenusSunRelativeOrbit.jsx` | Exact Sun-relative Venus reconstruction |
+| `src/components/MercurySunRelativeOrbit.jsx` | Exact Sun-relative Mercury reconstruction |
+| `src/components/ErosSunRelativeOrbit.jsx` | Exact Sun-relative Eros reconstruction |
+| `src/components/SolarSystem.jsx` | Live model entry point |
+| `src/components/PlotSolarSystem.jsx` | Trace and ephemeris-export model entry point |
+| `src/components/SunMarsBinaryTracker.jsx` | Optional diagnostic state collection and CSV export |
+| `src/utils/sunMarsBinaryState.js` | Binary diagnostic calculations |
+| `src/utils/plotModelFunctions.js` | Plot/export update ordering |
+| `src/settings/celestial-settings.json` | User-editable source parameters; unchanged by the refactor |
+
+The component tests compare each new relative reconstruction with its independent
+legacy chain at selected epochs and across dense long-duration grids. The final
+simulator exports remain the authoritative end-to-end check.
+
+## Does editing work differently now?
+
+### Short answer
+
+The controls can continue editing the same named settings, and changes propagate
+live through the new hierarchy. The author does **not** need to edit the generated
+Sun-relative component nodes directly.
+
+The recommended working process is different, however. A parameter now has a
+clear geometric role within a shared hierarchy. Editing a shared Sun setting can
+move several descendants, while editing a leaf or local plane should affect only
+one branch. Tuning should therefore follow dependencies and geometric layers
+rather than treating every visible number as an independent correction knob.
+
+### What the current Edit Settings menu does
+
+The current menu still groups entries by their legacy names. For example,
+`Mercury deferent A`, `Mercury deferent B` and `Mercury` appear as a Mercury
+group, while `Mercury Plane` appears as a separate group. The same is true for
+Venus Plane. The generated entries such as `Sun-Mercury Annual Carrier Mismatch`
+do not appear in the settings file or menu; they are calculated results, not
+new tunable parameters.
+
+This is functionally valid but does not clearly explain the new dependency tree.
+An author can continue using it now, provided the parameter roles below are
+respected.
+
+## Recommended tuning roles
+
+| Setting layer | What it primarily controls | Recommended use |
+|---|---|---|
+| `Sun deferent` / `Sun` | Shared solar origin, annual carrier and orientation | Treat as global. Change only for a declared Sun/system hypothesis, then recheck every Sun descendant and the Moon/Sun observables. |
+| `Mars deferent E` | Mars annual carrier, centre and outer orientation relative to the Sun | Use for annual/shared-frame geometry, not to correct a short-period Mars residual. |
+| `Mars deferent S` | Secondary Mars component or harmonic | Change only when residual period/phase evidence points to this stage. |
+| `Mars` | Main Mars phase, rate, radius, centre and plane | Use for the primary Sun-relative Mars path. Recheck Phobos and Deimos because they inherit this frame. |
+| Mercury/Venus `deferent A` | Annual carrier relative to the Sun | Keep stable unless testing the solar-companion carrier itself. It is highly coupled to the Sun subtraction. |
+| Mercury/Venus `deferent B` | Secondary centre/radius/orientation stage | Use for secondary geometry. Do not assume a zero radius makes the entire stage irrelevant. |
+| `Mercury Plane` / `Venus Plane` | Fixed plane centre and orientation | Use for latitude/declination and explicit orbital-plane hypotheses. Tune each plane separately unless the theory specifically requires a common solar-equator plane. |
+| `Mercury` / `Venus` | Main orbital phase, speed and radius | Use first for primary longitude/phase/scale questions. Transit-relative offsets should be a principal diagnostic. |
+| `Eros deferent A` | Annual carrier and fixed Eros basis | Treat as structural; changing its tilt also changes the non-cancelling annual remainder. |
+| `Eros deferent B` | Secondary Eros vector and rate | Use for a residual attributable to this stage, not as a generic correction. |
+| `Eros` | Main Eros orbit | Use first for main phase, speed and radius experiments. |
+| Outer-planet/Comet deferents and leaves | Their existing Sun-hosted geometry | Their editing process is unchanged. |
+| Moon Node/Plane/deferent/leaf | Independent Earth-hosted lunar geometry | Keep lunar experiments separate from solar-companion tuning. |
+
+`size`, `actualSize`, `tilt`, `tiltb`, `rotationStart` and `rotationSpeed` can
+describe appearance or axial rotation rather than orbital position. They should
+not be mixed into ephemeris tuning unless code inspection confirms that the
+selected observable uses them. Orbital position is primarily controlled by
+`startPos`, `speed`, `orbitRadius`, `orbitCenter*` and `orbitTilt*`.
+
+## Recommended author workflow
+
+1. **Freeze a reproducible baseline.** Save the settings file, TYCHOS export,
+   reference export, analysis reports and run label together.
+2. **State one geometric hypothesis.** Identify the body, hierarchy layer and
+   expected observable before changing a value.
+3. **Change one layer at a time.** Avoid changing a planet leaf, its plane and its
+   deferent in the same trial. Otherwise the source of any improvement is unclear.
+4. **Use the parameter matching the symptom.** Phase and radius tests belong at
+   the main orbit first; latitude errors suggest plane orientation; a coherent
+   secondary period may justify examining a deferent.
+5. **Use body-relative events where appropriate.** For Mercury and Venus, compare
+   planet-minus-Sun offsets at transits in addition to all-date RA/Dec. A shared
+   absolute reference-frame offset should not dominate that diagnostic.
+6. **Keep global and local tests separate.** A Sun edit is a system-wide test; a
+   Mercury Plane edit is local. Never judge a global edit from Mercury alone.
+7. **Test the same dates and cadence.** Do not compare RMS values from different
+   intervals or sampling grids.
+8. **Use chronological validation.** Select parameters on one interval and verify
+   them unchanged on a withheld interval. Long-period bodies require longer test
+   windows than Mercury or Venus.
+9. **Separate equivalence from accuracy.** The Phase 4 scripts prove a refactor
+   did not move anything. JPL/Stellarium comparisons evaluate observational
+   agreement. A structural pass is not an accuracy improvement, and an RMS
+   improvement is not proof of a physical interpretation.
+10. **Retest descendants and the complete system.** A retained change must pass
+    the target metric, guard metrics for other coordinates, event checks, and a
+    whole-system regression appropriate to its dependency scope.
+
+For ordinary parameter tuning, exact equivalence is neither expected nor the
+goal—the output should change. The requirement is instead that the change be
+intentional, localized as predicted, and validated out of sample. Exact
+equivalence gates should be used again when code or hierarchy is refactored
+without intending to alter the geometry.
+
+## Recommended Edit Settings menu redesign
+
+The current flat/group-by-name menu remains usable, but the new model would be
+safer and easier to understand with a hierarchy-aware presentation.
+
+Recommended top-level structure:
+
+```text
+Appearance
+Global / PVP frame
+Earth and Moon
+Sun–Mars system
+├─ Shared Sun geometry
+├─ Mars companion geometry
+│  ├─ Annual carrier (Mars deferent E)
+│  ├─ Secondary component (Mars deferent S)
+│  ├─ Main Mars orbit
+│  └─ Phobos / Deimos
+├─ Solar companions
+│  ├─ Mercury: carrier / B / plane / main orbit
+│  └─ Venus: carrier / B / plane / main orbit
+├─ Outer planets
+└─ Small bodies
+   ├─ Eros: carrier / B / main orbit
+   └─ Halley
+```
+
+Within every object, controls should be divided into:
+
+- **Phase and rate:** `startPos`, `speed`;
+- **Orbital scale:** `orbitRadius`;
+- **Orbit centre:** `orbitCentera`, `orbitCenterb`, `orbitCenterc`;
+- **Orbital plane:** `orbitTilta`, `orbitTiltb`;
+- **Body appearance and spin:** `size`, `actualSize`, `tilt`, `tiltb`, rotation
+  controls.
+
+Additional recommendations:
+
+- Mark Sun and other shared settings with a **global/shared** warning.
+- Display the generated relative-component names as read-only explanatory rows,
+  not editable duplicate parameters.
+- Show which descendants are affected before applying a shared change.
+- Provide per-body reset, transaction-level undo and a before/after settings diff.
+- Allow an experiment label and baseline snapshot to be saved with settings.
+- Highlight zero-radius but non-identity stages such as Mercury deferent B.
+- Add optional parameter descriptions and units directly in the menu.
+- Add a settings schema version and reject unknown names, non-numeric orbital
+  values and incomplete incompatible files during loading.
+- Include `rotationStart` in saved settings and in the panel's external-state
+  synchronization. It is currently displayed and exists in the source JSON, but
+  `saveSettingsAsJson()` omits it from `allowedProperties`, and the synchronization
+  effect updates `rotationSpeed` without updating `rotationStart`.
+- Avoid mutating the existing setting object before updating the store; create a
+  validated immutable replacement instead.
+
+The menu redesign is a usability and safety improvement. It should not replace or
+rename the underlying settings until a migration layer and equivalence test exist,
+because the relative components deliberately read the accepted legacy names.
+
+## Acceptance discipline for future changes
+
+For a hierarchy or code-only refactor:
+
+- run component unit tests;
+- build the application;
+- export the affected body before and after over identical timestamps;
+- run a formatted raw-export comparison where available;
+- rerun the complete multi-body analysis and binary diagnostic; and
+- require zero unintended differences.
+
+For a parameter or physical-geometry experiment:
+
+- preserve the baseline first;
+- declare the changed parameters and intended effect;
+- compare RA, declination, angular separation, longitude and latitude;
+- inspect mean bias, RMS, percentiles and time-dependent residuals;
+- check relevant relative events, especially Mercury/Venus transits;
+- check non-target bodies implied by shared ancestors; and
+- validate on an independent interval before accepting the setting.
+
+The guiding rule remains: improvements should arise from a coherent geometric
+interpretation and its correct implementation, not from adding fitted residual
+corrections to the exported coordinates.
+
+## Final interpretation
+
+The completed refactor gives the TYCHOS proposal greater explanatory clarity in
+software: the code tree now visibly expresses the relationships the framework
+claims instead of relying on a collection of Earth-level carrier chains. Because
+the outputs are unchanged, all previous observational strengths and weaknesses
+remain. The value of this phase is that future experiments can now be described
+in the same language as the proposed geometry—Sun primary, Mars companion,
+solar companions, local planes and inherited moons—while retaining a proven
+numerical baseline.

@@ -1,21 +1,28 @@
 import React from "react";
+import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
+import MercurySunRelativeOrbit from "./MercurySunRelativeOrbit";
 import SunMarsBinaryTracker from "./SunMarsBinaryTracker";
+import SunMarsRelativeOrbit from "./SunMarsRelativeOrbit";
+import VenusSunRelativeOrbit from "./VenusSunRelativeOrbit";
 
 /**
- * Shared semantic frame for the TYCHOS Sun-Mars binary.
+ * Shared semantic frame for the TYCHOS Sun-Mars primary-companion system.
  *
- * This first-stage refactor is deliberately coordinate preserving. The identity
- * groups name the physical roles without adding transforms, while the existing
- * Cobj/Pobj chains continue to produce the validated world positions. Keeping
- * both the visual and plot models on this component prevents their hierarchies
- * from drifting apart during later binary-geometry experiments.
+ * The named branches and relative-component transforms are deliberately
+ * coordinate preserving: they re-express the accepted settings without fitting
+ * new orbital parameters. Keeping both the visual and plot models on this
+ * component prevents their hierarchies from drifting apart.
  */
-const SunMarsBinarySystem = ({ ObjectComponent, trackLiveState = false }) => {
+const SunMarsBinarySystem = ({
+  ObjectComponent,
+  trackLiveState = false,
+  plotMode = false,
+}) => {
   const ObjectNode = ObjectComponent;
 
   return (
     <group name="Sun-Mars Binary Frame">
-      <group name="Sun Companion Branch">
+      <group name="Sun Primary Branch">
         <ObjectNode name="Sun deferent">
           <ObjectNode name="Sun">
             <ObjectNode name="Halleys deferent">
@@ -36,39 +43,41 @@ const SunMarsBinarySystem = ({ ObjectComponent, trackLiveState = false }) => {
             <ObjectNode name="Pluto deferent">
               <ObjectNode name="Pluto" />
             </ObjectNode>
-          </ObjectNode>
-        </ObjectNode>
-      </group>
-
-      {/*
-       * These carriers currently reconstruct the Sun-following motion without
-       * inheriting the Sun object. They stay unchanged until a solar-host frame
-       * can replace them with demonstrated ephemeris equivalence.
-       */}
-      <group name="Solar Moon Carrier Branches">
-        <ObjectNode name="Venus deferent A">
-          <ObjectNode name="Venus deferent B">
-            <ObjectNode name="Venus Plane">
-              <ObjectNode name="Venus" />
-            </ObjectNode>
-          </ObjectNode>
-        </ObjectNode>
-        <ObjectNode name="Mercury deferent A">
-          <ObjectNode name="Mercury deferent B">
-            <ObjectNode name="Mercury Plane">
-              <ObjectNode name="Mercury" />
-            </ObjectNode>
-          </ObjectNode>
-        </ObjectNode>
-      </group>
-
-      <group name="Mars Companion Branch">
-        <ObjectNode name="Mars deferent E">
-          <ObjectNode name="Mars deferent S">
-            <ObjectNode name="Mars">
-              <ObjectNode name="Phobos" />
-              <ObjectNode name="Deimos" />
-            </ObjectNode>
+            <SunMarsRelativeOrbit
+              name="Sun-Relative Mars Components"
+              plotMode={plotMode}
+            >
+              <group name="Mars Junior Companion Branch">
+                <ObjectNode name="Mars">
+                  <ObjectNode name="Phobos" />
+                  <ObjectNode name="Deimos" />
+                </ObjectNode>
+              </group>
+            </SunMarsRelativeOrbit>
+            <VenusSunRelativeOrbit
+              name="Sun-Relative Venus Frame"
+              plotMode={plotMode}
+            >
+              <group name="Venus Senior Solar Companion Branch">
+                <ObjectNode name="Venus" />
+              </group>
+            </VenusSunRelativeOrbit>
+            <MercurySunRelativeOrbit
+              name="Sun-Relative Mercury Frame"
+              plotMode={plotMode}
+            >
+              <group name="Mercury Junior Solar Companion Branch">
+                <ObjectNode name="Mercury" />
+              </group>
+            </MercurySunRelativeOrbit>
+            <ErosSunRelativeOrbit
+              name="Sun-Relative Eros Frame"
+              plotMode={plotMode}
+            >
+              <group name="Eros Solar Asteroid Branch">
+                <ObjectNode name="Eros" />
+              </group>
+            </ErosSunRelativeOrbit>
           </ObjectNode>
         </ObjectNode>
       </group>

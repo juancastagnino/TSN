@@ -45,6 +45,34 @@ export const createSunMarsBinaryDiagnostics = () => ({
 });
 
 /**
+ * Exact asymmetric decomposition with the Sun as primary and Mars as companion.
+ * This is a change of coordinates only: it does not impose a new Mars orbit.
+ */
+export const createSunMarsPrimaryCompanionState = () => ({
+  valid: false,
+  relationshipKind: "asymmetric-primary-companion",
+  primaryName: "Sun",
+  companionName: "Mars",
+  primaryWorld: new Vector3(),
+  companionWorld: new Vector3(),
+  companionFromPrimary: new Vector3(),
+  distance: 0,
+});
+
+export const updateSunMarsPrimaryCompanionState = (
+  state,
+  sunWorld,
+  marsWorld
+) => {
+  state.primaryWorld.copy(sunWorld);
+  state.companionWorld.copy(marsWorld);
+  state.companionFromPrimary.subVectors(marsWorld, sunWorld);
+  state.distance = state.companionFromPrimary.length();
+  state.valid = true;
+  return state;
+};
+
+/**
  * Re-express existing positions as a common centre plus two companion vectors.
  * This is an exact coordinate decomposition, not a fitted orbit or constraint.
  */

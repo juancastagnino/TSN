@@ -3,8 +3,10 @@ import { radToRa, radToDec } from "../utils/celestial-functions";
 import {
   createSunMarsBinaryDiagnostics,
   createSunMarsBinaryState,
+  createSunMarsPrimaryCompanionState,
   updateSunMarsBinaryDiagnostics,
   updateSunMarsBinaryState,
+  updateSunMarsPrimaryCompanionState,
 } from "./sunMarsBinaryState";
 
 // Helper to convert degrees to radians
@@ -18,6 +20,9 @@ export function movePlotModel(plotObjects, plotPos) {
         pObj.speed * plotPos - pObj.startPos * D2R;
     }
   });
+
+  // Coordinate adapters depend on the final orbital rotations for this sample.
+  plotObjects.forEach((pObj) => pObj.updateAfterMotion?.(plotPos));
 
   return getPlotSunMarsBinaryState(plotObjects, plotBinaryState);
 }
@@ -81,6 +86,32 @@ export function getPlotSunMarsBinaryDiagnostics(
     target.sample.pvpWorld,
     target.sample.sunWorld,
     target.sample.marsWorld
+  );
+}
+
+/**
+ * Express the hidden model's existing Mars position relative to the Sun.
+ * No transform is changed and world-space reconstruction remains exact.
+ */
+export function getPlotSunMarsPrimaryCompanionState(
+  plotObjects,
+  target = createSunMarsPrimaryCompanionState()
+) {
+  const sunObj = plotObjects.find((p) => p.name === "Sun");
+  const marsObj = plotObjects.find((p) => p.name === "Mars");
+  const sunPivot = sunObj?.pivotRef?.current;
+  const marsPivot = marsObj?.pivotRef?.current;
+  if (!sunPivot || !marsPivot) {
+    target.valid = false;
+    return target;
+  }
+
+  sunPivot.getWorldPosition(target.primaryWorld);
+  marsPivot.getWorldPosition(target.companionWorld);
+  return updateSunMarsPrimaryCompanionState(
+    target,
+    target.primaryWorld,
+    target.companionWorld
   );
 }
 

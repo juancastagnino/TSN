@@ -15,6 +15,7 @@ export const useStore = create(
       // Mutable, read-only diagnostic state populated by SunMarsBinaryTracker.
       // Keeping it in a ref prevents animation-frame updates from rerendering UI.
       sunMarsBinaryStateRef: createRef(),
+      sunMarsPrimaryCompanionStateRef: createRef(),
       run: false,
       toggleRun: () => set((state) => ({ run: !state.run })),
       speedFact: getDefaultSpeedFact(),

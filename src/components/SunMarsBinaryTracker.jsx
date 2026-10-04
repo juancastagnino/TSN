@@ -4,17 +4,27 @@ import { Vector3 } from "three";
 import { useStore } from "../store";
 import {
   createSunMarsBinaryState,
+  createSunMarsPrimaryCompanionState,
   updateSunMarsBinaryState,
+  updateSunMarsPrimaryCompanionState,
 } from "../utils/sunMarsBinaryState";
 
 /**
- * Publishes the live visual model's exact Sun-Mars binary decomposition.
+ * Publishes both the legacy common-centre diagnostics and the exact asymmetric
+ * Sun-primary / Mars-companion decomposition from the live visual model.
  * It observes existing objects only; it never modifies their transformations.
  */
 const SunMarsBinaryTracker = () => {
   const { scene } = useThree();
   const binaryStateRef = useStore((state) => state.sunMarsBinaryStateRef);
+  const primaryCompanionStateRef = useStore(
+    (state) => state.sunMarsPrimaryCompanionStateRef
+  );
   const binaryState = useMemo(createSunMarsBinaryState, []);
+  const primaryCompanionState = useMemo(
+    createSunMarsPrimaryCompanionState,
+    []
+  );
   const positions = useMemo(
     () => ({
       center: new Vector3(),
@@ -31,7 +41,9 @@ const SunMarsBinaryTracker = () => {
 
     if (!earth || !sun || !mars) {
       binaryState.valid = false;
+      primaryCompanionState.valid = false;
       binaryStateRef.current = binaryState;
+      primaryCompanionStateRef.current = primaryCompanionState;
       return;
     }
 
@@ -44,11 +56,16 @@ const SunMarsBinaryTracker = () => {
       positions.sun,
       positions.mars
     );
+    updateSunMarsPrimaryCompanionState(
+      primaryCompanionState,
+      positions.sun,
+      positions.mars
+    );
     binaryStateRef.current = binaryState;
+    primaryCompanionStateRef.current = primaryCompanionState;
   });
 
   return null;
 };
 
 export default SunMarsBinaryTracker;
-

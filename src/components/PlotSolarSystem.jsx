@@ -13,12 +13,7 @@ const PlotSolarSystem = () => {
           </Pobj>
         </MoonOrbitalPlane>
 
-          <SunMarsBinarySystem ObjectComponent={Pobj} />
-          <Pobj name="Eros deferent A">
-            <Pobj name="Eros deferent B">
-              <Pobj name="Eros"></Pobj>
-            </Pobj>
-          </Pobj>
+          <SunMarsBinarySystem ObjectComponent={Pobj} plotMode />
         </Pobj>
       </Pobj>
     </group>
