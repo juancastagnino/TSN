@@ -12,11 +12,12 @@ python.exe -m pip install -r edits/scripts/requirements.txt
 # Download JPL once for that selection and time grid.
 python.exe -B edits/scripts/download_jpl.py
 
+python.exe -B edits/scripts/analyze_sun_mars_binary.py
 # In TYCHOS, export the same bodies/dates/step to:
 # edits/data/raw/tychos_ephemerides.txt
 
 # Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "binary tychos overhaul test. 2020-2026 3h"
+python.exe -B edits/scripts/run_analysis.py --label "binary tychos overhaul test phase 2. 2000-2026 3h"
 
 # Read-only Mercury/Venus residual attribution after a matching Sun run.
 python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py
@@ -33,6 +34,36 @@ The residual-attribution command writes
 model-derived annual, orbital, synodic and second-harmonic periods in chronological
 blocks, compares each planet with the simultaneous Sun residual, and searches FFT
 periods through 1000 days. It never modifies simulator settings or ephemerides.
+
+### Sun-Mars binary Phase 2.5 diagnostic
+
+In the TYCHOS ephemeris panel, enable **Sun-Mars binary CSV** and use the normal
+start date, end date and step controls. Planet selections are optional. When the
+run finishes, **Save binary CSV** downloads a separate diagnostic file; the normal
+planetary TXT format is unchanged.
+
+Move or save that file as `edits/data/raw/sun_mars_binary.csv`, then run:
+
+```powershell
+python.exe -B edits/scripts/analyze_sun_mars_binary.py
+```
+
+Or pass its download location explicitly with `--input`. The report at
+`edits/reports/sun_mars_binary_report.md` compares the existing Earth pivot, the
+PVP/SystemCenter and the per-sample Sun-Mars midpoint. The midpoint is a mathematical
+control: its equal radii and exact opposition are true by construction and do not
+identify a physical barycentre.
+
+The follow-up Phase 3A screen reuses the same CSV; no new simulator or JPL export
+is required:
+
+```powershell
+python.exe -B edits/scripts/analyze_sun_mars_phase3a.py
+```
+
+It compares a family of fixed Sun-Mars radius ratios using separate PVP-distance,
+path-size and best-fit-circle criteria. Its exact opposition is imposed by the
+weighted-centre construction and must not be interpreted as an independent result.
 
 Before a comparison trial, optionally [save the current results](#optional-pre-test-backup)
 in `edits/data/pretest/` before replacing exports or running the analysis again.

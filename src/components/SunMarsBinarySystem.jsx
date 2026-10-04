@@ -1,4 +1,5 @@
 import React from "react";
+import SunMarsBinaryTracker from "./SunMarsBinaryTracker";
 
 /**
  * Shared semantic frame for the TYCHOS Sun-Mars binary.
@@ -9,7 +10,7 @@ import React from "react";
  * both the visual and plot models on this component prevents their hierarchies
  * from drifting apart during later binary-geometry experiments.
  */
-const SunMarsBinarySystem = ({ ObjectComponent }) => {
+const SunMarsBinarySystem = ({ ObjectComponent, trackLiveState = false }) => {
   const ObjectNode = ObjectComponent;
 
   return (
@@ -71,6 +72,8 @@ const SunMarsBinarySystem = ({ ObjectComponent }) => {
           </ObjectNode>
         </ObjectNode>
       </group>
+
+      {trackLiveState && <SunMarsBinaryTracker />}
     </group>
   );
 };

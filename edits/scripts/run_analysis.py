@@ -3,11 +3,14 @@
 import argparse
 import csv
 from datetime import datetime, timezone
+import errno
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
+import time
 
 import analyze_ephemerides
 import compare_ephemerides
@@ -18,6 +21,35 @@ from ephemeris_io import tychos_blocks, jpl_blocks, validate_jpl_header, select_
 ROOT = Path(__file__).resolve().parents[2]
 REPORTS = ROOT / "edits/reports"
 DERIVED = ROOT / "edits/data/derived"
+
+
+def publish_file(source, destination, attempts=5, retry_delay=0.25):
+    """Publish a complete file atomically, tolerating brief OneDrive locks."""
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, staged_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
+    )
+    os.close(descriptor)
+    staged = Path(staged_name)
+    try:
+        shutil.copyfile(source, staged)
+        for attempt in range(attempts):
+            try:
+                os.replace(staged, destination)
+                return
+            except OSError as error:
+                retryable = error.errno in (errno.EACCES, errno.EINVAL) or getattr(
+                    error, "winerror", None
+                ) in (5, 32)
+                if not retryable or attempt == attempts - 1:
+                    raise OSError(
+                        f"Could not replace {destination}. Close it in Excel or "
+                        "another program and, if necessary, pause OneDrive sync, "
+                        f"then rerun the analysis. Original error: {error}"
+                    ) from error
+                time.sleep(retry_delay)
+    finally:
+        staged.unlink(missing_ok=True)
 
 
 def fingerprint(path):
@@ -174,8 +206,7 @@ def main(argv=None):
                 if fingerprint(ROOT/inputs[body][source]["path"]) != inputs[body][source]["sha256"]:
                     raise ValueError("Input changed during analysis; outputs were not replaced")
         for source, destination in publications:
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source, destination)
+            publish_file(source, destination)
     write_overview(configs)
     write_notes(summaries)
     print("Updated edits/reports/ephemeris_overview.md")

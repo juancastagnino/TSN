@@ -15,7 +15,7 @@ const SolarSystem = () => {
               <Cobj name="Actual Moon" />
             </Cobj>
           </MoonOrbitalPlane>
-          <SunMarsBinarySystem ObjectComponent={Cobj} />
+          <SunMarsBinarySystem ObjectComponent={Cobj} trackLiveState />
           <Cobj name="Eros deferent A">
             <Cobj name="Eros deferent B">
               <Cobj name="Eros" />

@@ -1,8 +1,15 @@
 import { Vector3, Spherical } from "three";
 import { radToRa, radToDec } from "../utils/celestial-functions";
+import {
+  createSunMarsBinaryDiagnostics,
+  createSunMarsBinaryState,
+  updateSunMarsBinaryDiagnostics,
+  updateSunMarsBinaryState,
+} from "./sunMarsBinaryState";
 
 // Helper to convert degrees to radians
 const D2R = Math.PI / 180;
+const plotBinaryState = createSunMarsBinaryState();
 
 export function movePlotModel(plotObjects, plotPos) {
   plotObjects.forEach((pObj) => {
@@ -11,6 +18,70 @@ export function movePlotModel(plotObjects, plotPos) {
         pObj.speed * plotPos - pObj.startPos * D2R;
     }
   });
+
+  return getPlotSunMarsBinaryState(plotObjects, plotBinaryState);
+}
+
+/**
+ * Derive the same common-centre companion vectors from the hidden plot model.
+ * Callers may pass a reusable target when sampling many ephemeris positions.
+ */
+export function getPlotSunMarsBinaryState(
+  plotObjects,
+  target = createSunMarsBinaryState()
+) {
+  const earthObj = plotObjects.find((p) => p.name === "Earth");
+  const sunObj = plotObjects.find((p) => p.name === "Sun");
+  const marsObj = plotObjects.find((p) => p.name === "Mars");
+
+  const earthPivot = earthObj?.pivotRef?.current;
+  const sunPivot = sunObj?.pivotRef?.current;
+  const marsPivot = marsObj?.pivotRef?.current;
+  if (!earthPivot || !sunPivot || !marsPivot) {
+    target.valid = false;
+    return target;
+  }
+
+  earthPivot.getWorldPosition(target.centerWorld);
+  sunPivot.getWorldPosition(target.sunWorld);
+  marsPivot.getWorldPosition(target.marsWorld);
+  return updateSunMarsBinaryState(
+    target,
+    target.centerWorld,
+    target.sunWorld,
+    target.marsWorld
+  );
+}
+
+export function getPlotSunMarsBinaryDiagnostics(
+  plotObjects,
+  target = createSunMarsBinaryDiagnostics()
+) {
+  const systemCenterObj = plotObjects.find((p) => p.name === "SystemCenter");
+  const earthObj = plotObjects.find((p) => p.name === "Earth");
+  const sunObj = plotObjects.find((p) => p.name === "Sun");
+  const marsObj = plotObjects.find((p) => p.name === "Mars");
+
+  const systemCenterPivot = systemCenterObj?.pivotRef?.current;
+  const earthPivot = earthObj?.pivotRef?.current;
+  const sunPivot = sunObj?.pivotRef?.current;
+  const marsPivot = marsObj?.pivotRef?.current;
+  if (!systemCenterPivot || !earthPivot || !sunPivot || !marsPivot) {
+    target.valid = false;
+    return target;
+  }
+
+  systemCenterPivot.getWorldPosition(target.sample.pvpWorld);
+  earthPivot.getWorldPosition(target.sample.earthWorld);
+  sunPivot.getWorldPosition(target.sample.sunWorld);
+  marsPivot.getWorldPosition(target.sample.marsWorld);
+  return updateSunMarsBinaryDiagnostics(
+    target,
+    target.sample.earthWorld,
+    target.sample.pvpWorld,
+    target.sample.sunWorld,
+    target.sample.marsWorld
+  );
 }
 
 export function getPlotModelRaDecDistance(name, plotObjects) {
