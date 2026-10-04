@@ -16,6 +16,7 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+from settings_schema import settings_map
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,10 +46,6 @@ SUN_CHAIN = ["Sun deferent", "Sun"]
 
 def number(setting: dict, key: str) -> float:
     return float(setting.get(key, 0) or 0)
-
-
-def settings_map(path: Path) -> dict[str, dict]:
-    return {item["name"]: item for item in json.loads(path.read_text(encoding="utf-8"))}
 
 
 def rx(angle):

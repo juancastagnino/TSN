@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Matrix4, Vector3 } from "three";
 import { usePlotStore, useSettingsStore, useStore } from "../store";
+import { buildSettingsIndex } from "../utils/celestialSettingsSchema";
 
 export const SUN_MARS_FRAME_NAME = "Sun-Mars Binary Frame";
 export const SUN_MARS_RELATIVE_UPDATER_NAME = "Sun-Mars Relative Components";
@@ -50,13 +51,13 @@ export const updateSunMarsRelativeComponents = (
   settingsByName,
   position
 ) => {
-  const get = (name) =>
+  const get = (id) =>
     settingsByName instanceof Map
-      ? settingsByName.get(name)
-      : settingsByName[name];
-  const sun = get("Sun");
-  const marsE = get("Mars deferent E");
-  const marsS = get("Mars deferent S");
+      ? settingsByName.get(id)
+      : settingsByName[id];
+  const sun = get("sun");
+  const marsE = get("mars-deferent-e");
+  const marsS = get("mars-deferent-s");
 
   orbitalOrientation(
     marsE,
@@ -136,10 +137,7 @@ export const updateSunRelativeFrame = (
  */
 const SunMarsRelativeOrbit = ({ children, plotMode = false }) => {
   const settings = useSettingsStore((state) => state.settings);
-  const settingsByName = useMemo(
-    () => new Map(settings.map((setting) => [setting.name, setting])),
-    [settings]
-  );
+  const settingsByName = useMemo(() => buildSettingsIndex(settings), [settings]);
   const components = useMemo(createSunMarsRelativeComponents, []);
   const rootRef = useRef();
   const centreRef = useRef();

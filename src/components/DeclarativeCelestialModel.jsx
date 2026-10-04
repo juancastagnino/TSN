@@ -1,6 +1,7 @@
 import React from "react";
 import celestialModel from "../settings/celestial-model.json";
 import celestialSettings from "../settings/celestial-settings.json";
+import { normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
 import MercurySunRelativeOrbit from "./MercurySunRelativeOrbit";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
@@ -22,10 +23,7 @@ export const CELESTIAL_NODE_KINDS = new Set([
 const modeAllows = (node, mode) =>
   !node.modes || node.modes.length === 0 || node.modes.includes(mode);
 
-export const findCelestialNode = (
-  id,
-  node = celestialModel.root
-) => {
+export const findCelestialNode = (id, node = celestialModel.root) => {
   if (node.id === id) return node;
   for (const child of node.children || []) {
     const found = findCelestialNode(id, child);
@@ -34,14 +32,43 @@ export const findCelestialNode = (
   return undefined;
 };
 
-export const validateCelestialModel = (
-  model = celestialModel,
-  settingNames
-) => {
-  if (model.schemaVersion !== 1) {
+export const validateCelestialModel = (model = celestialModel, settingIds) => {
+  if (model.schemaVersion !== 2) {
     throw new Error(`Unsupported celestial model schema ${model.schemaVersion}`);
   }
+  if (
+    model.id !== "tychos-native-binary-system" ||
+    model.settingsSchemaVersion !== 2
+  ) {
+    throw new Error("Celestial model identity or settings schema is invalid");
+  }
   if (!model.root) throw new Error("Celestial model has no root node");
+  if (
+    !Array.isArray(model.settingsCatalog) ||
+    !Array.isArray(model.editorGroups)
+  ) {
+    throw new Error("Celestial model has no settings catalog or editor groups");
+  }
+
+  const catalogIds = new Set();
+  const catalogNames = new Set();
+  model.settingsCatalog.forEach(({ id, name }) => {
+    if (!id || !name) throw new Error("Invalid celestial settings catalog entry");
+    if (catalogIds.has(id) || catalogNames.has(name)) {
+      throw new Error(`Duplicate celestial settings catalog entry '${id}'`);
+    }
+    catalogIds.add(id);
+    catalogNames.add(name);
+  });
+  model.editorGroups.forEach((group) =>
+    group.settingIds.forEach((id) => {
+      if (!catalogIds.has(id)) {
+        throw new Error(
+          `Editor group '${group.id}' references unknown setting '${id}'`
+        );
+      }
+    })
+  );
 
   const ids = new Set();
   const visit = (node, parentPath = "") => {
@@ -58,15 +85,15 @@ export const validateCelestialModel = (
     if (node.modes?.some((mode) => !["live", "plot"].includes(mode))) {
       throw new Error(`Invalid render mode at ${path}`);
     }
-    if (settingNames) {
-      const required = node.settings || (node.kind === "object" ? [node.name] : []);
-      required
-        .filter((name) => !name.startsWith("Actual "))
-        .forEach((name) => {
-          if (!settingNames.has(name)) {
-            throw new Error(`Unknown setting '${name}' referenced at ${path}`);
-          }
-        });
+    if (settingIds) {
+      const required =
+        node.settingIds ||
+        (node.kind === "object" ? [node.settingId || node.id] : []);
+      required.forEach((id) => {
+        if (!settingIds.has(id)) {
+          throw new Error(`Unknown setting '${id}' referenced at ${path}`);
+        }
+      });
     }
     (node.children || []).forEach((child) => visit(child, path));
   };
@@ -77,7 +104,9 @@ export const validateCelestialModel = (
 
 validateCelestialModel(
   celestialModel,
-  new Set(celestialSettings.map((setting) => setting.name))
+  new Set(
+    normalizeCelestialSettings(celestialSettings).map((setting) => setting.id)
+  )
 );
 
 export const renderCelestialNode = (
@@ -89,10 +118,18 @@ export const renderCelestialNode = (
 
   const children = (node.children || [])
     .map((child) =>
-      renderCelestialNode(child, { ObjectComponent, mode }, `${keyPath}/${child.id}`)
+      renderCelestialNode(
+        child,
+        { ObjectComponent, mode },
+        `${keyPath}/${child.id}`
+      )
     )
     .filter(Boolean);
-  const props = { key: keyPath, name: node.name };
+  const props = {
+    key: keyPath,
+    name: node.name,
+    settingId: node.settingId || (node.kind === "object" ? node.id : undefined),
+  };
 
   switch (node.kind) {
     case "group":

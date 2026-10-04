@@ -1,5 +1,10 @@
-[
+{
+  "schemaVersion": 2,
+  "modelSchemaVersion": 2,
+  "modelId": "tychos-native-binary-system",
+  "settings": [
   {
+    "id": "system-center",
     "name": "SystemCenter",
     "size": 1,
     "startPos": 0,
@@ -15,6 +20,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "earth",
     "name": "Earth",
     "size": 4,
     "actualSize": 0.00426,
@@ -32,6 +38,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "moon-node",
     "name": "Moon Node",
     "size": 0,
     "startPos": -296,
@@ -45,6 +52,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "moon-plane",
     "name": "Moon Plane",
     "size": 0,
     "startPos": 0,
@@ -58,6 +66,7 @@
     "orbitTiltb": -5.15
   },
   {
+    "id": "moon-deferent-a",
     "name": "Moon deferent A",
     "size": 0.6,
     "startPos": 167.51,
@@ -71,6 +80,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "moon",
     "name": "Moon",
     "size": 1,
     "actualSize": 0.00116,
@@ -86,6 +96,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "sun-deferent",
     "name": "Sun deferent",
     "size": 0,
     "startPos": 0,
@@ -99,6 +110,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "sun",
     "name": "Sun",
     "size": 8,
     "actualSize": 0.465,
@@ -116,6 +128,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "mercury-deferent-a",
     "name": "Mercury deferent A",
     "size": 0,
     "startPos": 0,
@@ -129,6 +142,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "mercury-deferent-b",
     "name": "Mercury deferent B",
     "size": 0,
     "startPos": 195.5,
@@ -142,6 +156,7 @@
     "orbitTiltb": -0.1
   },
   {
+    "id": "mercury-plane",
     "name": "Mercury Plane",
     "size": 0,
     "startPos": 0,
@@ -155,6 +170,7 @@
     "orbitTiltb": -3
   },
   {
+    "id": "mercury",
     "name": "Mercury",
     "size": 1.53,
     "actualSize": 0.00163,
@@ -171,6 +187,7 @@
     "orbitTiltb": 0.5
   },
   {
+    "id": "venus-deferent-a",
     "name": "Venus deferent A",
     "size": 2,
     "startPos": 0,
@@ -184,6 +201,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "venus-deferent-b",
     "name": "Venus deferent B",
     "size": 2,
     "startPos": 10.7,
@@ -197,6 +215,7 @@
     "orbitTiltb": 0.05
   },
   {
+    "id": "venus-plane",
     "name": "Venus Plane",
     "size": 0,
     "startPos": -0.25,
@@ -210,6 +229,7 @@
     "orbitTiltb": 0.3
   },
   {
+    "id": "venus",
     "name": "Venus",
     "size": 3.8,
     "actualSize": 0.00404,
@@ -226,6 +246,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "mars-deferent-e",
     "name": "Mars deferent E",
     "size": 2,
     "startPos": 0,
@@ -239,6 +260,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "mars-deferent-s",
     "name": "Mars deferent S",
     "size": 2,
     "startPos": -115,
@@ -252,6 +274,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "mars",
     "name": "Mars",
     "size": 2.13,
     "actualSize": 0.00227,
@@ -268,6 +291,7 @@
     "orbitTiltb": -1.7
   },
   {
+    "id": "phobos",
     "name": "Phobos",
     "size": 0.5,
     "actualSize": 0.00000742,
@@ -282,6 +306,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "deimos",
     "name": "Deimos",
     "size": 0.5,
     "actualSize": 0.00000414,
@@ -296,6 +321,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "jupiter-deferent",
     "name": "Jupiter deferent",
     "size": 1,
     "startPos": 75.4,
@@ -309,6 +335,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "jupiter",
     "name": "Jupiter",
     "size": 6,
     "actualSize": 0.0467,
@@ -326,6 +353,7 @@
   },
 
   {
+    "id": "saturn-deferent",
     "name": "Saturn deferent",
     "size": 1,
     "startPos": 518,
@@ -339,6 +367,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "saturn",
     "name": "Saturn",
     "size": 5,
     "actualSize": 0.0389,
@@ -355,6 +384,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "uranus-deferent",
     "name": "Uranus deferent",
     "size": 1,
     "startPos": 123,
@@ -368,6 +398,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "uranus",
     "name": "Uranus",
     "size": 7.5,
     "actualSize": 0.0169,
@@ -384,6 +415,7 @@
     "orbitTiltb": -0.7
   },
   {
+    "id": "neptune-deferent",
     "name": "Neptune deferent",
     "size": 1,
     "startPos": 175.2,
@@ -397,6 +429,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "neptune",
     "name": "Neptune",
     "size": 7.5,
     "actualSize": 0.0164,
@@ -413,6 +446,7 @@
     "orbitTiltb": 1.15
   },
   {
+    "id": "pluto-deferent",
     "name": "Pluto deferent",
     "size": "0",
     "startPos": "8",
@@ -426,6 +460,7 @@
     "orbitTiltb": "0"
   },
   {
+    "id": "pluto",
     "name": "Pluto",
     "size": "0.9",
     "actualSize": "0.00079",
@@ -441,6 +476,7 @@
     "orbitTiltb": "-10"
   },
   {
+    "id": "halley-deferent",
     "name": "Halleys deferent",
     "size": 1,
     "startPos": 179,
@@ -454,6 +490,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "halley",
     "name": "Halleys",
     "size": 1.5,
     "actualSize": 0.00000368,
@@ -470,6 +507,7 @@
     "orbitTiltb": 18.55
   },
   {
+    "id": "eros-deferent-a",
     "name": "Eros deferent A",
     "size": 2,
     "startPos": 0,
@@ -483,6 +521,7 @@
     "orbitTiltb": 3.6
   },
   {
+    "id": "eros-deferent-b",
     "name": "Eros deferent B",
     "size": 2,
     "startPos": 0,
@@ -496,6 +535,7 @@
     "orbitTiltb": 0
   },
   {
+    "id": "eros",
     "name": "Eros",
     "size": 0.1,
     "actualSize": 0.00000563,
@@ -511,4 +551,5 @@
     "orbitTilta": 0,
     "orbitTiltb": 0
   }
-]
+  ]
+}

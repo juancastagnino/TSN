@@ -55,9 +55,11 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   act(() => root.render(<EditSettings />));
 
   const data = mockLevaStore.getData();
-  expect(data["Settings.Moon Node.Main Orbit.Moon Nodespeed"]).toBeDefined();
   expect(
-    data["Settings.Moon Plane.Main Orbit.Moon PlaneorbitTilta"]
+    data["Settings.Earth-Moon System.Moon Node.Moon Nodespeed"]
+  ).toBeDefined();
+  expect(
+    data["Settings.Earth-Moon System.Moon Plane.Moon PlaneorbitTilta"]
   ).toBeDefined();
   expect(data["Show / Hide settings.Moonvisible"].value).toBe(true);
   expect(data["Show / Hide settings.Moon Nodevisible"]).toBeUndefined();
@@ -69,8 +71,9 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
 
 test("edits, resets and reopens lunar controls without losing synchronization", () => {
   act(() => root.render(<EditSettings />));
-  const nodePath = "Settings.Moon Node.Main Orbit.Moon Nodespeed";
-  const planePath = "Settings.Moon Plane.Main Orbit.Moon PlaneorbitTilta";
+  const nodePath = "Settings.Earth-Moon System.Moon Node.Moon Nodespeed";
+  const planePath =
+    "Settings.Earth-Moon System.Moon Plane.Moon PlaneorbitTilta";
 
   act(() =>
     mockLevaStore.set(
@@ -108,10 +111,14 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
 
   const data = mockLevaStore.getData();
   expect(
-    data["Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTilta"]
+    data[
+      "Settings.Mercury Junior Solar Companion.Mercury Plane.Mercury PlaneorbitTilta"
+    ]
   ).toBeDefined();
   expect(
-    data["Settings.Venus Plane.Main Orbit.Venus PlaneorbitTilta"]
+    data[
+      "Settings.Venus Senior Solar Companion.Venus Plane.Venus PlaneorbitTilta"
+    ]
   ).toBeDefined();
   expect(data["Show / Hide settings.Mercury Planevisible"]).toBeUndefined();
   expect(data["Show / Hide settings.Venus Planevisible"]).toBeUndefined();

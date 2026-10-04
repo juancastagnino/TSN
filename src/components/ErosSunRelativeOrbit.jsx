@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Matrix4, Vector3 } from "three";
 import { usePlotStore, useSettingsStore, useStore } from "../store";
+import { buildSettingsIndex } from "../utils/celestialSettingsSchema";
 import {
   SUN_MARS_FRAME_NAME,
   updateSunRelativeFrame,
@@ -54,14 +55,14 @@ export const updateErosSunRelativeComponents = (
   settingsByName,
   position
 ) => {
-  const get = (name) =>
+  const get = (id) =>
     settingsByName instanceof Map
-      ? settingsByName.get(name)
-      : settingsByName[name];
-  const sunDeferent = get("Sun deferent");
-  const sun = get("Sun");
-  const erosA = get("Eros deferent A");
-  const erosB = get("Eros deferent B");
+      ? settingsByName.get(id)
+      : settingsByName[id];
+  const sunDeferent = get("sun-deferent");
+  const sun = get("sun");
+  const erosA = get("eros-deferent-a");
+  const erosB = get("eros-deferent-b");
 
   orbitalOrientation(
     erosA,
@@ -131,10 +132,7 @@ export const updateErosSunRelativeComponents = (
 /** Phase 4E: make Eros structurally Sun-hosted without changing coordinates. */
 const ErosSunRelativeOrbit = ({ children, plotMode = false }) => {
   const settings = useSettingsStore((state) => state.settings);
-  const settingsByName = useMemo(
-    () => new Map(settings.map((setting) => [setting.name, setting])),
-    [settings]
-  );
+  const settingsByName = useMemo(() => buildSettingsIndex(settings), [settings]);
   const components = useMemo(createErosSunRelativeComponents, []);
   const rootRef = useRef();
   const centreRef = useRef();

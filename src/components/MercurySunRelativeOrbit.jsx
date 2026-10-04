@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Matrix4, Vector3 } from "three";
 import { usePlotStore, useSettingsStore, useStore } from "../store";
+import { buildSettingsIndex } from "../utils/celestialSettingsSchema";
 import {
   SUN_MARS_FRAME_NAME,
   updateSunRelativeFrame,
@@ -60,15 +61,15 @@ export const updateMercurySunRelativeComponents = (
   settingsByName,
   position
 ) => {
-  const get = (name) =>
+  const get = (id) =>
     settingsByName instanceof Map
-      ? settingsByName.get(name)
-      : settingsByName[name];
-  const sunDeferent = get("Sun deferent");
-  const sun = get("Sun");
-  const mercuryA = get("Mercury deferent A");
-  const mercuryB = get("Mercury deferent B");
-  const mercuryPlane = get("Mercury Plane");
+      ? settingsByName.get(id)
+      : settingsByName[id];
+  const sunDeferent = get("sun-deferent");
+  const sun = get("sun");
+  const mercuryA = get("mercury-deferent-a");
+  const mercuryB = get("mercury-deferent-b");
+  const mercuryPlane = get("mercury-plane");
 
   orbitalOrientation(
     mercuryA,
@@ -157,10 +158,7 @@ export const updateMercurySunRelativeComponents = (
 /** Phase 4C: make Mercury structurally Sun-hosted without changing coordinates. */
 const MercurySunRelativeOrbit = ({ children, plotMode = false }) => {
   const settings = useSettingsStore((state) => state.settings);
-  const settingsByName = useMemo(
-    () => new Map(settings.map((setting) => [setting.name, setting])),
-    [settings]
-  );
+  const settingsByName = useMemo(() => buildSettingsIndex(settings), [settings]);
   const components = useMemo(createMercurySunRelativeComponents, []);
   const rootRef = useRef();
   const centreRef = useRef();

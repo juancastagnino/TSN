@@ -10,6 +10,7 @@ import Deferent from "./Deferent";
 import EclipticGrid from "./Helpers/EclipticGrid";
 import createCircleTexture from "../utils/createCircleTexture";
 import usePlanetSpeed from "../utils/usePlanetSpeed";
+import { findCelestialSetting } from "../utils/celestialSettingsSchema";
 
 // PERFORMANCE FIX: Hoist the red dot material outside the component
 const circleTexture = createCircleTexture("red");
@@ -20,7 +21,7 @@ const spriteMaterial = new THREE.SpriteMaterial({
   sizeAttenuation: false,
 });
 
-const Cobj = ({ name, children }) => {
+const Cobj = ({ name, settingId, children }) => {
   const { settings } = useSettingsStore();
   const { scene } = useThree();
 
@@ -31,9 +32,9 @@ const Cobj = ({ name, children }) => {
   if (name.startsWith("Actual ")) {
     actualMoon = true;
     visible = false;
-    s = settings.find((p) => p.name === name.replace("Actual ", ""));
+    s = findCelestialSetting(settings, settingId || name.replace("Actual ", ""));
   } else {
-    s = settings.find((p) => p.name === name);
+    s = findCelestialSetting(settings, settingId || name);
     visible = s.visible;
   }
 

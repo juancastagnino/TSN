@@ -6,6 +6,7 @@ import {
   saveSettingsAsJson,
   loadSettingsFromFile,
 } from "../../utils/saveAndLoadSettings";
+import { getCelestialEditorGroups } from "../../utils/celestialSettingsSchema";
 
 const getControls = (s, updateSetting) => ({
   [`${s.name}size`]: {
@@ -323,19 +324,21 @@ const EditSettingsPanel = () => {
         };
       }
 
-      const planetSubmenus = {};
+    });
 
-      if (group.main) {
-        planetSubmenus["Main Orbit"] = folder(
-          getControls(group.main, updateSetting)
+    // The edit menu follows the declared astronomical system rather than
+    // inferring parentage from display-name substrings.
+    getCelestialEditorGroups(settings).forEach((editorGroup) => {
+      const groupControls = {};
+      editorGroup.settings.forEach((setting) => {
+        groupControls[setting.name] = folder(
+          getControls(setting, updateSetting),
+          { collapsed: true }
         );
-      }
-
-      group.deferents.forEach((def) => {
-        planetSubmenus[def.name] = folder(getControls(def, updateSetting));
       });
-
-      settingsMenu[parentName] = folder(planetSubmenus, { collapsed: true });
+      settingsMenu[editorGroup.name] = folder(groupControls, {
+        collapsed: true,
+      });
     });
 
     return {
@@ -383,6 +386,9 @@ const EditSettingsPanel = () => {
       }
       updatedValues[`${s.name}startPos`] = "\u200B" + s.startPos;
       updatedValues[`${s.name}speed`] = "\u200B" + s.speed;
+      if (s.rotationStart !== undefined) {
+        updatedValues[`${s.name}rotationStart`] = "\u200B" + s.rotationStart;
+      }
       if (s.rotationSpeed !== undefined) {
         updatedValues[`${s.name}rotationSpeed`] = "\u200B" + s.rotationSpeed;
       }

@@ -1,12 +1,13 @@
 import { Object3D, Vector3 } from "three";
 import settings from "../settings/celestial-settings.json";
+import { buildSettingsIndex, normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import {
   createErosSunRelativeComponents,
   updateErosSunRelativeComponents,
 } from "./ErosSunRelativeOrbit";
 
 const D2R = Math.PI / 180;
-const byName = new Map(settings.map((setting) => [setting.name, setting]));
+const byName = buildSettingsIndex(normalizeCelestialSettings(settings));
 const number = (setting, key) => Number(setting[key] || 0);
 
 const appendOrbitNode = (parent, setting, position) => {

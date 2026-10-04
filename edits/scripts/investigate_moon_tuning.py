@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+from settings_schema import settings_map
 
 ROOT = Path(__file__).resolve().parents[2]
 D2R = math.pi / 180
@@ -42,10 +43,6 @@ def rz(a):
 
 def apply(m, v):
     return np.einsum("nij,nj->ni", m, v) if m.ndim == 3 else v @ m.T
-
-
-def setting_map(path):
-    return {item["name"]: item for item in json.loads(path.read_text(encoding="utf-8"))}
 
 
 def f(s, key):
@@ -113,7 +110,7 @@ def score(pred, ref):
 
 def main():
     pos, ref, exported = load_reference()
-    settings = setting_map(ROOT / "src/settings/celestial-settings.json")
+    settings = settings_map(ROOT / "src/settings/celestial-settings.json")
     print("reconstruction_vs_export", score(model(settings,pos), exported))
     print("current_vs_jpl", score(model(settings,pos), ref))
 

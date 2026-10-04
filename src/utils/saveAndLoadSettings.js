@@ -1,37 +1,10 @@
 import { useSettingsStore } from "../store";
+import { serializeCelestialSettings } from "./celestialSettingsSchema";
 
 export const saveSettingsAsJson = (settings) => {
-  // Define the properties to include in the JSON
-  const allowedProperties = [
-    "name",
-    "size",
-    "actualSize",
-    "startPos",
-    "speed",
-    "rotationSpeed",
-    "tilt",
-    "tiltb",
-    "orbitRadius",
-    "orbitCentera",
-    "orbitCenterb",
-    "orbitCenterc",
-    "orbitTilta",
-    "orbitTiltb",
-  ];
-
-  // Filter settings to include only the allowed properties
-  const filteredSettings = settings.map((item) => {
-    const filteredItem = {};
-    allowedProperties.forEach((prop) => {
-      if (item.hasOwnProperty(prop)) {
-        filteredItem[prop] = item[prop];
-      }
-    });
-    return filteredItem;
-  });
-
-  // Convert filtered settings to JSON string with indentation
-  const jsonString = JSON.stringify(filteredSettings, null, 2);
+  // Native schema v2 retains stable IDs and rotationStart. Older flat arrays
+  // remain accepted by the loader for compatibility with existing authors.
+  const jsonString = JSON.stringify(serializeCelestialSettings(settings), null, 2);
 
   // Create a Blob with the JSON content
   const blob = new Blob([jsonString], { type: "application/json" });
@@ -65,7 +38,7 @@ export const loadSettingsFromFile = async () => {
     // Create file input element
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = ".txt";
+    input.accept = ".txt,.json";
 
     // Wrap file selection in a promise
     const file = await new Promise((resolve) => {
@@ -79,29 +52,8 @@ export const loadSettingsFromFile = async () => {
     const fileContents = await file.text();
     const parsedSettings = JSON.parse(fileContents);
 
-    // Validate the file structure
-    if (!Array.isArray(parsedSettings)) {
-      throw new Error("Invalid file format: Expected an array of settings");
-    }
-
-    const requiredProperties = ["name"]; // Minimum required property
-    const validSettings = parsedSettings.filter((item) => {
-      return (
-        item &&
-        typeof item === "object" &&
-        requiredProperties.every((prop) => prop in item)
-      );
-    });
-
-    if (validSettings.length === 0) {
-      throw new Error("No valid settings found in the file");
-    }
-
-    // Update Zustand store with each setting
-    const { updateSetting } = useSettingsStore.getState();
-    validSettings.forEach((setting) => {
-      updateSetting(setting);
-    });
+    // One atomic update supports both schema-v2 documents and legacy arrays.
+    useSettingsStore.getState().loadSettings(parsedSettings);
 
     return true; // Success
   } catch (error) {

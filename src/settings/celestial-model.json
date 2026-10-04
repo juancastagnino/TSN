@@ -1,7 +1,57 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "settingsSchemaVersion": 2,
+  "id": "tychos-native-binary-system",
   "name": "TYCHOS declarative celestial model",
-  "description": "Coordinate-preserving Sun-primary/Mars-companion hierarchy using the accepted numerical settings.",
+  "description": "Coordinate-preserving Sun-primary/Mars-companion hierarchy using stable setting identifiers and the accepted numerical settings.",
+  "settingsCatalog": [
+    { "id": "system-center", "name": "SystemCenter" },
+    { "id": "earth", "name": "Earth" },
+    { "id": "moon-node", "name": "Moon Node" },
+    { "id": "moon-plane", "name": "Moon Plane" },
+    { "id": "moon-deferent-a", "name": "Moon deferent A" },
+    { "id": "moon", "name": "Moon" },
+    { "id": "sun-deferent", "name": "Sun deferent" },
+    { "id": "sun", "name": "Sun" },
+    { "id": "mercury-deferent-a", "name": "Mercury deferent A" },
+    { "id": "mercury-deferent-b", "name": "Mercury deferent B" },
+    { "id": "mercury-plane", "name": "Mercury Plane" },
+    { "id": "mercury", "name": "Mercury" },
+    { "id": "venus-deferent-a", "name": "Venus deferent A" },
+    { "id": "venus-deferent-b", "name": "Venus deferent B" },
+    { "id": "venus-plane", "name": "Venus Plane" },
+    { "id": "venus", "name": "Venus" },
+    { "id": "mars-deferent-e", "name": "Mars deferent E" },
+    { "id": "mars-deferent-s", "name": "Mars deferent S" },
+    { "id": "mars", "name": "Mars" },
+    { "id": "phobos", "name": "Phobos" },
+    { "id": "deimos", "name": "Deimos" },
+    { "id": "jupiter-deferent", "name": "Jupiter deferent" },
+    { "id": "jupiter", "name": "Jupiter" },
+    { "id": "saturn-deferent", "name": "Saturn deferent" },
+    { "id": "saturn", "name": "Saturn" },
+    { "id": "uranus-deferent", "name": "Uranus deferent" },
+    { "id": "uranus", "name": "Uranus" },
+    { "id": "neptune-deferent", "name": "Neptune deferent" },
+    { "id": "neptune", "name": "Neptune" },
+    { "id": "pluto-deferent", "name": "Pluto deferent" },
+    { "id": "pluto", "name": "Pluto" },
+    { "id": "halley-deferent", "name": "Halleys deferent" },
+    { "id": "halley", "name": "Halleys" },
+    { "id": "eros-deferent-a", "name": "Eros deferent A" },
+    { "id": "eros-deferent-b", "name": "Eros deferent B" },
+    { "id": "eros", "name": "Eros" }
+  ],
+  "editorGroups": [
+    { "id": "pvp-frame", "name": "PVP / Observer Frame", "settingIds": ["system-center", "earth"] },
+    { "id": "earth-moon", "name": "Earth-Moon System", "settingIds": ["moon-node", "moon-plane", "moon-deferent-a", "moon"] },
+    { "id": "sun-primary", "name": "Sun Primary", "settingIds": ["sun-deferent", "sun"] },
+    { "id": "mars-companion", "name": "Mars Junior Companion", "settingIds": ["mars-deferent-e", "mars-deferent-s", "mars", "phobos", "deimos"] },
+    { "id": "venus-companion", "name": "Venus Senior Solar Companion", "settingIds": ["venus-deferent-a", "venus-deferent-b", "venus-plane", "venus"] },
+    { "id": "mercury-companion", "name": "Mercury Junior Solar Companion", "settingIds": ["mercury-deferent-a", "mercury-deferent-b", "mercury-plane", "mercury"] },
+    { "id": "outer-planets", "name": "Sun-Hosted Outer Planets", "settingIds": ["jupiter-deferent", "jupiter", "saturn-deferent", "saturn", "uranus-deferent", "uranus", "neptune-deferent", "neptune", "pluto-deferent", "pluto"] },
+    { "id": "small-bodies", "name": "Sun-Hosted Small Bodies", "settingIds": ["halley-deferent", "halley", "eros-deferent-a", "eros-deferent-b", "eros"] }
+  ],
   "root": {
     "id": "tychos-model",
     "kind": "group",
@@ -25,7 +75,7 @@
                 "kind": "moon-orbital-plane",
                 "name": "Moon Orbital Node and Plane",
                 "role": "earth-satellite-plane",
-                "settings": ["Moon Node", "Moon Plane"],
+                "settingIds": ["moon-node", "moon-plane"],
                 "children": [
                   {
                     "id": "moon-deferent-a",
@@ -45,6 +95,7 @@
                     "id": "actual-moon-deferent-a",
                     "kind": "object",
                     "name": "Actual Moon deferent A",
+                    "settingId": "moon-deferent-a",
                     "role": "physical-coordinate-moon-deferent",
                     "modes": ["live"],
                     "children": [
@@ -52,6 +103,7 @@
                         "id": "actual-moon",
                         "kind": "object",
                         "name": "Actual Moon",
+                        "settingId": "moon",
                         "role": "physical-coordinate-moon",
                         "modes": ["live"]
                       }
@@ -172,7 +224,7 @@
                                 "kind": "sun-mars-relative",
                                 "name": "Sun-Relative Mars Components",
                                 "role": "junior-companion-orbit",
-                                "settings": ["Sun", "Mars deferent E", "Mars deferent S", "Mars"],
+                                "settingIds": ["sun", "mars-deferent-e", "mars-deferent-s", "mars"],
                                 "children": [
                                   {
                                     "id": "mars-companion-branch",
@@ -209,7 +261,7 @@
                                 "kind": "venus-sun-relative",
                                 "name": "Sun-Relative Venus Frame",
                                 "role": "senior-solar-companion-orbit",
-                                "settings": ["Sun deferent", "Sun", "Venus deferent A", "Venus deferent B", "Venus Plane", "Venus"],
+                                "settingIds": ["sun-deferent", "sun", "venus-deferent-a", "venus-deferent-b", "venus-plane", "venus"],
                                 "children": [
                                   {
                                     "id": "venus-companion-branch",
@@ -232,7 +284,7 @@
                                 "kind": "mercury-sun-relative",
                                 "name": "Sun-Relative Mercury Frame",
                                 "role": "junior-solar-companion-orbit",
-                                "settings": ["Sun deferent", "Sun", "Mercury deferent A", "Mercury deferent B", "Mercury Plane", "Mercury"],
+                                "settingIds": ["sun-deferent", "sun", "mercury-deferent-a", "mercury-deferent-b", "mercury-plane", "mercury"],
                                 "children": [
                                   {
                                     "id": "mercury-companion-branch",
@@ -255,7 +307,7 @@
                                 "kind": "eros-sun-relative",
                                 "name": "Sun-Relative Eros Frame",
                                 "role": "solar-asteroid-orbit",
-                                "settings": ["Sun deferent", "Sun", "Eros deferent A", "Eros deferent B", "Eros"],
+                                "settingIds": ["sun-deferent", "sun", "eros-deferent-a", "eros-deferent-b", "eros"],
                                 "children": [
                                   {
                                     "id": "eros-branch",

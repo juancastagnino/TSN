@@ -7,7 +7,8 @@ pushing changes to the branch. Generated reports are the evidence for individual
 
 ## Branch scope
 
-This handoff describes the **`binary-tychos`** branch, created from `development`.
+This handoff describes the **`native-binary-system`** branch, descended from the
+accepted `declarative-hierarchy` baseline.
 It retains the accepted Moon Node/Plane baseline and explicit separate fixed planes
 for Mercury and Venus. Mercury and Venus otherwise reproduce the original TYCHOS
 geometry, and Pluto uses its original TYCHOS settings.
@@ -21,6 +22,31 @@ binary orbit, barycentric constraint or fitted parameter has been introduced.
 This branch intentionally excludes Observer Trace. It also does not add moving
 Mercury or Venus node objects: the current evidence supports separate fixed planes,
 but does not yet establish measurable nodal precession for either solar satellite.
+
+## Native binary-system core
+
+The hierarchy is now native and versioned rather than being only a JSX
+re-expression of a flat settings array:
+
+- `celestial-model.json` schema v2 declares the complete topology, semantic roles,
+  live/plot modes, stable settings registry and editor groups.
+- `celestial-settings.json` schema v2 stores every unchanged numerical parameter
+  under a stable ID. Human-readable legacy names remain labels and import aliases.
+- `DeclarativeCelestialModel.jsx`, `Cobj`, `Pobj`, the lunar frame and the four
+  Sun-relative reconstructors resolve settings by stable ID.
+- The Edit Settings panel is generated from the declared astronomical groups.
+- Old flat-array settings files still load through a validated compatibility
+  importer; new saves use schema v2 and retain `rotationStart`.
+- The analysis-only Python tools that read celestial settings accept both schemas.
+
+This migration changes organization and identity, not geometry. The source suite
+passes 57 tests across 11 suites, including exact relative-chain reconstruction,
+legacy import, schema round-trip and complete editor coverage. The production build
+passes with only the pre-existing MediaPipe source-map warnings. The last accepted
+declarative baseline remains in `00-backup/new-baseline`. The native end-to-end
+gate now also passes: all ten summary bodies have zero delta, 31 of 31 numeric
+artifacts are byte-identical, all 9,497 binary rows are unchanged, and all 75,969
+Eros rows match in every displayed export field.
 
 ## Sun-Mars primary-companion architecture: phases 1 through 4C
 
@@ -55,7 +81,7 @@ Earth
    │              └─ Mercury
 ```
 
-No celestial setting changes were needed for this hierarchy. Venus now uses an
+No numerical celestial setting changes were needed for this hierarchy. Venus now uses an
 exact expansion of its established compensating deferent chain beneath the moving
 Sun object; Mercury now has the parallel Phase 4C candidate. The outer planets
 remain under the Sun exactly as before. The Mars, Venus and Mercury stages are
@@ -968,10 +994,14 @@ proposed geometry on an independent interval.
 
 ## Where to inspect the implementation
 
+- [celestial-model.json](../src/settings/celestial-model.json): versioned native
+  topology, setting registry and editor grouping.
 - [MoonOrbitalPlane.jsx](../src/components/MoonOrbitalPlane.jsx): node / counter-rotation.
 - [celestial-settings.json](../src/settings/celestial-settings.json): retained node,
   lunar parameters and equivalence-preserving Mercury/Venus planes; lunar deferent B
   is intentionally absent.
+- [celestialSettingsSchema.js](../src/utils/celestialSettingsSchema.js): schema
+  validation, stable-ID lookup, legacy import and native serialization.
 - [PlotSolarSystem.jsx](../src/components/PlotSolarSystem.jsx) and [Pobj.jsx](../src/components/Pobj.jsx): hierarchy, local axes, offsets and inherited transformations.
 - [plotModelFunctions.js](../src/utils/plotModelFunctions.js): motion and conversion to exported coordinates.
 - [analyze_ephemerides.py](scripts/analyze_ephemerides.py): reference rotation, fixed periods and diagnostic fits.

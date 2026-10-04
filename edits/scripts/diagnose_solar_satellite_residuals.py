@@ -17,6 +17,7 @@ import math
 from pathlib import Path
 
 import numpy as np
+from settings_schema import settings_entries
 
 from analyze_ephemerides import (
     equatorial_to_ecliptic,
@@ -287,7 +288,7 @@ def main():
     args = parser.parse_args()
 
     settings_path = ROOT / "src" / "settings" / "celestial-settings.json"
-    settings = json.loads(settings_path.read_text(encoding="utf-8-sig"))
+    settings = settings_entries(settings_path)
     data = {
         body: load_body(args.data_dir / f"{body}_comparison.csv")
         for body in ("sun", *BODY_NAMES)

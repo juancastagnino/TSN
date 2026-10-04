@@ -13,6 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+from settings_schema import settings_map
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -71,10 +72,6 @@ def apply(matrix, vectors):
 
 def number(setting, key):
     return float(setting.get(key, 0) or 0)
-
-
-def setting_map(path):
-    return {item["name"]: item for item in json.loads(path.read_text(encoding="utf-8"))}
 
 
 def unit_vectors(ra, dec):
@@ -198,7 +195,7 @@ def main():
     args = parser.parse_args()
 
     dates, positions, reference, exported = load_comparison(args.body, args.stride)
-    settings = setting_map(ROOT / "src/settings/celestial-settings.json")
+    settings = settings_map(ROOT / "src/settings/celestial-settings.json")
     reconstructed = model(settings, args.body, positions)
     print("samples", len(positions), "stride", args.stride)
     print("reconstruction_vs_export", metrics(reconstructed, exported))

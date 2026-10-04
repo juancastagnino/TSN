@@ -216,6 +216,32 @@ binary rows. The direct Eros comparison has 75,969 matching timestamps and zero
 displayed RA, declination, distance or elongation mismatches. The declarative
 hierarchy is therefore accepted as coordinate preserving.
 
+### Native binary-system schema gate
+
+The `native-binary-system` branch promotes the accepted declarative topology and
+flat parameter array into linked schema-v2 model/settings documents. Numerical
+parameters and all relative-orbit formulas remain unchanged. Legacy flat-array
+settings files remain importable; new saves use stable IDs.
+
+Use one combined TYCHOS export containing the normal ten bodies **plus Eros** on
+the same three-hour `2000-06-21 00:00` through `2026-06-21 00:00` grid, and save
+the Sun-Mars binary CSV from the same unchanged model state. Then run:
+
+```powershell
+python.exe -B edits/scripts/run_analysis.py --label "Native binary system schema v2, 2000-2026 3h"
+python.exe -B edits/scripts/compare_phase_equivalence.py --output edits/reports/native_binary_system_equivalence_report.md
+```
+
+```powershell
+python.exe -B edits/scripts/compare_tychos_body_exports.py --candidate edits/data/raw/tychos_ephemerides.txt --output edits/reports/native_binary_system_eros_equivalence_report.md
+```
+
+Both native-schema gates pass. The ten-body summaries have zero numerical deltas,
+all 31 numeric artifacts are byte-identical, and all 9,497 Sun-Mars binary rows
+are exactly unchanged. The combined export also reproduces all 75,969 saved Eros
+timestamps and displayed RA, declination, distance and elongation fields exactly.
+The native schema is therefore accepted as coordinate preserving.
+
 Before a comparison trial, optionally [save the current results](#optional-pre-test-backup)
 in `edits/data/pretest/` before replacing exports or running the analysis again.
 

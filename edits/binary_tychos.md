@@ -2,14 +2,21 @@
 
 ## Purpose and status
 
-This branch expresses the TYCHOS model through an explicit asymmetric
-Sun–Mars primary/companion hierarchy. Mercury and Venus are structurally hosted
-by the Sun as its junior and senior solar companions, Eros is a Sun-hosted small
-body, and Phobos and Deimos remain children of Mars.
+This branch expresses the accepted TYCHOS geometry through an explicit,
+versioned asymmetric Sun–Mars primary/companion hierarchy. Mercury and Venus
+are structurally hosted by the Sun as its junior and senior solar companions,
+Eros is a Sun-hosted small body, and Phobos and Deimos remain children of Mars.
 
-The change is deliberately **coordinate preserving**. It reorganizes the scene
-and export hierarchy without fitting new orbital parameters or changing
-`celestial-settings.json`. The resulting ephemerides are identical to the
+This is the first genuinely native/declarative implementation of that hierarchy
+in the software, but it should not yet be described as the final or complete
+book-native TYCHOS architecture. The distinction is important: the code now
+states the intended astronomical roles explicitly, while some parentage and
+relative-coordinate mathematics remain deliberately constrained by the old
+model so that no accepted ephemeris is changed accidentally.
+
+The change is deliberately **coordinate preserving**. It reorganizes the scene,
+export hierarchy and settings schema without fitting new orbital parameters.
+The numerical values in `celestial-settings.json` are unchanged. The resulting ephemerides are identical to the
 pre-refactor model at export precision. This proves that the new hierarchy is a
 lossless representation of the accepted geometry; it does not by itself prove a
 physical binary interpretation or improve agreement with JPL.
@@ -19,7 +26,7 @@ status is:
 
 | Check | Result |
 |---|---:|
-| Source tests | 47 tests in 9 suites passed |
+| Source tests | 57 tests in 11 suites passed |
 | Production build | Passed; only pre-existing MediaPipe source-map warnings |
 | Scientific summaries | Zero deltas for all 10 analyzed bodies |
 | Numeric analysis artifacts | 31 of 31 byte-identical |
@@ -33,6 +40,106 @@ The accepted evidence is in:
 - `reports/eros_phase4d_report.md`
 - `00-backup/phase4d/` for the immediate full-system baseline
 - `00-backup/phase4c/eros_ephemerides_before.txt` for the pre-Eros export
+
+## Present conceptual status
+
+Three different claims must be kept separate:
+
+1. **Native software representation:** achieved. The topology and settings are
+   now versioned data, use stable IDs, drive both the visible and export models,
+   and expose Sun, Mars, Mercury, Venus, Eros and the moons through explicit
+   astronomical roles.
+2. **Coordinate-preserving migration:** achieved. The new hierarchy reproduces
+   the accepted pre-migration coordinates and exports without numerical changes.
+3. **Complete literal implementation of every structural statement in the
+   TYCHOS book and the author's October 2026 notes:** not yet achieved or fully
+   specified.
+
+The third claim cannot be made honestly until several remaining theoretical
+choices are defined by the authors and then tested. This does not invalidate the
+present implementation. It establishes a safe native baseline from which those
+physical changes can be made without mixing them with software refactoring.
+
+### What remains from the former model
+
+The old hierarchy is no longer the active source of truth, but several kinds of
+legacy information are intentionally retained:
+
+- The accepted numerical orbital parameters are unchanged.
+- Historical setting names remain as labels and import aliases so existing
+  settings files still load.
+- The deferent components that mathematically generate the accepted paths remain
+  active where they have not been shown to be redundant.
+- Sun-relative Mars, Mercury, Venus and Eros positions are reconstructed from
+  exact differences between their former chains and the Sun chain. These are
+  compatibility equations inside the new hierarchy, not post-export corrections.
+- At the root level the Sun–Mars system is still structurally beneath Earth so
+  that the accepted geocentric coordinates are preserved. `SystemCenter`
+  identifies the PVP/secular context, but it is not yet an independently defined
+  physical parent of both the Earth path and the Sun–Mars system.
+
+Therefore, “legacy” here does not mean that a second hidden old model is still
+running. It means that the new native tree deliberately preserves the proven
+mathematics and values of the preceding implementation.
+
+### Findings from the author's structure document
+
+The October 2026 document is broadly compatible with the direction of this
+refactor. It supports an asymmetric Sun–Mars relationship, treats Mercury and
+Venus as solar companions, retains Phobos and Deimos under Mars, and places
+Eros and Halley in the wider solar branch. It also adds requirements that are
+not yet represented literally:
+
+- the centre of the PVP orbit may serve as a secular system centre or secular
+  barycentre, although the author describes that interpretation as debatable;
+- Mercury and Venus should be coplanar with the Sun's equatorial plane, inclined
+  by approximately 6–7 degrees;
+- the 25,344-year Great Year, the 50,688-year Sun–Mars recurrence, the proposed
+  1,000/2,000-year Mercury/Venus recurrences and their transit/retrograde
+  relations should become explicit validation targets; and
+- some Mars/deferent elements have not yet been classified by the author as
+  fundamental geometry versus implementation devices.
+
+The current Mercury and Venus branches retain two separate fixed planes because
+that is what was required for exact equivalence with the accepted ephemerides.
+They are not yet a single shared solar-equatorial plane. Likewise, the present
+Sun–Mars hierarchy is semantically explicit but does not yet make the PVP centre
+the literal common parent of a separately represented Earth path and Sun–Mars
+system.
+
+### Candidate fully book-native hierarchy
+
+Once those definitions are settled, a stricter conceptual target could be:
+
+```text
+PVP / Secular Centre
+├─ Earth PVP Path
+└─ Sun–Mars System
+   └─ Sun Primary
+      ├─ Mars Junior Companion
+      │  ├─ Phobos
+      │  └─ Deimos
+      ├─ Shared Solar Equatorial Plane
+      │  ├─ Venus Senior Solar Companion
+      │  └─ Mercury Junior Solar Companion
+      ├─ Jupiter / Saturn / Uranus / Neptune / Pluto
+      ├─ Halley
+      └─ Eros
+```
+
+That would be a physical-geometry revision, not another equivalence refactor.
+It may legitimately change the ephemerides and therefore requires explicit
+definitions, new settings and observational validation rather than being folded
+silently into the accepted native baseline.
+
+Before attempting it, the authors should ideally specify:
+
+- whether the PVP centre is a true parent/origin or only a descriptive reference;
+- the exact epoch, axes and orientation of the shared solar-equatorial plane;
+- which current deferent components are fundamental and which may be replaced;
+- what “return to the same place” means for the quoted long cycles: coordinate
+  frame, observable, timestamp and numerical tolerance; and
+- whether axial parallelism is a renderer constraint, an orbital rule or both.
 
 ## Development path and findings
 
@@ -54,7 +161,7 @@ minimum **Earth-to-Mars distance**, not to Sun/Mars binary radii and not to an
 inferred mass ratio. It should remain an observational/geometric feature to
 explain, not a value imposed on a barycentric construction.
 
-## Resulting hierarchy
+## Current coordinate-preserving hierarchy
 
 The effective model tree is:
 
@@ -201,12 +308,13 @@ object: its deferent-A orientation already defines a fixed orbital basis.
 | `src/components/SunMarsBinaryTracker.jsx` | Optional diagnostic state collection and CSV export |
 | `src/utils/sunMarsBinaryState.js` | Binary diagnostic calculations |
 | `src/utils/plotModelFunctions.js` | Plot/export update ordering |
-| `src/settings/celestial-settings.json` | User-editable source parameters; unchanged by the refactor |
+| `src/settings/celestial-model.json` | Versioned native topology, roles, stable setting registry and editor groups |
+| `src/settings/celestial-settings.json` | Versioned native parameter document keyed by stable setting IDs |
+| `src/utils/celestialSettingsSchema.js` | Validation, legacy import, serialization, indexing and editor-group resolution |
 
-## Declarative hierarchy migration
+## Native, versioned hierarchy migration
 
-The first native-core migration is implemented on the `declarative-hierarchy`
-branch. `src/settings/celestial-model.json` is now the single declarative source
+The first migration made `src/settings/celestial-model.json` the single declarative source
 for the complete topology. It records:
 
 - stable node IDs and node types;
@@ -221,25 +329,42 @@ model. `SolarSystem.jsx` and `PlotSolarSystem.jsx` no longer contain independent
 hand-written celestial trees. `SunMarsBinarySystem.jsx` remains only as a
 backward-compatible view of the corresponding declarative subtree.
 
-This is the first migration level: the hierarchy and semantic roles are native
-and declarative, while all numerical values and relative-orbit mathematics remain
-unchanged. The Edit Settings menu still edits the accepted legacy settings;
-generating its hierarchy-aware layout from the schema is a separate future UI
-migration.
+The final native-core migration on `native-binary-system` links that topology to
+schema-v2 celestial settings. Every setting now has a stable ID such as
+`mercury-plane`; human-readable names are retained as labels and compatibility
+aliases. Relative-orbit mathematics and object rendering resolve stable IDs,
+while external scene names remain unchanged for cameras, labels and exports.
+
+The Edit Settings menu is generated from the model's declared editor groups. It
+now presents PVP/Earth, Earth-Moon, Sun primary, Mars companion, Venus companion,
+Mercury companion, outer planets and small bodies as explicit systems rather
+than guessing relationships from name substrings.
+
+Loading remains backward compatible. Existing flat-array `TS_settings` files are
+validated against the registry and converted to stable IDs in memory. New saves
+use schema v2, retain `rotationStart`, and can be loaded atomically. Unknown,
+duplicate or incomplete native defaults fail validation instead of silently
+creating a partially broken model.
 
 The schema tests verify unique IDs, known node types, valid render modes, valid
-setting dependencies, accepted object order and exclusion of the physical
+setting dependencies, legacy import and native round-trip, complete editor
+coverage, accepted object order and exclusion of the physical
 `Actual Moon` and live binary tracker from the plot/export model. The complete
-source suite passes 52 tests across 10 suites, and the production build passes
+source suite passes 57 tests across 11 suites, and the production build passes
 with only the pre-existing MediaPipe source-map warnings.
 
-The migration is fully accepted. The fresh full-system gate has zero deltas in all
+The preceding declarative migration was fully accepted. Its fresh full-system gate has zero deltas in all
 ten scientific summaries, all 31 numeric artifacts are byte-identical, and all
 9,497 Sun-Mars binary rows are exactly unchanged. The direct Eros gate also passes:
 all 75,969 timestamps and displayed RA, declination, distance and elongation fields
 are identical to the restored pre-migration export. The tiny calculated direction
 RMS (`5.20e-7 deg`) is floating-point `acos` noise between identical formatted
-coordinates, not an exported-coordinate difference.
+coordinates, not an exported-coordinate difference. The schema-v2 migration
+changes no numerical setting and passes all code-level reconstruction tests. Its
+fresh simulator gate now passes as well: the ten-body summaries have zero delta,
+31 of 31 numeric artifacts are byte-identical, all 9,497 binary rows are exactly
+unchanged, and all 75,969 Eros rows match in every displayed export field. The
+native version is accepted as coordinate preserving.
 
 The component tests compare each new relative reconstruction with its independent
 legacy chain at selected epochs and across dense long-duration grids. The final
@@ -249,8 +374,9 @@ simulator exports remain the authoritative end-to-end check.
 
 ### Short answer
 
-The controls can continue editing the same named settings, and changes propagate
-live through the new hierarchy. The author does **not** need to edit the generated
+The controls continue displaying the familiar setting names, and changes propagate
+live through the new hierarchy. Internally the update is applied by stable ID.
+The author does **not** need to edit the generated
 Sun-relative component nodes directly.
 
 The recommended working process is different, however. A parameter now has a
@@ -261,16 +387,12 @@ rather than treating every visible number as an independent correction knob.
 
 ### What the current Edit Settings menu does
 
-The current menu still groups entries by their legacy names. For example,
-`Mercury deferent A`, `Mercury deferent B` and `Mercury` appear as a Mercury
-group, while `Mercury Plane` appears as a separate group. The same is true for
-Venus Plane. The generated entries such as `Sun-Mercury Annual Carrier Mismatch`
-do not appear in the settings file or menu; they are calculated results, not
-new tunable parameters.
-
-This is functionally valid but does not clearly explain the new dependency tree.
-An author can continue using it now, provided the parameter roles below are
-respected.
+The current menu follows the native declared systems. Mercury's A/B stages,
+fixed plane and leaf are together under `Mercury Junior Solar Companion`; Venus
+has its own corresponding group; Mars includes both deferents, the main body,
+Phobos and Deimos. Generated entries such as `Sun-Mercury Annual Carrier
+Mismatch` remain absent because they are calculated results, not independent
+tunable parameters.
 
 ## Recommended tuning roles
 
@@ -331,12 +453,9 @@ intentional, localized as predicted, and validated out of sample. Exact
 equivalence gates should be used again when code or hierarchy is refactored
 without intending to alter the geometry.
 
-## Recommended Edit Settings menu redesign
+## Edit Settings hierarchy and future refinements
 
-The current flat/group-by-name menu remains usable, but the new model would be
-safer and easier to understand with a hierarchy-aware presentation.
-
-Recommended top-level structure:
+The implemented top-level structure is:
 
 ```text
 Appearance
@@ -367,7 +486,7 @@ Within every object, controls should be divided into:
 - **Body appearance and spin:** `size`, `actualSize`, `tilt`, `tiltb`, rotation
   controls.
 
-Additional recommendations:
+Useful future refinements:
 
 - Mark Sun and other shared settings with a **global/shared** warning.
 - Display the generated relative-component names as read-only explanatory rows,
@@ -377,18 +496,13 @@ Additional recommendations:
 - Allow an experiment label and baseline snapshot to be saved with settings.
 - Highlight zero-radius but non-identity stages such as Mercury deferent B.
 - Add optional parameter descriptions and units directly in the menu.
-- Add a settings schema version and reject unknown names, non-numeric orbital
-  values and incomplete incompatible files during loading.
-- Include `rotationStart` in saved settings and in the panel's external-state
-  synchronization. It is currently displayed and exists in the source JSON, but
-  `saveSettingsAsJson()` omits it from `allowedProperties`, and the synchronization
-  effect updates `rotationSpeed` without updating `rotationStart`.
+- Add explicit units and numeric-range validation for orbital values.
 - Avoid mutating the existing setting object before updating the store; create a
   validated immutable replacement instead.
 
-The menu redesign is a usability and safety improvement. It should not replace or
-rename the underlying settings until a migration layer and equivalence test exist,
-because the relative components deliberately read the accepted legacy names.
+Stable IDs now allow visible labels to evolve without changing astronomical
+identity. Legacy names should nevertheless remain as import aliases until the
+authors intentionally retire the old settings format.
 
 ## Acceptance discipline for future changes
 
@@ -417,11 +531,24 @@ corrections to the exported coordinates.
 
 ## Final interpretation
 
-The completed refactor gives the TYCHOS proposal greater explanatory clarity in
-software: the code tree now visibly expresses the relationships the framework
-claims instead of relying on a collection of Earth-level carrier chains. Because
-the outputs are unchanged, all previous observational strengths and weaknesses
-remain. The value of this phase is that future experiments can now be described
-in the same language as the proposed geometry—Sun primary, Mars companion,
-solar companions, local planes and inherited moons—while retaining a proven
-numerical baseline.
+The completed refactor gives the TYCHOS proposal substantially greater
+explanatory clarity in software: the code tree now visibly expresses Sun
+primary, Mars companion, solar companions, inherited moons and Sun-hosted small
+bodies instead of leaving those meanings implicit in Earth-level carrier
+chains. The topology and parameter registry are genuinely native and
+declarative; this is more than a display-only relabelling.
+
+At the same time, exact equivalence was an intentional design constraint. The
+current implementation should be presented as a **native, versioned,
+coordinate-preserving TYCHOS hierarchy**, not yet as a definitive encoding of
+every physical detail proposed in the book. Its remaining compatibility
+mathematics preserve the accepted geometry while isolating the questions that
+still require author definitions: the root role of the PVP centre, a possible
+shared solar-equatorial plane for Mercury and Venus, and the theoretical status
+of the retained deferent components.
+
+Because the outputs are unchanged, all previous observational strengths and
+weaknesses remain. That is precisely what makes this a reliable baseline. The
+next book-native migration can now be evaluated as an explicit astronomical
+hypothesis, with its coordinate changes measured against both this baseline and
+independent observations, rather than being confused with a software rewrite.

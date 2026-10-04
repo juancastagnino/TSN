@@ -1,6 +1,7 @@
 import React from "react";
 import celestialModel from "../settings/celestial-model.json";
 import celestialSettings from "../settings/celestial-settings.json";
+import { normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import {
   findCelestialNode,
   renderCelestialNode,
@@ -41,8 +42,10 @@ const pathTo = (targetId, node = celestialModel.root, parents = []) => {
 };
 
 test("validates every declarative node and settings dependency", () => {
-  const settingNames = new Set(celestialSettings.map((setting) => setting.name));
-  expect(validateCelestialModel(celestialModel, settingNames)).toBe(true);
+  const settingIds = new Set(
+    normalizeCelestialSettings(celestialSettings).map((setting) => setting.id)
+  );
+  expect(validateCelestialModel(celestialModel, settingIds)).toBe(true);
 });
 
 test("declares one shared Sun-Mars hierarchy with the accepted branches", () => {

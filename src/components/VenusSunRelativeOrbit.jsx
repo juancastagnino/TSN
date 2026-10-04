@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Matrix4, Vector3 } from "three";
 import { usePlotStore, useSettingsStore, useStore } from "../store";
+import { buildSettingsIndex } from "../utils/celestialSettingsSchema";
 import {
   SUN_MARS_FRAME_NAME,
   updateSunRelativeFrame,
@@ -60,15 +61,15 @@ export const updateVenusSunRelativeComponents = (
   settingsByName,
   position
 ) => {
-  const get = (name) =>
+  const get = (id) =>
     settingsByName instanceof Map
-      ? settingsByName.get(name)
-      : settingsByName[name];
-  const sunDeferent = get("Sun deferent");
-  const sun = get("Sun");
-  const venusA = get("Venus deferent A");
-  const venusB = get("Venus deferent B");
-  const venusPlane = get("Venus Plane");
+      ? settingsByName.get(id)
+      : settingsByName[id];
+  const sunDeferent = get("sun-deferent");
+  const sun = get("sun");
+  const venusA = get("venus-deferent-a");
+  const venusB = get("venus-deferent-b");
+  const venusPlane = get("venus-plane");
 
   orbitalOrientation(
     venusA,
@@ -157,10 +158,7 @@ export const updateVenusSunRelativeComponents = (
 /** Phase 4B: make Venus structurally Sun-hosted without changing coordinates. */
 const VenusSunRelativeOrbit = ({ children, plotMode = false }) => {
   const settings = useSettingsStore((state) => state.settings);
-  const settingsByName = useMemo(
-    () => new Map(settings.map((setting) => [setting.name, setting])),
-    [settings]
-  );
+  const settingsByName = useMemo(() => buildSettingsIndex(settings), [settings]);
   const components = useMemo(createVenusSunRelativeComponents, []);
   const rootRef = useRef();
   const centreRef = useRef();
