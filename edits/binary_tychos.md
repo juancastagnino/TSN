@@ -203,6 +203,44 @@ object: its deferent-A orientation already defines a fixed orbital basis.
 | `src/utils/plotModelFunctions.js` | Plot/export update ordering |
 | `src/settings/celestial-settings.json` | User-editable source parameters; unchanged by the refactor |
 
+## Declarative hierarchy migration
+
+The first native-core migration is implemented on the `declarative-hierarchy`
+branch. `src/settings/celestial-model.json` is now the single declarative source
+for the complete topology. It records:
+
+- stable node IDs and node types;
+- parent/child relationships;
+- astronomical roles;
+- live-only versus plot/export nodes; and
+- the accepted legacy settings on which every derived relative frame depends.
+
+`DeclarativeCelestialModel.jsx` validates the schema and every referenced setting,
+then recursively builds either the live `Cobj` model or the plot/export `Pobj`
+model. `SolarSystem.jsx` and `PlotSolarSystem.jsx` no longer contain independent
+hand-written celestial trees. `SunMarsBinarySystem.jsx` remains only as a
+backward-compatible view of the corresponding declarative subtree.
+
+This is the first migration level: the hierarchy and semantic roles are native
+and declarative, while all numerical values and relative-orbit mathematics remain
+unchanged. The Edit Settings menu still edits the accepted legacy settings;
+generating its hierarchy-aware layout from the schema is a separate future UI
+migration.
+
+The schema tests verify unique IDs, known node types, valid render modes, valid
+setting dependencies, accepted object order and exclusion of the physical
+`Actual Moon` and live binary tracker from the plot/export model. The complete
+source suite passes 52 tests across 10 suites, and the production build passes
+with only the pre-existing MediaPipe source-map warnings.
+
+The migration is fully accepted. The fresh full-system gate has zero deltas in all
+ten scientific summaries, all 31 numeric artifacts are byte-identical, and all
+9,497 Sun-Mars binary rows are exactly unchanged. The direct Eros gate also passes:
+all 75,969 timestamps and displayed RA, declination, distance and elongation fields
+are identical to the restored pre-migration export. The tiny calculated direction
+RMS (`5.20e-7 deg`) is floating-point `acos` noise between identical formatted
+coordinates, not an exported-coordinate difference.
+
 The component tests compare each new relative reconstruction with its independent
 legacy chain at selected epochs and across dense long-duration grids. The final
 simulator exports remain the authoritative end-to-end check.

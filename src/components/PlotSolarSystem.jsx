@@ -1,22 +1,7 @@
 import Pobj from "./Pobj";
-import MoonOrbitalPlane from "./MoonOrbitalPlane";
-import SunMarsBinarySystem from "./SunMarsBinarySystem";
+import DeclarativeCelestialModel from "./DeclarativeCelestialModel";
 
 const PlotSolarSystem = () => {
-  return (
-    <group>
-      <Pobj name="SystemCenter">
-      <Pobj name="Earth">
-        <MoonOrbitalPlane>
-          <Pobj name="Moon deferent A">
-            <Pobj name="Moon" />
-          </Pobj>
-        </MoonOrbitalPlane>
-
-          <SunMarsBinarySystem ObjectComponent={Pobj} plotMode />
-        </Pobj>
-      </Pobj>
-    </group>
-  );
+  return <DeclarativeCelestialModel ObjectComponent={Pobj} mode="plot" />;
 };
 export default PlotSolarSystem;

@@ -183,6 +183,39 @@ byte-identical, and all 9,497 Sun-Mars binary rows are exactly unchanged. Source
 tests and the production build also pass. Phase 4E is therefore accepted as
 coordinate preserving.
 
+### Declarative hierarchy equivalence gate
+
+The `declarative-hierarchy` branch moves the complete live and plot/export topology
+into `src/settings/celestial-model.json`. Numerical settings and all accepted
+relative-orbit components remain unchanged. The pre-migration reports, raw TYCHOS
+export, binary CSV, Eros export, JPL source, settings and analysis configuration are
+preserved together in `00-backup/new-baseline`.
+
+After the code migration, export the normal ten bodies over the same
+`2000-06-21 00:00` through `2026-06-21 00:00` three-hour grid, enable and save the
+Sun-Mars binary CSV, and rerun:
+
+```powershell
+python.exe -B edits/scripts/run_analysis.py --label "Declarative hierarchy candidate, 2000-2026 3h"
+python.exe -B edits/scripts/compare_phase_equivalence.py
+```
+
+Also export Eros alone over the same grid as
+`edits/data/raw/eros_ephemerides_after.txt`, then run:
+
+```powershell
+python.exe -B edits/scripts/compare_tychos_body_exports.py
+```
+
+The migration is accepted only when both reports pass with no unintended output
+change.
+
+Both gates pass. The full ten-body and Sun-Mars binary comparison has zero summary
+deltas, 31 of 31 byte-identical numeric artifacts and 9,497 exactly unchanged
+binary rows. The direct Eros comparison has 75,969 matching timestamps and zero
+displayed RA, declination, distance or elongation mismatches. The declarative
+hierarchy is therefore accepted as coordinate preserving.
+
 Before a comparison trial, optionally [save the current results](#optional-pre-test-backup)
 in `edits/data/pretest/` before replacing exports or running the analysis again.
 

@@ -235,11 +235,11 @@ def generate_report(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--baseline-reports", type=Path, default=ROOT / "00-backup" / "phase4d")
+    parser.add_argument("--baseline-reports", type=Path, default=ROOT / "00-backup" / "new-baseline")
     parser.add_argument("--candidate-reports", type=Path, default=ROOT / "edits" / "reports")
-    parser.add_argument("--baseline-binary", type=Path, default=ROOT / "00-backup" / "phase4d" / "sun_mars_binary.csv")
+    parser.add_argument("--baseline-binary", type=Path, default=ROOT / "00-backup" / "new-baseline" / "sun_mars_binary.csv")
     parser.add_argument("--candidate-binary", type=Path, default=ROOT / "edits" / "data" / "raw" / "sun_mars_binary.csv")
-    parser.add_argument("--output", type=Path, default=ROOT / "edits" / "reports" / "phase4e_system_equivalence_report.md")
+    parser.add_argument("--output", type=Path, default=ROOT / "edits" / "reports" / "declarative_hierarchy_equivalence_report.md")
     parser.add_argument("--tolerance", type=float, default=1e-9)
     parser.add_argument("--endpoint-angle-tolerance", type=float, default=2e-6)
     return parser.parse_args()

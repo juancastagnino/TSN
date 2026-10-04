@@ -160,7 +160,7 @@ def parse_args():
     parser.add_argument(
         "--baseline",
         type=Path,
-        default=ROOT / "00-backup/phase4c/eros_ephemerides_before.txt",
+        default=ROOT / "00-backup/new-baseline/eros_ephemerides_before.txt",
     )
     parser.add_argument(
         "--candidate",
@@ -170,16 +170,33 @@ def parse_args():
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "edits/reports/phase4e_eros_equivalence_report.md",
+        default=ROOT / "edits/reports/declarative_hierarchy_eros_equivalence_report.md",
     )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    report, accepted = compare(
-        args.baseline.resolve(), args.candidate.resolve(), args.body
-    )
+    try:
+        report, accepted = compare(
+            args.baseline.resolve(), args.candidate.resolve(), args.body
+        )
+    except (OSError, ValueError) as error:
+        accepted = False
+        report = "\n".join(
+            [
+                f"# {args.body} TYCHOS export-equivalence comparison",
+                "",
+                "Status: **INCOMPLETE**  ",
+                f"Baseline: `{args.baseline.resolve().as_posix()}`  ",
+                f"Candidate: `{args.candidate.resolve().as_posix()}`",
+                "",
+                f"The direct comparison could not run: `{error}`",
+                "",
+                "This is a missing/invalid-input result, not a scientific mismatch.",
+                "",
+            ]
+        )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(report, encoding="utf-8")
     print(report)

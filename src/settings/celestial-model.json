@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "name": "TYCHOS declarative celestial model",
+  "description": "Coordinate-preserving Sun-primary/Mars-companion hierarchy using the accepted numerical settings.",
+  "root": {
+    "id": "tychos-model",
+    "kind": "group",
+    "name": "TYCHOS Celestial Model",
+    "role": "model-root",
+    "children": [
+      {
+        "id": "system-center",
+        "kind": "object",
+        "name": "SystemCenter",
+        "role": "pvp-system-origin",
+        "children": [
+          {
+            "id": "earth",
+            "kind": "object",
+            "name": "Earth",
+            "role": "observer-world",
+            "children": [
+              {
+                "id": "moon-orbital-frame",
+                "kind": "moon-orbital-plane",
+                "name": "Moon Orbital Node and Plane",
+                "role": "earth-satellite-plane",
+                "settings": ["Moon Node", "Moon Plane"],
+                "children": [
+                  {
+                    "id": "moon-deferent-a",
+                    "kind": "object",
+                    "name": "Moon deferent A",
+                    "role": "moon-deferent",
+                    "children": [
+                      {
+                        "id": "moon",
+                        "kind": "object",
+                        "name": "Moon",
+                        "role": "earth-satellite"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "actual-moon-deferent-a",
+                    "kind": "object",
+                    "name": "Actual Moon deferent A",
+                    "role": "physical-coordinate-moon-deferent",
+                    "modes": ["live"],
+                    "children": [
+                      {
+                        "id": "actual-moon",
+                        "kind": "object",
+                        "name": "Actual Moon",
+                        "role": "physical-coordinate-moon",
+                        "modes": ["live"]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "sun-mars-binary",
+                "kind": "group",
+                "name": "Sun-Mars Binary Frame",
+                "role": "asymmetric-primary-companion-system",
+                "children": [
+                  {
+                    "id": "sun-primary-branch",
+                    "kind": "group",
+                    "name": "Sun Primary Branch",
+                    "role": "primary-branch",
+                    "children": [
+                      {
+                        "id": "sun-deferent",
+                        "kind": "object",
+                        "name": "Sun deferent",
+                        "role": "sun-carrier",
+                        "children": [
+                          {
+                            "id": "sun",
+                            "kind": "object",
+                            "name": "Sun",
+                            "role": "primary",
+                            "children": [
+                              {
+                                "id": "halley-deferent",
+                                "kind": "object",
+                                "name": "Halleys deferent",
+                                "role": "comet-deferent",
+                                "children": [
+                                  {
+                                    "id": "halley",
+                                    "kind": "object",
+                                    "name": "Halleys",
+                                    "role": "sun-hosted-comet"
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "jupiter-deferent",
+                                "kind": "object",
+                                "name": "Jupiter deferent",
+                                "role": "outer-planet-deferent",
+                                "children": [
+                                  {
+                                    "id": "jupiter",
+                                    "kind": "object",
+                                    "name": "Jupiter",
+                                    "role": "sun-hosted-outer-planet"
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "saturn-deferent",
+                                "kind": "object",
+                                "name": "Saturn deferent",
+                                "role": "outer-planet-deferent",
+                                "children": [
+                                  {
+                                    "id": "saturn",
+                                    "kind": "object",
+                                    "name": "Saturn",
+                                    "role": "sun-hosted-outer-planet"
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "uranus-deferent",
+                                "kind": "object",
+                                "name": "Uranus deferent",
+                                "role": "outer-planet-deferent",
+                                "children": [
+                                  {
+                                    "id": "uranus",
+                                    "kind": "object",
+                                    "name": "Uranus",
+                                    "role": "sun-hosted-outer-planet"
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "neptune-deferent",
+                                "kind": "object",
+                                "name": "Neptune deferent",
+                                "role": "outer-planet-deferent",
+                                "children": [
+                                  {
+                                    "id": "neptune",
+                                    "kind": "object",
+                                    "name": "Neptune",
+                                    "role": "sun-hosted-outer-planet"
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "pluto-deferent",
+                                "kind": "object",
+                                "name": "Pluto deferent",
+                                "role": "outer-planet-deferent",
+                                "children": [
+                                  {
+                                    "id": "pluto",
+                                    "kind": "object",
+                                    "name": "Pluto",
+                                    "role": "sun-hosted-outer-body"
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "mars-relative-orbit",
+                                "kind": "sun-mars-relative",
+                                "name": "Sun-Relative Mars Components",
+                                "role": "junior-companion-orbit",
+                                "settings": ["Sun", "Mars deferent E", "Mars deferent S", "Mars"],
+                                "children": [
+                                  {
+                                    "id": "mars-companion-branch",
+                                    "kind": "group",
+                                    "name": "Mars Junior Companion Branch",
+                                    "role": "junior-companion-branch",
+                                    "children": [
+                                      {
+                                        "id": "mars",
+                                        "kind": "object",
+                                        "name": "Mars",
+                                        "role": "junior-companion",
+                                        "children": [
+                                          {
+                                            "id": "phobos",
+                                            "kind": "object",
+                                            "name": "Phobos",
+                                            "role": "mars-satellite"
+                                          },
+                                          {
+                                            "id": "deimos",
+                                            "kind": "object",
+                                            "name": "Deimos",
+                                            "role": "mars-satellite"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "venus-relative-orbit",
+                                "kind": "venus-sun-relative",
+                                "name": "Sun-Relative Venus Frame",
+                                "role": "senior-solar-companion-orbit",
+                                "settings": ["Sun deferent", "Sun", "Venus deferent A", "Venus deferent B", "Venus Plane", "Venus"],
+                                "children": [
+                                  {
+                                    "id": "venus-companion-branch",
+                                    "kind": "group",
+                                    "name": "Venus Senior Solar Companion Branch",
+                                    "role": "senior-solar-companion-branch",
+                                    "children": [
+                                      {
+                                        "id": "venus",
+                                        "kind": "object",
+                                        "name": "Venus",
+                                        "role": "senior-solar-companion"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "mercury-relative-orbit",
+                                "kind": "mercury-sun-relative",
+                                "name": "Sun-Relative Mercury Frame",
+                                "role": "junior-solar-companion-orbit",
+                                "settings": ["Sun deferent", "Sun", "Mercury deferent A", "Mercury deferent B", "Mercury Plane", "Mercury"],
+                                "children": [
+                                  {
+                                    "id": "mercury-companion-branch",
+                                    "kind": "group",
+                                    "name": "Mercury Junior Solar Companion Branch",
+                                    "role": "junior-solar-companion-branch",
+                                    "children": [
+                                      {
+                                        "id": "mercury",
+                                        "kind": "object",
+                                        "name": "Mercury",
+                                        "role": "junior-solar-companion"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "eros-relative-orbit",
+                                "kind": "eros-sun-relative",
+                                "name": "Sun-Relative Eros Frame",
+                                "role": "solar-asteroid-orbit",
+                                "settings": ["Sun deferent", "Sun", "Eros deferent A", "Eros deferent B", "Eros"],
+                                "children": [
+                                  {
+                                    "id": "eros-branch",
+                                    "kind": "group",
+                                    "name": "Eros Solar Asteroid Branch",
+                                    "role": "solar-asteroid-branch",
+                                    "children": [
+                                      {
+                                        "id": "eros",
+                                        "kind": "object",
+                                        "name": "Eros",
+                                        "role": "sun-hosted-asteroid"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "sun-mars-binary-tracker",
+                    "kind": "sun-mars-binary-tracker",
+                    "name": "Sun-Mars Binary Tracker",
+                    "role": "live-diagnostic",
+                    "modes": ["live"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

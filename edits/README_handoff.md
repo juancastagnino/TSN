@@ -471,6 +471,35 @@ a separate phase from this frozen structural baseline. The consolidated hierarch
 implementation and author-facing tuning guidance are documented in
 [`binary_tychos.md`](binary_tychos.md).
 
+### Declarative hierarchy candidate
+
+The first native-core migration is now implemented on the
+`declarative-hierarchy` branch. `src/settings/celestial-model.json` declares the
+complete Earth/Moon and Sun-primary/Mars-companion topology, semantic roles,
+mode-specific nodes and relative-component settings dependencies. Both
+`SolarSystem.jsx` and `PlotSolarSystem.jsx` now use one recursive
+`DeclarativeCelestialModel` renderer instead of maintaining separate JSX trees.
+
+No celestial setting or relative-orbit equation was changed. Schema and hierarchy
+tests bring the complete suite to 52 passing tests across 10 suites. The production
+build succeeds with only the pre-existing MediaPipe source-map warnings.
+
+Both export gates pass, so the first declarative migration is **accepted as
+coordinate preserving**:
+
+- all ten scientific summary fields have zero deltas;
+- all 31 numeric artifacts are byte-identical;
+- all 9,497 Sun-Mars binary rows are exactly unchanged; and
+- the direct Eros comparison has 75,969 matching timestamps with zero displayed
+  RA, declination, distance or elongation mismatches.
+
+The accepted reports are `reports/declarative_hierarchy_equivalence_report.md`
+and `reports/declarative_hierarchy_eros_equivalence_report.md`. The very small
+Eros direction RMS (`5.20e-7 deg`) is floating-point `acos` noise between identical
+formatted coordinates. `celestial-model.json` may now be treated as the accepted
+topological source of truth, while `celestial-settings.json` remains the accepted
+numerical source of truth.
+
 This remains an architectural re-expression, not parameter tuning.
 
 Leave the outer planets and Halley in place because they are already Sun
