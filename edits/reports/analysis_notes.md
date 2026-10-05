@@ -6,121 +6,121 @@ Read the [developer handoff](../README_handoff.md) for the retained baseline and
 
 ## Moon — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -0.243878 deg; RMS 1.118789 deg.
-- Declination: mean -0.011961 deg; RMS 0.370266 deg.
-- Angular separation: mean 0.949483 deg; RMS 1.127079 deg.
+- RA: mean -0.150830 deg; RMS 1.107192 deg.
+- Declination: mean 0.007144 deg; RMS 0.379622 deg.
+- Angular separation: mean 0.950265 deg; RMS 1.122669 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Sun — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean 0.009528 deg; RMS 0.054706 deg.
-- Declination: mean 0.003903 deg; RMS 0.014145 deg.
-- Angular separation: mean 0.048500 deg; RMS 0.053584 deg.
+- RA: mean 0.034910 deg; RMS 0.049646 deg.
+- Declination: mean 0.000742 deg; RMS 0.012857 deg.
+- Angular separation: mean 0.044690 deg; RMS 0.049187 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Mercury — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -0.070267 deg; RMS 2.582757 deg.
-- Declination: mean 0.213288 deg; RMS 1.046590 deg.
-- Angular separation: mean 2.157157 deg; RMS 2.677341 deg.
+- RA: mean -0.045277 deg; RMS 2.628988 deg.
+- Declination: mean 0.199138 deg; RMS 1.036547 deg.
+- Angular separation: mean 2.186521 deg; RMS 2.712446 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Venus — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -0.034407 deg; RMS 0.423323 deg.
-- Declination: mean 0.041715 deg; RMS 0.237351 deg.
-- Angular separation: mean 0.387534 deg; RMS 0.461426 deg.
+- RA: mean -0.018348 deg; RMS 0.416400 deg.
+- Declination: mean 0.037338 deg; RMS 0.227395 deg.
+- Angular separation: mean 0.386033 deg; RMS 0.450871 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Mars — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean 0.103560 deg; RMS 0.507825 deg.
-- Declination: mean -0.285433 deg; RMS 0.442256 deg.
-- Angular separation: mean 0.552903 deg; RMS 0.648968 deg.
+- RA: mean 0.106922 deg; RMS 0.606933 deg.
+- Declination: mean -0.333595 deg; RMS 0.531716 deg.
+- Angular separation: mean 0.643944 deg; RMS 0.781403 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Jupiter — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -0.071695 deg; RMS 0.330077 deg.
-- Declination: mean -0.264183 deg; RMS 0.289047 deg.
-- Angular separation: mean 0.396866 deg; RMS 0.430288 deg.
+- RA: mean -0.314633 deg; RMS 0.514196 deg.
+- Declination: mean -0.283276 deg; RMS 0.319245 deg.
+- Angular separation: mean 0.509251 deg; RMS 0.590565 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Saturn — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -0.081173 deg; RMS 0.681177 deg.
-- Declination: mean -0.026352 deg; RMS 0.172020 deg.
-- Angular separation: mean 0.572329 deg; RMS 0.673577 deg.
+- RA: mean 0.476993 deg; RMS 0.899023 deg.
+- Declination: mean -0.024003 deg; RMS 0.219219 deg.
+- Angular separation: mean 0.698590 deg; RMS 0.889880 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Uranus — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -0.275236 deg; RMS 0.294406 deg.
-- Declination: mean -0.007081 deg; RMS 0.045188 deg.
-- Angular separation: mean 0.274629 deg; RMS 0.293417 deg.
+- RA: mean 0.010370 deg; RMS 0.194399 deg.
+- Declination: mean 0.041423 deg; RMS 0.075975 deg.
+- Angular separation: mean 0.178887 deg; RMS 0.203847 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Neptune — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean 0.065835 deg; RMS 0.073729 deg.
-- Declination: mean -0.135410 deg; RMS 0.149317 deg.
-- Angular separation: mean 0.158620 deg; RMS 0.165642 deg.
+- RA: mean -0.298870 deg; RMS 0.453301 deg.
+- Declination: mean 0.014025 deg; RMS 0.236832 deg.
+- Angular separation: mean 0.397288 deg; RMS 0.493915 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
 ## Pluto — true-of-date apparent
 
-Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
+Interval: 1826-06-21 00:00:00 to 2026-06-21 00:00:00; 73050 samples.
 
-Export configuration: Not recorded; current settings do not establish export settings
+Export configuration: TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval
 
-- RA: mean -4.054771 deg; RMS 4.862810 deg.
-- Declination: mean 2.688729 deg; RMS 2.709348 deg.
-- Angular separation: mean 4.946189 deg; RMS 5.298340 deg.
+- RA: mean 7.538010 deg; RMS 10.540256 deg.
+- Declination: mean -0.134145 deg; RMS 1.894528 deg.
+- Angular separation: mean 8.726269 deg; RMS 10.161661 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 

@@ -19,6 +19,9 @@ python.exe -B edits/scripts/analyze_sun_mars_binary.py
 # Compare the exports and generate reports.
 python.exe -B edits/scripts/run_analysis.py --label "binary tychos overhaul test phase 2. 2000-2026 3h"
 
+# Analyze a TYCHOS native export against JPL apparent true-of-date RA/Dec.
+python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date --label "TYCHOS native versus JPL true-of-date apparent 1826-2026 1d interval"
+
 # Read-only Mercury/Venus residual attribution after a matching Sun run.
 python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py
 
