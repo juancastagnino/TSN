@@ -1,219 +1,164 @@
 # Ephemeris analysis
 
-Run from the repository root on Windows with Python 3.11 or newer.
+This directory contains the reproducible comparison workflow for the classic
+TYCHOS development branch. Run commands from the repository root on Windows with
+Python 3.11 or newer.
+
+## Quick start
 
 ```powershell
-# First-time setup only
+# First-time setup
 py -m venv .venv
 .venv\Scripts\activate
 python.exe -m pip install -r edits/scripts/requirements.txt
 
-# Edit edits/scripts/analysis_config.json: bodies, UTC dates, step, input paths.
-# Download JPL once for that selection and time grid.
+# Configure bodies, UTC dates, cadence and paths in:
+# edits/scripts/analysis_config.json
+
+# Download the matching JPL bundle.
 python.exe -B edits/scripts/download_jpl.py
 
-# In TYCHOS, export the same bodies/dates/step to:
+# Export the same bodies, dates and cadence from TYCHOS to:
 # edits/data/raw/tychos_ephemerides.txt
 
-# Compare the exports and generate reports.
-python.exe -B edits/scripts/run_analysis.py --label "old tychos test. 2020-2026 3h"
+# Default fixed-frame comparison.
+python.exe -B edits/scripts/run_analysis.py --all --reference icrf `
+  --label "Development baseline"
 
-python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date --label "TYCHOS native versus JPL true-of-date apparent"
+# Exploratory comparison of the native export with JPL apparent true-of-date.
+python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date `
+  --label "TYCHOS native versus JPL apparent true-of-date"
 
+# Produce both separately labelled report sets.
+python.exe -B edits/scripts/run_analysis.py --all --reference both `
+  --label "Reference-frame comparison"
+```
+
+The principal outputs are
+[ephemeris_overview.md](reports/ephemeris_overview.md) and
+[analysis_notes.md](reports/analysis_notes.md). Existing matching JPL data may be
+reused when only TYCHOS geometry changes.
+
+## Configuration
+
+Edit [analysis_config.json](scripts/analysis_config.json):
+
+| Setting | Purpose |
+|---|---|
+| `bodies` | Default bodies to download and analyze |
+| `start`, `stop`, `step` | Common UTC interval and cadence |
+| `tychos` | Combined TYCHOS export path |
+| `jpl` | Combined Horizons bundle path |
+
+The files, not the JSON alone, determine the samples analyzed. Set the same bodies,
+interval and cadence in both exporters. [bodies.json](scripts/bodies.json) maps
+supported names to Horizons target IDs.
+
+Useful overrides:
+
+```powershell
+python.exe -B edits/scripts/download_jpl.py moon sun mars `
+  --start "2000-06-21 00:00" --stop "2026-06-21 00:00" --step "6 h"
+
+python.exe -B edits/scripts/run_analysis.py moon mercury
+python.exe -B edits/scripts/run_analysis.py --tychos path/to/tychos.txt `
+  --jpl path/to/jpl.txt --label "declared export configuration"
+```
+
+`--all` analyzes registered bodies present in both files. An explicitly requested
+body must exist in both.
+
+## Reference modes
+
+One Horizons download contains both supported products:
+
+| `--reference` | JPL quantity | Appropriate TYCHOS input | Meaning |
+|---|---|---|---|
+| `icrf` | Astrometric RA/Dec in fixed ICRF | J2000 export when available | Fixed-frame comparison; default |
+| `apparent-of-date` | Airless apparent RA/Dec in the true equator/equinox of date | Classic/native PVP export | Exploratory moving-frame comparison |
+| `both` | Both products | Either export, interpreted separately | Writes two labelled result sets |
+
+JPL apparent-of-date includes light-time, gravitational light deflection, stellar
+aberration, precession and nutation. It is not assumed to be physically equivalent
+to the native TYCHOS frame. That mode tests numerical proximity only.
+
+True-of-date reports contain RA, declination and angular separation. They omit
+ecliptic coordinates and lunar periodic fits because a fixed J2000 obliquity would
+mix reference frames.
+
+## Current development baseline
+
+This branch retains the classic hand-written hierarchy with the accepted Moon
+Node/Plane model and explicit fixed planes for Mercury and Venus:
+
+```text
+SystemCenter                         (PVP coordinate reference)
+└─ Earth                             (PVP path)
+   ├─ Moon Node / Plane -> Moon deferent A -> Moon
+   ├─ Sun -> outer planets and Halley
+   ├─ Venus deferent A / B -> Venus Plane -> Venus
+   ├─ Mercury deferent A / B -> Mercury Plane -> Mercury
+   ├─ Mars deferent E / S -> Mars -> Phobos / Deimos
+   └─ Eros deferent A / B -> Eros
+```
+
+`SystemCenter` is a coordinate reference for the geometric centre of Earth's PVP
+path, not a body, barycentre or cause of motion. The Mercury/Venus plane objects
+re-express their original TYCHOS transforms without changing their intended
+ephemerides. Pluto retains its original settings. Observer Trace is not included.
+
+See [README_handoff.md](README_handoff.md) for retained parameters, evidence and
+the next controlled experiments.
+
+## Focused diagnostics
+
+```powershell
 # Read-only Mercury/Venus residual attribution after a matching Sun run.
 python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py
 
+# Exploratory in-memory geometry screens; neither edits settings.
+python.exe -B edits/scripts/investigate_moon_tuning.py
+python.exe -B edits/scripts/investigate_planet_tuning.py
 ```
 
-Open `edits/reports/ephemeris_overview.md` for results and
-`edits/reports/analysis_notes.md` for diagnostic observations.
-For an existing pair of exports, only `run_analysis.py` is needed.
-No virtual-environment activation is required.
+These tools characterize residuals and sensitivity. Their fitted terms or candidate
+parameters are not accepted model changes without a simulator export and controlled
+validation.
 
-The residual-attribution command writes
-`edits/reports/solar_satellite_residual_diagnostics.md` and `.json`. It fits
-model-derived annual, orbital, synodic and second-harmonic periods in chronological
-blocks, compares each planet with the simultaneous Sun residual, and searches FFT
-periods through 1000 days. It never modifies simulator settings or ephemerides.
-
-Before a comparison trial, optionally [save the current results](#optional-pre-test-backup)
-in `edits/data/pretest/` before replacing exports or running the analysis again.
-
-## Configure an analysis
-
-Edit [scripts/analysis_config.json](scripts/analysis_config.json):
-
-| Setting | Default | Purpose |
-|---|---|---|
-| `bodies` | `moon`, `sun`, `mars` | Bodies downloaded and analyzed by default |
-| `start`, `stop` | 2000-06-21 to 2026-06-21, 00:00 UTC | JPL request interval |
-| `step` | `6 h` | JPL request cadence; integer `m`, `h` or `d` |
-| `tychos` | `edits/data/raw/tychos_ephemerides.txt` | Combined simulator export |
-| `jpl` | `edits/data/raw/jpl_ephemerides.txt` | Combined reference file |
-
-Set the same interval and cadence manually in the TYCHOS exporter. The analyzer
-uses the dates actually present in the files; changing the JSON does not update,
-trim or regenerate an existing export.
-
-[scripts/bodies.json](scripts/bodies.json) maps body names to Horizons target IDs.
-Other registered bodies can be selected without changing the scripts.
-
-```powershell
-# Default: analyze against JPL ICRF astrometric RA/Dec.
-python.exe -B edits/scripts/run_analysis.py moon
-python.exe -B edits/scripts/run_analysis.py --all
-
-# Analyze a TYCHOS native export against JPL apparent true-of-date RA/Dec.
-python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date `
-  --label "TYCHOS native versus JPL true-of-date apparent"
-
-# Generate separate ICRF and true-of-date report sets from the same inputs.
-python.exe -B edits/scripts/run_analysis.py --all --reference both `
-  --label "Reference-frame comparison"
-
-# Override the JPL request without editing the defaults.
-python.exe -B edits/scripts/download_jpl.py moon sun mars --start "2000-06-21 00:00" --stop "2026-06-21 00:00" --step "6 h"
-```
-
-Explicitly selected/default bodies must exist in both exports. `--all` uses the
-intersection and reports registered bodies present in only one input.
-
-### JPL reference modes
-
-`run_analysis.py --reference` accepts:
-
-| Value | JPL columns | Intended TYCHOS export | Interpretation |
-|---|---|---|---|
-| `icrf` | Astrometric RA/Dec in fixed ICRF | J2000 export when available; otherwise a fixed-frame diagnostic | Historical fixed-frame comparison; this remains the default for backward compatibility. |
-| `apparent-of-date` | Airless apparent RA/Dec in Earth's true equator and equinox of date | Classic/native PVP export | Exploratory comparison between moving frames; this is the relevant new mode for the classic TYCHOS export. |
-| `both` | Both products | Whichever TYCHOS export is supplied | Writes two separately labelled report sets for inspection; it does not make one TYCHOS export belong to both frames. |
-
-JPL apparent-of-date includes light-time, gravitational light deflection, stellar
-aberration, precession and nutation. The TYCHOS framework may interpret several
-observed effects geometrically through the Man's Yearly Path, but this analysis
-option tests numerical agreement only; it does not assume that the JPL and TYCHOS
-mechanisms or moving frames are equivalent.
-
-True-of-date reports contain RA, declination and angular-separation statistics.
-They intentionally omit ecliptic longitude/latitude and lunar periodic fits:
-rotating true-of-date RA/Dec with the pipeline's fixed J2000 obliquity would mix
-reference frames and create invalid diagnostics.
-
-## Inputs and provenance
-
-TYCHOS already exports a single TXT with `PLANET: MOON`, `PLANET: SUN`, etc.
-Save that file directly; do not split it or modify the simulator.
-The JPL downloader requests bodies sequentially and combines complete responses,
-including target headers, time tables, request URLs and download time. It replaces
-the reference file only after all responses pass validation.
-
-JPL requests use Earth geocenter (`500@399`), `OBSERVER`, quantities `1,2`, UT,
-ICRF, HMS, seconds, extra precision and CSV-formatted text. Quantity 1 supplies
-astrometric ICRF RA/Dec; for this Earth-centred observer, quantity 2 supplies
-airless apparent RA/Dec in the true equator and equinox of date. One download
-therefore supports all three analysis modes. The reference source is read from
-Horizons headers, not inferred from the filename. Complete Thunder Client
-responses can also be concatenated, with one response per target.
-
-Reuse JPL when changing only the simulator geometry. Download again when the
-required bodies or time grid change; a download replaces the bundle with exactly
-the requested selection. The analyzer checks body identities, matching timestamps,
-malformed rows and duplicates. It does not interpolate.
-
-`--label` describes the settings used **at export time**, not the current settings
-file. Without a label, configuration is unknown unless the identical TYCHOS file
-already has a recorded label. `--export-settings path/to/settings.json` optionally
-records a snapshot that you declare was used for the export. Neither declaration
-is automatically verified against the simulator.
-
-Use `--tychos path/to/export.txt` and `--jpl path/to/reference.txt` to override
-analysis inputs, or `--output path/to/reference.txt` to override a download.
-
-## Generated outputs
-
-Each run replaces fixed outputs for its selected bodies; no per-experiment folders
-are needed. Other bodies' previous outputs remain until recomputed or removed.
+## Outputs and provenance
 
 | Location | Contents |
 |---|---|
-| `data/derived/<body>_comparison.csv` | Matched coordinates and differences |
-| `reports/<body>_summary.json` | Metrics, dates, hashes and declared export settings |
-| `reports/<body>_ephemeris_report.md` | Per-body summary |
-| `reports/<body>_annual_stats.csv`, `<body>_residuals.csv` | Annual and per-sample diagnostics |
-| `reports/<body>_fft_peaks.csv` | Exploratory longitude spectral peaks |
-| `reports/moon_periodic_components.csv` | Moon-only fitted periodic components |
-| `reports/<body>_apparent_of_date_*` | Separate true-of-date outputs created by `--reference apparent-of-date` or `both` |
-| `reports/ephemeris_overview.md` | Latest results and input freshness by body |
-| `reports/analysis_notes.md` | Observations and questions for bodies in this run |
+| `data/derived/<body>_comparison.csv` | Matched samples and coordinate differences |
+| `reports/<body>_summary.json` | Metrics, dates, hashes and declared settings provenance |
+| `reports/<body>_ephemeris_report.md` | Per-body report |
+| `reports/<body>_annual_stats.csv` | Annual statistics |
+| `reports/<body>_residuals.csv` | Per-sample diagnostics |
+| `reports/<body>_fft_peaks.csv` | Exploratory finite-window spectral peaks |
+| `reports/*_apparent_of_date_*` | Separate true-of-date products |
+| `reports/ephemeris_overview.md` | Combined current overview |
+| `reports/analysis_notes.md` | Generated observations for the current run |
 
-The overview checks whole-file hashes, not simulator settings. Replacing one body
-in a combined file conservatively marks other saved results stale. Refresh that
-status without recalculating with `run_analysis.py --overview-only`.
+Generated reports are replaceable evidence. Before a controlled trial, preserve
+the complete reports, matching raw exports, configuration and settings used for
+the export. Input hashes and `--label` record provenance but cannot prove which
+simulator settings produced a file.
 
-Reports and derived CSVs can be regenerated. A clean `reports/` directory is valid.
-Do not manually maintain scientific conclusions inside generated files: record
-accepted conclusions in [README_handoff.md](README_handoff.md).
+## Working rules
 
-## Optional pre-test backup
+- Never add fitted perturbations or empirical corrections to TYCHOS output.
+- Change geometry only through a stated hypothesis and retain guard metrics.
+- Keep bodies, timestamps, cadence and reference convention identical in a
+  before/after comparison.
+- Separate structural equivalence from observational accuracy.
+- Validate retained parameter changes on an independent interval.
+- Establish the coordinate contract before interpreting JPL residuals as orbital
+  errors.
 
-Use `data/pretest/` when you want to compare a new trial with the previous run.
-Copy the complete `reports/` directory to `data/pretest/reports/` before rerunning
-the analysis. Include the JSON and CSV files, not just the Markdown summaries.
-The overview identifies which bodies belong to the saved run; older outputs for
-other bodies may also be present.
+## Maintained material
 
-For a reproducible comparison, also preserve the two input TXT files under
-`data/pretest/raw/`, plus `analysis_config.json`, `bodies.json` and the settings
-snapshot actually used for that export. Save these before changing settings or
-replacing the inputs. A copy of today's settings is evidence of the export
-configuration only if you know that export used them. Derived comparison CSVs
-are optional because they can be regenerated from the saved inputs.
-
-This is a manual, optional backup of one comparison baseline. The scripts neither
-read nor update `data/pretest/` automatically. Keep its contents together from
-the same run; replace the backup deliberately when choosing a new baseline, or
-archive it elsewhere if it must be retained. No separate trial document or backup
-for every run is required. Compare the same bodies, timestamps and reference
-conventions, and describe the changed parameter with `--label` in the new run.
-
-## Purpose and interpretation
-
-This workflow evaluates the compact TYCHOS geometry against reference ephemerides.
-**Golden rule: never add perturbation terms or empirical corrections to the model
-or its exported ephemerides.** Improvements must come from geometry and its correct
-implementation; fitted periodic terms are for residual analysis only.
-
-Before changing the model, read the [developer handoff](README_handoff.md) and
-consult the source material in [data/docs/](data/docs/). A coherent residual can
-point to a geometric or coordinate issue to investigate. Unexplained residuals
-remain open questions, not candidates for compensating perturbation terms.
-
-The default primary metrics compare against JPL ICRF astrometric RA/Dec. The
-optional true-of-date mode uses JPL apparent coordinates and is explicitly
-labelled as an exploratory moving-frame comparison. Ecliptic diagnostics are
-available only for ICRF mode and use a common fixed J2000 obliquity. RA differences
-are coordinate differences; angular separation measures total directional error.
-Do not mix frames, intervals or export settings when comparing results.
-
-The Moon's periodic fits are in-sample diagnostics, not simulator corrections or
-proof of a physical mechanism. Other bodies do not receive lunar terms. FFT peaks
-are finite-window estimates over 1-500 days, requiring regular cadence and enough
-samples. Out-of-sample validation remains a separate pending investigation.
-
-## Documents and scripts
-
-- **This README:** setup, commands and output conventions; update when the workflow changes.
-- **[README_handoff.md](README_handoff.md):** retained baseline, reasoning constraints and next investigations; review before pushing branch changes.
-- **[data/docs/](data/docs/):** the TYCHOS book and other source material; cite edition and chapter/page when using it.
-- **`reports/`:** generated evidence for each run, not a development diary.
-- **`data/pretest/` (optional):** manually saved results and inputs for a before/after comparison.
-
-The operational scripts are `download_jpl.py`, `ephemeris_io.py`,
-`compare_ephemerides.py`, `analyze_ephemerides.py`, `generate_report.py` and
-`run_analysis.py`. NumPy is the only additional Python dependency.
-Use either command-line entry point with `--help` for its options.
-
-## Research tools
-
-- [Machine learning](machine_learning/README.md): temporal residual diagnostics, configuration and generated experiment outputs.
-- [Stellarium](stellarium/README.md): reference export and coordinate comparisons; datasets remain under `data/stellarium*`.
+- [README_handoff.md](README_handoff.md): concise accepted state, constraints and
+  next work for developers and AI agents.
+- [data/docs/](data/docs/): TYCHOS source material.
+- [machine_learning/README.md](machine_learning/README.md): residual diagnostics.
+- [stellarium/README.md](stellarium/README.md): independent coordinate comparisons.
