@@ -80,12 +80,16 @@ def main(argv=None):
     lines.append("")
     lines.append("| Metric | Mean | RMS | P95 abs. | Max abs. |")
     lines.append("|---|---:|---:|---:|---:|")
-    for label, key in ([('RA (coordinate)', 'ra_residual')] if 'ra_residual' in s else []) + [
+    metric_rows = ([('RA (coordinate)', 'ra_residual')] if 'ra_residual' in s else []) + [
         ("Declination", "declination_residual"),
         ("Angular separation", "angular_separation"),
-        ("Ecliptic longitude", "ecliptic_longitude_residual"),
-        ("Ecliptic latitude", "ecliptic_latitude_residual"),
-    ]:
+    ]
+    if "ecliptic_longitude_residual" in s:
+        metric_rows.extend([
+            ("Ecliptic longitude", "ecliptic_longitude_residual"),
+            ("Ecliptic latitude", "ecliptic_latitude_residual"),
+        ])
+    for label, key in metric_rows:
         d = s[key]
         lines.append(
             f"| {label} | {fmt(d['mean_deg'])}° | {fmt(d['rms_deg'])}° | {fmt(d['p95_abs_deg'])}° | {fmt(d['max_abs_deg'])}° |"
@@ -97,12 +101,16 @@ def main(argv=None):
         lines.append("")
         lines.append("| Metric | Baseline RMS | Current RMS | Improvement |")
         lines.append("|---|---:|---:|---:|")
-        for label, key in [
+        baseline_rows = [
             ("Declination", "declination_residual"),
             ("Angular separation", "angular_separation"),
-            ("Ecliptic longitude", "ecliptic_longitude_residual"),
-            ("Ecliptic latitude", "ecliptic_latitude_residual"),
-        ]:
+        ]
+        if "ecliptic_longitude_residual" in s and "ecliptic_longitude_residual" in baseline:
+            baseline_rows.extend([
+                ("Ecliptic longitude", "ecliptic_longitude_residual"),
+                ("Ecliptic latitude", "ecliptic_latitude_residual"),
+            ])
+        for label, key in baseline_rows:
             old = baseline[key]["rms_deg"]
             new = s[key]["rms_deg"]
             imp = improvement(old, new)
@@ -138,13 +146,22 @@ def main(argv=None):
     if annual:
         lines.append("## Annual stability")
         lines.append("")
-        lines.append("| Year | N | RMS longitude | RMS latitude | RMS Dec | RMS separation |")
-        lines.append("|---:|---:|---:|---:|---:|---:|")
-        for r in annual:
-            lines.append(
-                f"| {r['year']} | {r['n']} | {fmt(r['rms_dlon_deg'])}° | "
-                f"{fmt(r['rms_dlat_deg'])}° | {fmt(r['rms_ddec_deg'])}° | {fmt(r['rms_sep_deg'])}° |"
-            )
+        if "rms_dlon_deg" in annual[0]:
+            lines.append("| Year | N | RMS longitude | RMS latitude | RMS Dec | RMS separation |")
+            lines.append("|---:|---:|---:|---:|---:|---:|")
+            for r in annual:
+                lines.append(
+                    f"| {r['year']} | {r['n']} | {fmt(r['rms_dlon_deg'])}° | "
+                    f"{fmt(r['rms_dlat_deg'])}° | {fmt(r['rms_ddec_deg'])}° | {fmt(r['rms_sep_deg'])}° |"
+                )
+        else:
+            lines.append("| Year | N | RMS RA | RMS Dec | RMS separation |")
+            lines.append("|---:|---:|---:|---:|---:|")
+            for r in annual:
+                lines.append(
+                    f"| {r['year']} | {r['n']} | {fmt(r['rms_dra_deg'])}° | "
+                    f"{fmt(r['rms_ddec_deg'])}° | {fmt(r['rms_sep_deg'])}° |"
+                )
         lines.append("")
 
     lines.append("## Interpretation notes")
@@ -152,24 +169,35 @@ def main(argv=None):
     if body != "moon":
         lines.append("- No lunar periodic terms are fitted to this body.")
         lines.append("- Compare shared-frame changes across bodies using the same epochs and declared export configuration.")
-        lines.append("- Ecliptic coordinates use a common fixed rotation; this does not establish the simulator's reference-frame accuracy.")
+        if s.get("reference_mode") == "apparent-of-date":
+            lines.append("- This is an exploratory moving-frame comparison. JPL apparent coordinates include light-time, light deflection, stellar aberration, precession and nutation.")
+            lines.append("- J2000 ecliptic residuals are intentionally omitted because fixed J2000 obliquity is not valid for true-of-date RA/Dec.")
+        else:
+            lines.append("- Ecliptic coordinates use a common fixed rotation; this does not establish the simulator's reference-frame accuracy.")
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"Report written to: {output}")
         return
-    lines.append(
-        "- The periodic labels above identify frequencies present in the TYCHOS-minus-JPL residual. "
-        "They should not by themselves be interpreted as proof of a particular physical mechanism."
-    )
-    lines.append(
-        "- The lunar-plane modification should be evaluated primarily by whether it reduces latitude/declination "
-        "error without materially degrading the longitude already produced by the original TYCHOS geometry."
-    )
-    lines.append(
-        "- Remaining longitudinal structure can then be investigated within the geometry proposed by TYCHOS "
-        "without introducing perturbations or empirical correction terms."
-    )
+    if s.get("reference_mode") == "apparent-of-date":
+        lines.append(
+            "- This is an exploratory moving-frame comparison. JPL apparent coordinates include light-time, "
+            "light deflection, stellar aberration, precession and nutation."
+        )
+        lines.append("- Lunar ecliptic periodic diagnostics are intentionally omitted in this mode.")
+    else:
+        lines.append(
+            "- The periodic labels above identify frequencies present in the TYCHOS-minus-JPL residual. "
+            "They should not by themselves be interpreted as proof of a particular physical mechanism."
+        )
+        lines.append(
+            "- The lunar-plane modification should be evaluated primarily by whether it reduces latitude/declination "
+            "error without materially degrading the longitude already produced by the original TYCHOS geometry."
+        )
+        lines.append(
+            "- Remaining longitudinal structure can then be investigated within the geometry proposed by TYCHOS "
+            "without introducing perturbations or empirical correction terms."
+        )
     lines.append("")
 
     output = Path(args.output)

@@ -18,6 +18,8 @@ python.exe -B edits/scripts/download_jpl.py
 # Compare the exports and generate reports.
 python.exe -B edits/scripts/run_analysis.py --label "old tychos test. 2020-2026 3h"
 
+python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date --label "TYCHOS native versus JPL true-of-date apparent"
+
 # Read-only Mercury/Venus residual attribution after a matching Sun run.
 python.exe -B edits/scripts/diagnose_solar_satellite_residuals.py
 
@@ -57,9 +59,17 @@ trim or regenerate an existing export.
 Other registered bodies can be selected without changing the scripts.
 
 ```powershell
-# Analyze only the Moon, or all registered bodies present in both files.
+# Default: analyze against JPL ICRF astrometric RA/Dec.
 python.exe -B edits/scripts/run_analysis.py moon
 python.exe -B edits/scripts/run_analysis.py --all
+
+# Analyze a TYCHOS native export against JPL apparent true-of-date RA/Dec.
+python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date `
+  --label "TYCHOS native versus JPL true-of-date apparent"
+
+# Generate separate ICRF and true-of-date report sets from the same inputs.
+python.exe -B edits/scripts/run_analysis.py --all --reference both `
+  --label "Reference-frame comparison"
 
 # Override the JPL request without editing the defaults.
 python.exe -B edits/scripts/download_jpl.py moon sun mars --start "2000-06-21 00:00" --stop "2026-06-21 00:00" --step "6 h"
@@ -67,6 +77,27 @@ python.exe -B edits/scripts/download_jpl.py moon sun mars --start "2000-06-21 00
 
 Explicitly selected/default bodies must exist in both exports. `--all` uses the
 intersection and reports registered bodies present in only one input.
+
+### JPL reference modes
+
+`run_analysis.py --reference` accepts:
+
+| Value | JPL columns | Intended TYCHOS export | Interpretation |
+|---|---|---|---|
+| `icrf` | Astrometric RA/Dec in fixed ICRF | J2000 export when available; otherwise a fixed-frame diagnostic | Historical fixed-frame comparison; this remains the default for backward compatibility. |
+| `apparent-of-date` | Airless apparent RA/Dec in Earth's true equator and equinox of date | Classic/native PVP export | Exploratory comparison between moving frames; this is the relevant new mode for the classic TYCHOS export. |
+| `both` | Both products | Whichever TYCHOS export is supplied | Writes two separately labelled report sets for inspection; it does not make one TYCHOS export belong to both frames. |
+
+JPL apparent-of-date includes light-time, gravitational light deflection, stellar
+aberration, precession and nutation. The TYCHOS framework may interpret several
+observed effects geometrically through the Man's Yearly Path, but this analysis
+option tests numerical agreement only; it does not assume that the JPL and TYCHOS
+mechanisms or moving frames are equivalent.
+
+True-of-date reports contain RA, declination and angular-separation statistics.
+They intentionally omit ecliptic longitude/latitude and lunar periodic fits:
+rotating true-of-date RA/Dec with the pipeline's fixed J2000 obliquity would mix
+reference frames and create invalid diagnostics.
 
 ## Inputs and provenance
 
@@ -77,9 +108,12 @@ including target headers, time tables, request URLs and download time. It replac
 the reference file only after all responses pass validation.
 
 JPL requests use Earth geocenter (`500@399`), `OBSERVER`, quantities `1,2`, UT,
-ICRF, HMS, seconds, extra precision and CSV-formatted text. The reference source
-is read from Horizons headers, not inferred from the filename. Complete Thunder
-Client responses can also be concatenated, with one response per target.
+ICRF, HMS, seconds, extra precision and CSV-formatted text. Quantity 1 supplies
+astrometric ICRF RA/Dec; for this Earth-centred observer, quantity 2 supplies
+airless apparent RA/Dec in the true equator and equinox of date. One download
+therefore supports all three analysis modes. The reference source is read from
+Horizons headers, not inferred from the filename. Complete Thunder Client
+responses can also be concatenated, with one response per target.
 
 Reuse JPL when changing only the simulator geometry. Download again when the
 required bodies or time grid change; a download replaces the bundle with exactly
@@ -108,6 +142,7 @@ are needed. Other bodies' previous outputs remain until recomputed or removed.
 | `reports/<body>_annual_stats.csv`, `<body>_residuals.csv` | Annual and per-sample diagnostics |
 | `reports/<body>_fft_peaks.csv` | Exploratory longitude spectral peaks |
 | `reports/moon_periodic_components.csv` | Moon-only fitted periodic components |
+| `reports/<body>_apparent_of_date_*` | Separate true-of-date outputs created by `--reference apparent-of-date` or `both` |
 | `reports/ephemeris_overview.md` | Latest results and input freshness by body |
 | `reports/analysis_notes.md` | Observations and questions for bodies in this run |
 
@@ -153,11 +188,12 @@ consult the source material in [data/docs/](data/docs/). A coherent residual can
 point to a geometric or coordinate issue to investigate. Unexplained residuals
 remain open questions, not candidates for compensating perturbation terms.
 
-Primary metrics compare against JPL ICRF astrometric RA/Dec; the CSV also retains
-apparent-coordinate comparisons. Ecliptic diagnostics use a common fixed J2000
-obliquity. RA differences are coordinate differences; angular separation measures
-total directional error. Do not mix frames, intervals or export settings when
-comparing results.
+The default primary metrics compare against JPL ICRF astrometric RA/Dec. The
+optional true-of-date mode uses JPL apparent coordinates and is explicitly
+labelled as an exploratory moving-frame comparison. Ecliptic diagnostics are
+available only for ICRF mode and use a common fixed J2000 obliquity. RA differences
+are coordinate differences; angular separation measures total directional error.
+Do not mix frames, intervals or export settings when comparing results.
 
 The Moon's periodic fits are in-sample diagnostics, not simulator corrections or
 proof of a physical mechanism. Other bodies do not receive lunar terms. FFT peaks
