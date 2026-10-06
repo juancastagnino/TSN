@@ -4,12 +4,16 @@ import { Matrix4, Vector3 } from "three";
 import { usePlotStore, useSettingsStore, useStore } from "../store";
 import { buildSettingsIndex } from "../utils/celestialSettingsSchema";
 import {
+  createNativeRelativeCarrierState,
+  updateNativeRelativeCarrier,
+} from "../utils/nativeRelativeCarrier";
+import {
   SUN_MARS_FRAME_NAME,
   updateSunRelativeFrame,
 } from "./SunMarsRelativeOrbit";
 
 export const VENUS_SUN_RELATIVE_UPDATER_NAME =
-  "Venus Sun-Relative Components";
+  "Venus Native Relative Components";
 
 const D2R = Math.PI / 180;
 const number = (setting, key) => Number(setting?.[key] || 0);
@@ -39,22 +43,19 @@ export const createVenusSunRelativeComponents = () => ({
   deferentBStage: new Vector3(),
   planeStage: new Vector3(),
   mainBasis: new Matrix4(),
+  nativeCarrier: createNativeRelativeCarrierState(),
   aOrientation: new Matrix4(),
   bOrientation: new Matrix4(),
   planeOrientation: new Matrix4(),
-  sunDeferentOrientation: new Matrix4(),
-  sunOrientation: new Matrix4(),
   abBasis: new Matrix4(),
   scratchMatrix: new Matrix4(),
   scratchVector: new Vector3(),
 });
 
 /**
- * Expand the legacy Venus chain into the five exact Phase 4A terms.
- *
- * The returned vectors and basis are expressed in the common binary-frame axes.
- * The unchanged Venus object supplies the fifth term (its centre, orientation
- * and radius) beneath mainBasis.
+ * Evaluate the native Sun-relative Venus chain. Deferent A stores a direct
+ * relative centre, annual residual and local orientation basis; B, the fixed
+ * plane and the Venus leaf remain local geometric stages.
  */
 export const updateVenusSunRelativeComponents = (
   target,
@@ -65,18 +66,14 @@ export const updateVenusSunRelativeComponents = (
     settingsByName instanceof Map
       ? settingsByName.get(id)
       : settingsByName[id];
-  const sunDeferent = get("sun-deferent");
-  const sun = get("sun");
   const venusA = get("venus-deferent-a");
   const venusB = get("venus-deferent-b");
   const venusPlane = get("venus-plane");
 
-  orbitalOrientation(
-    venusA,
-    position,
-    target.aOrientation,
-    target.scratchMatrix
-  );
+  updateNativeRelativeCarrier(target.nativeCarrier, venusA, position);
+  target.centreDifference.copy(target.nativeCarrier.centre);
+  target.annualCarrierMismatch.copy(target.nativeCarrier.annualResidual);
+  target.aOrientation.copy(target.nativeCarrier.orientation);
   orbitalOrientation(
     venusB,
     position,
@@ -89,42 +86,6 @@ export const updateVenusSunRelativeComponents = (
     target.planeOrientation,
     target.scratchMatrix
   );
-  orbitalOrientation(
-    sunDeferent,
-    position,
-    target.sunDeferentOrientation,
-    target.scratchMatrix
-  );
-  orbitalOrientation(
-    sun,
-    position,
-    target.sunOrientation,
-    target.scratchMatrix
-  );
-
-  // cA - cSunDeferent - QSunDeferent*cSun
-  settingCenter(venusA, target.centreDifference);
-  settingCenter(sunDeferent, target.scratchVector);
-  target.centreDifference.sub(target.scratchVector);
-  settingCenter(sun, target.scratchVector).applyMatrix4(
-    target.sunDeferentOrientation
-  );
-  target.centreDifference.sub(target.scratchVector);
-
-  // QA*rA - QD*rD - QD*QSun*rSun
-  target.annualCarrierMismatch
-    .set(number(venusA, "orbitRadius"), 0, 0)
-    .applyMatrix4(target.aOrientation);
-  target.scratchVector
-    .set(number(sunDeferent, "orbitRadius"), 0, 0)
-    .applyMatrix4(target.sunDeferentOrientation);
-  target.annualCarrierMismatch.sub(target.scratchVector);
-  target.scratchVector
-    .set(number(sun, "orbitRadius"), 0, 0)
-    .applyMatrix4(target.sunOrientation)
-    .applyMatrix4(target.sunDeferentOrientation);
-  target.annualCarrierMismatch.sub(target.scratchVector);
-
   // QA*(cB + QB*rB)
   target.deferentBStage
     .set(number(venusB, "orbitRadius"), 0, 0)
@@ -155,7 +116,7 @@ export const updateVenusSunRelativeComponents = (
   return target;
 };
 
-/** Phase 4B: make Venus structurally Sun-hosted without changing coordinates. */
+/** Native parent-relative Venus branch. */
 const VenusSunRelativeOrbit = ({ children, plotMode = false }) => {
   const settings = useSettingsStore((state) => state.settings);
   const settingsByName = useMemo(() => buildSettingsIndex(settings), [settings]);
@@ -213,11 +174,11 @@ const VenusSunRelativeOrbit = ({ children, plotMode = false }) => {
   return (
     <group
       ref={rootRef}
-      name="Sun-Relative Venus Frame"
+      name="Venus Native Relative Frame"
       matrixAutoUpdate={false}
     >
-      <group ref={centreRef} name="Sun-Venus Centre Difference">
-        <group ref={carrierRef} name="Sun-Venus Annual Carrier Mismatch">
+      <group ref={centreRef} name="Venus Parent-Relative Centre">
+        <group ref={carrierRef} name="Venus Direct Annual Residual">
           <group ref={deferentBRef} name="Venus Deferent-B Stage">
             <group ref={planeRef} name="Venus Fixed-Plane Stage">
               <group ref={mainBasisRef} name="Venus Main-Orbit Basis">

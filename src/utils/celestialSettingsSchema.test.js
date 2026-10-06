@@ -50,6 +50,47 @@ test("applies partial legacy imports through stable IDs", () => {
   );
 });
 
+test("preserves every direct parent-relative carrier field", () => {
+  const native = normalizeCelestialSettings(nativeDocument);
+  const serialized = serializeCelestialSettings(native);
+  const roundTrip = buildSettingsIndex(normalizeCelestialSettings(serialized));
+
+  [
+    "mars-deferent-e",
+    "mercury-deferent-a",
+    "venus-deferent-a",
+    "eros-deferent-a",
+  ].forEach((id) => {
+    const carrier = roundTrip.get(id);
+    expect(carrier.orbitRadius).toBe(0);
+    expect(carrier).toEqual(
+      expect.objectContaining({
+        relativeAnnualStart: expect.any(Number),
+        relativeAnnualSpeed: expect.any(Number),
+        relativeAnnualCosX: expect.any(Number),
+        relativeAnnualCosY: expect.any(Number),
+        relativeAnnualCosZ: expect.any(Number),
+        relativeAnnualSinX: expect.any(Number),
+        relativeAnnualSinY: expect.any(Number),
+        relativeAnnualSinZ: expect.any(Number),
+      })
+    );
+  });
+});
+
+test("rejects a former absolute carrier import in the full binary model", () => {
+  const native = normalizeCelestialSettings(nativeDocument);
+  expect(() =>
+    mergeCelestialSettings(native, [
+      {
+        name: "Mercury deferent A",
+        orbitRadius: 100,
+        orbitCentera: -1.3,
+      },
+    ])
+  ).toThrow(/former absolute carrier format/);
+});
+
 test("declares every setting exactly once in the hierarchy-aware editor", () => {
   const settings = normalizeCelestialSettings(nativeDocument);
   const grouped = getCelestialEditorGroups(settings).flatMap(

@@ -37,7 +37,7 @@ export const validateCelestialModel = (model = celestialModel, settingIds) => {
     throw new Error(`Unsupported celestial model schema ${model.schemaVersion}`);
   }
   if (
-    model.id !== "tychos-native-binary-system" ||
+    model.id !== "tychos-full-binary-system" ||
     model.settingsSchemaVersion !== 2
   ) {
     throw new Error("Celestial model identity or settings schema is invalid");

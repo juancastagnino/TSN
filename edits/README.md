@@ -1,8 +1,8 @@
 # Ephemeris analysis
 
-This directory contains the reproducible analysis workflow for the accepted
-native TYCHOS hierarchy. Run commands from the repository root on Windows with
-Python 3.11 or newer.
+This directory contains the reproducible analysis workflow for TYCHOS hierarchy
+experiments. Run commands from the repository root on Windows with Python 3.11
+or newer.
 
 ## Quick start
 
@@ -27,7 +27,7 @@ python.exe -B edits/scripts/run_analysis.py --all --reference icrf `
 
 # Moving-frame exploratory comparison: use the native TYCHOS export.
 python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date `
-  --label "TYCHOS native versus JPL apparent true-of-date"
+  --label "Full binary equivalence versus JPL apparent true-of-date"
 
 # Produce both report sets from the same inputs for inspection.
 python.exe -B edits/scripts/run_analysis.py --all --reference both `
@@ -87,12 +87,12 @@ True-of-date reports contain RA, declination and angular separation. They omit
 ecliptic coordinates and lunar periodic fits because rotating them with a fixed
 J2000 obliquity would mix frames.
 
-## Accepted native hierarchy baseline
+## Full parent-relative hierarchy trial
 
-The `native-binary-system` branch uses schema-v2
+The `full-binary-tychos` branch uses schema-v2
 [celestial-model.json](../src/settings/celestial-model.json) and
-[celestial-settings.json](../src/settings/celestial-settings.json). The accepted
-hierarchy is:
+[celestial-settings.json](../src/settings/celestial-settings.json). Its hierarchy
+is:
 
 ```text
 SystemCenter                         (PVP coordinate reference)
@@ -113,23 +113,36 @@ of Earth's PVP orbit. It is not a body, barycentre or cause of motion. The Sun
 system remains inside Earth's branch: Earth follows the PVP path, the Sun orbits
 Earth, and the remaining solar bodies are organized beneath the Sun.
 
-The migration changed topology and parameter identity, not accepted coordinates.
-Both native equivalence gates passed: ten-body summaries have zero delta, all 31
-numeric artifacts are byte-identical, all 9,497 binary rows are unchanged, and all
-75,969 Eros export rows match the saved baseline.
+This branch completes the settings-level migration begun by
+`native-binary-system`. Mars, Mercury, Venus and Eros now inherit the Sun's world
+position and store only direct parent-relative centres, annual residuals and local
+orbital stages. Their former duplicated radius-100 absolute carriers are gone.
 
-To reproduce the gates with matching fresh exports:
+The direct-settings derivation and fresh exports are equivalent to the saved
+native baseline. The dense 200-model-year audit passes below `3e-14`, and all
+759,756 non-metadata lines in the ten-body TYCHOS export are exactly identical.
+
+Run the source-level migration and software gates with:
 
 ```powershell
-python.exe -B edits/scripts/run_analysis.py --label "Native binary system baseline"
-python.exe -B edits/scripts/compare_phase_equivalence.py `
-  --output edits/reports/native_binary_system_equivalence_report.md
-python.exe -B edits/scripts/compare_tychos_body_exports.py `
-  --candidate edits/data/raw/tychos_ephemerides.txt `
-  --output edits/reports/native_binary_system_eros_equivalence_report.md
+node edits/scripts/derive_full_binary_settings.js
+npm test -- --watchAll=false --runInBand
+npm run build
 ```
 
-The saved pre-migration baseline is under `00-backup/new-baseline`.
+Then export the same bodies, timestamps and cadence and compare them with the
+saved pre-migration baseline under `00-backup/native-relative-baseline`.
+
+```powershell
+python.exe -B edits/scripts/compare_raw_tychos_exports.py
+python.exe -B edits/scripts/compare_tychos_body_exports.py
+
+# Optional report/artifact gate: regenerate reports with the same JPL product
+# used by the saved baseline before running this comparison.
+python.exe -B edits/scripts/run_analysis.py --all --reference apparent-of-date `
+  --label "Full binary equivalence"
+python.exe -B edits/scripts/compare_phase_equivalence.py
+```
 
 ## Focused diagnostics
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "settingsSchemaVersion": 2,
-  "id": "tychos-native-binary-system",
+  "id": "tychos-full-binary-system",
   "name": "TYCHOS declarative celestial model",
   "description": "Coordinate-preserving Sun-primary/Mars-companion hierarchy using stable setting identifiers and the accepted numerical settings.",
   "settingsCatalog": [
@@ -222,9 +222,9 @@
                               {
                                 "id": "mars-relative-orbit",
                                 "kind": "sun-mars-relative",
-                                "name": "Sun-Relative Mars Components",
-                                "role": "junior-companion-orbit",
-                                "settingIds": ["sun", "mars-deferent-e", "mars-deferent-s", "mars"],
+                                "name": "Mars Native Relative Components",
+                                "role": "native-junior-companion-orbit",
+                                "settingIds": ["mars-deferent-e", "mars-deferent-s", "mars"],
                                 "children": [
                                   {
                                     "id": "mars-companion-branch",
@@ -259,9 +259,9 @@
                               {
                                 "id": "venus-relative-orbit",
                                 "kind": "venus-sun-relative",
-                                "name": "Sun-Relative Venus Frame",
-                                "role": "senior-solar-companion-orbit",
-                                "settingIds": ["sun-deferent", "sun", "venus-deferent-a", "venus-deferent-b", "venus-plane", "venus"],
+                                "name": "Venus Native Relative Frame",
+                                "role": "native-senior-solar-companion-orbit",
+                                "settingIds": ["venus-deferent-a", "venus-deferent-b", "venus-plane", "venus"],
                                 "children": [
                                   {
                                     "id": "venus-companion-branch",
@@ -282,9 +282,9 @@
                               {
                                 "id": "mercury-relative-orbit",
                                 "kind": "mercury-sun-relative",
-                                "name": "Sun-Relative Mercury Frame",
-                                "role": "junior-solar-companion-orbit",
-                                "settingIds": ["sun-deferent", "sun", "mercury-deferent-a", "mercury-deferent-b", "mercury-plane", "mercury"],
+                                "name": "Mercury Native Relative Frame",
+                                "role": "native-junior-solar-companion-orbit",
+                                "settingIds": ["mercury-deferent-a", "mercury-deferent-b", "mercury-plane", "mercury"],
                                 "children": [
                                   {
                                     "id": "mercury-companion-branch",
@@ -305,9 +305,9 @@
                               {
                                 "id": "eros-relative-orbit",
                                 "kind": "eros-sun-relative",
-                                "name": "Sun-Relative Eros Frame",
-                                "role": "solar-asteroid-orbit",
-                                "settingIds": ["sun-deferent", "sun", "eros-deferent-a", "eros-deferent-b", "eros"],
+                                "name": "Eros Native Relative Frame",
+                                "role": "native-solar-asteroid-orbit",
+                                "settingIds": ["eros-deferent-a", "eros-deferent-b", "eros"],
                                 "children": [
                                   {
                                     "id": "eros-branch",

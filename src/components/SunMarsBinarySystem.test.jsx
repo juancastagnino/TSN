@@ -54,7 +54,7 @@ test("models the Sun as primary and Mars as its junior companion branch", () => 
   expect(descendantNames(marsBranch)).toContain("Mars");
   expect(descendantNames(marsBranch)).not.toContain("Sun");
   expect(descendantNames(sunBranch)).toContain(
-    "Sun-Relative Mars Components"
+    "Mars Native Relative Components"
   );
 });
 
@@ -80,7 +80,7 @@ test("keeps the accepted Venus companion beneath the Sun", () => {
 
   expect(venusBranch).toBeDefined();
   expect(descendantNames(venusBranch)).toContain("Venus");
-  expect(descendantNames(sunBranch)).toContain("Sun-Relative Venus Frame");
+  expect(descendantNames(sunBranch)).toContain("Venus Native Relative Frame");
   expect(descendantNames(sunBranch)).not.toContain("Venus deferent A");
   expect(descendantNames(sunBranch)).not.toContain("Venus deferent B");
   expect(descendantNames(sunBranch)).not.toContain("Venus Plane");
@@ -96,7 +96,7 @@ test("makes Mercury an explicit Sun-hosted companion", () => {
 
   expect(mercuryBranch).toBeDefined();
   expect(descendantNames(mercuryBranch)).toContain("Mercury");
-  expect(descendantNames(sunBranch)).toContain("Sun-Relative Mercury Frame");
+  expect(descendantNames(sunBranch)).toContain("Mercury Native Relative Frame");
   expect(descendantNames(sunBranch)).not.toContain("Mercury deferent A");
   expect(descendantNames(sunBranch)).not.toContain("Mercury deferent B");
   expect(descendantNames(sunBranch)).not.toContain("Mercury Plane");
@@ -110,7 +110,7 @@ test("makes Eros an explicit Sun-hosted asteroid", () => {
 
   expect(erosBranch).toBeDefined();
   expect(descendantNames(erosBranch)).toContain("Eros");
-  expect(descendantNames(sunBranch)).toContain("Sun-Relative Eros Frame");
+  expect(descendantNames(sunBranch)).toContain("Eros Native Relative Frame");
   expect(descendantNames(sunBranch)).not.toContain("Eros deferent A");
   expect(descendantNames(sunBranch)).not.toContain("Eros deferent B");
 });

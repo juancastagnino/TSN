@@ -160,7 +160,7 @@ def parse_args():
     parser.add_argument(
         "--baseline",
         type=Path,
-        default=ROOT / "00-backup/new-baseline/eros_ephemerides_before.txt",
+        default=ROOT / "00-backup/native-relative-baseline/eros_ephemerides_before.txt",
     )
     parser.add_argument(
         "--candidate",
@@ -170,7 +170,7 @@ def parse_args():
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "edits/reports/declarative_hierarchy_eros_equivalence_report.md",
+        default=ROOT / "edits/reports/full_binary_eros_equivalence_report.md",
     )
     return parser.parse_args()
 

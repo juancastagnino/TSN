@@ -165,6 +165,32 @@ const getControls = (s, updateSetting) => ({
       updateSetting({ ...s, orbitTiltb: cleanValue });
     },
   },
+  ...Object.fromEntries(
+    [
+      "relativeAnnualStart",
+      "relativeAnnualSpeed",
+      "relativeAnnualCosX",
+      "relativeAnnualCosY",
+      "relativeAnnualCosZ",
+      "relativeAnnualSinX",
+      "relativeAnnualSinY",
+      "relativeAnnualSinZ",
+    ]
+      .filter((property) => s[property] !== undefined)
+      .map((property) => [
+        `${s.name}${property}`,
+        {
+          label: property,
+          value: "\u200B" + s[property],
+          editable: true,
+          onChange: (value) => {
+            const cleanValue = value.replace(/\u200B/g, "");
+            s[property] = cleanValue;
+            updateSetting({ ...s, [property]: cleanValue });
+          },
+        },
+      ])
+  ),
 });
 
 // The inner component containing the hooks only mounts when the menu is active
@@ -402,6 +428,20 @@ const EditSettingsPanel = () => {
       updatedValues[`${s.name}orbitCenterc`] = "\u200B" + s.orbitCenterc;
       updatedValues[`${s.name}orbitTilta`] = "\u200B" + s.orbitTilta;
       updatedValues[`${s.name}orbitTiltb`] = "\u200B" + s.orbitTiltb;
+      [
+        "relativeAnnualStart",
+        "relativeAnnualSpeed",
+        "relativeAnnualCosX",
+        "relativeAnnualCosY",
+        "relativeAnnualCosZ",
+        "relativeAnnualSinX",
+        "relativeAnnualSinY",
+        "relativeAnnualSinZ",
+      ].forEach((property) => {
+        if (s[property] !== undefined) {
+          updatedValues[`${s.name}${property}`] = "\u200B" + s[property];
+        }
+      });
     });
     set(updatedValues);
   }, [settings, set, showPlanets, shadeOrbits]);

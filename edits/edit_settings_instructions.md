@@ -6,10 +6,9 @@ This guide explains how to adjust the native binary TYCHOS model without losing
 track of what each setting controls. It is an operating manual for geometric
 experiments, not a list of recommended corrections.
 
-Before beginning, read [binary_tychos.md](binary_tychos.md). The current model is
-a validated, coordinate-preserving baseline. Its hierarchy and setting registry
-are native and declarative, while some established deferent mathematics remains
-active to preserve the accepted ephemerides.
+Before beginning, read [binary_tychos.md](binary_tychos.md). This branch is a
+direct parent-relative migration whose algebraic and software gates pass. Complete
+the fresh-export equivalence gate before accepting any physical retuning.
 
 ## The three layers of the model
 
@@ -19,9 +18,8 @@ Keep these layers separate when interpreting an edit:
    dependencies and Edit Settings groups.
 2. `src/settings/celestial-settings.json` contains the numerical parameters,
    identified by stable IDs.
-3. Generated Sun-relative components reconstruct the accepted body-minus-Sun
-   vectors. They are calculated from the declared settings and are not separate
-   parameters to tune.
+3. Native relative evaluators combine the direct parent-relative carrier fields
+   with the local deferent, plane and body settings.
 
 Use the Edit Settings panel for ordinary parameter experiments. Change the model
 schema only when testing a different astronomical hierarchy.
@@ -37,6 +35,7 @@ part could produce the observed residual.
 | Orbital scale | Size of the local path | `orbitRadius` |
 | Orbit centre | Constant or rotating displacement of a stage | `orbitCentera`, `orbitCenterb`, `orbitCenterc` |
 | Orbital plane | Latitude/declination geometry and node orientation | `orbitTilta`, `orbitTiltb` |
+| Direct annual residual | Parent-relative annual vector that did not cancel in migration | `relativeAnnualCos*`, `relativeAnnualSin*`, `relativeAnnualSpeed`, `relativeAnnualStart` |
 | Appearance/spin | Rendering or axial rotation, usually not orbital position | `size`, `actualSize`, `tilt`, `tiltb`, `rotationStart`, `rotationSpeed` |
 
 An Euler control such as `orbitTilta` is not automatically the physical
@@ -49,14 +48,18 @@ the parent axes, transform order and other rotations in the chain.
 - A Mars change also affects Phobos and Deimos because they inherit Mars's frame.
 - Mercury and Venus each have a carrier, secondary stage, fixed plane and leaf
   orbit. Edit only the layer associated with the hypothesis being tested.
-- Eros deferent A defines both an annual carrier and its orbital basis; changing
-  its tilt changes the non-cancelling annual remainder.
+- The migrated Mars E, Mercury A, Venus A and Eros A carriers have zero orbital
+  radius. Their annual remainder is stored explicitly in `relativeAnnual*`; their
+  normal phase/speed/tilt fields still define the local orientation basis.
 - Moon experiments are independent of solar-companion tuning and should be kept
   in a separate trial.
 - A zero `orbitRadius` does not guarantee that a stage is irrelevant. Its centre
   and orientation may still alter descendant coordinates.
-- Never edit the generated `Sun-Relative ...` components. They are derived
-  coordinate adapters rather than free astronomical settings.
+- Do not treat the `relativeAnnual*` vectors as generic correction knobs. They
+  encode an exact predecessor component; changing them requires a stated
+  geometric hypothesis and a full descendant regression.
+- Former absolute carrier files cannot be merged into this model. Migrate the
+  affected carrier fields explicitly instead of restoring radius-100 child paths.
 
 ## Safe experiment workflow
 

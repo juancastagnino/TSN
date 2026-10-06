@@ -71,25 +71,25 @@ test("preserves the accepted parent path for every reparented body", () => {
   ];
   expect(pathTo("mars")).toEqual([
     ...prefix,
-    "Sun-Relative Mars Components",
+    "Mars Native Relative Components",
     "Mars Junior Companion Branch",
     "Mars",
   ]);
   expect(pathTo("venus")).toEqual([
     ...prefix,
-    "Sun-Relative Venus Frame",
+    "Venus Native Relative Frame",
     "Venus Senior Solar Companion Branch",
     "Venus",
   ]);
   expect(pathTo("mercury")).toEqual([
     ...prefix,
-    "Sun-Relative Mercury Frame",
+    "Mercury Native Relative Frame",
     "Mercury Junior Solar Companion Branch",
     "Mercury",
   ]);
   expect(pathTo("eros")).toEqual([
     ...prefix,
-    "Sun-Relative Eros Frame",
+    "Eros Native Relative Frame",
     "Eros Solar Asteroid Branch",
     "Eros",
   ]);

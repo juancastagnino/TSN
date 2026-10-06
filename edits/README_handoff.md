@@ -1,210 +1,139 @@
 # Developer / AI handoff
 
-Read [README.md](README.md) for commands. This file records only the accepted
-baseline, its interpretation, constraints and next work. Generated reports contain
-the detailed evidence for individual experiments.
+This handoff describes the experimental **`full-binary-tychos`** branch. See
+[README.md](README.md) for analysis commands and [binary_tychos.md](binary_tychos.md)
+for the design rationale.
 
-## Current branch and status
+## Current state
 
-This handoff describes **`native-binary-system`**, built from the accepted
-declarative hierarchy baseline.
+The accepted predecessor is `native-binary-system`. Its complete reports and raw
+exports are preserved under `00-backup/native-relative-baseline`.
 
-The current baseline is accepted as coordinate preserving. It includes:
+This branch completes the parent-relative settings migration without deliberately
+changing any accepted orbit:
 
-- a native schema-v2 topology in `celestial-model.json`;
-- stable-ID schema-v2 parameters in `celestial-settings.json`;
-- the accepted Moon Node/Plane model and lunar tuning;
-- an explicit asymmetric Sun–Mars primary/companion hierarchy;
-- explicit Sun-relative Mercury, Venus and Eros branches;
-- separate fixed Mercury and Venus plane objects reproducing their original
-  TYCHOS geometry;
-- Phobos and Deimos inheriting Mars; and
-- the outer planets and Halley remaining beneath the Sun.
-
-The branch excludes Observer Trace. It contains no Mercury/Venus eccentric or
-synodic correction layers, no moving solar-companion nodes and no Pluto tuning.
-
-## Accepted hierarchy
+- Earth supplies the PVP motion.
+- The Sun inherits Earth and supplies the solar-system position.
+- Mars, Mercury, Venus and Eros inherit the Sun's world position.
+- Their former absolute radius-100 A/E carriers have been replaced by direct
+  parent-relative centres and explicit annual residual vectors.
+- Their local S/B stages, fixed planes and body orbits retain the accepted values
+  and matrix order.
+- Jupiter, Saturn, Uranus, Neptune, Pluto and Halley were already Sun-hosted.
+- The Moon remains Earth-hosted; Phobos and Deimos remain Mars-hosted.
 
 ```text
-SystemCenter                         (fixed PVP coordinate reference)
-└─ Earth                             (moves on the PVP path)
-   ├─ Moon Node / Plane
-   │  └─ Moon deferent A
-   │     └─ Moon
+SystemCenter
+└─ Earth
+   ├─ Moon Node / Plane -> Moon
    └─ Sun-Mars Binary Frame
-      └─ Sun Primary Branch
-         └─ Sun deferent
-            └─ Sun
-               ├─ Mars Junior Companion
-               │  └─ Mars -> Phobos / Deimos
-               ├─ Venus Senior Solar Companion
-               ├─ Mercury Junior Solar Companion
-               ├─ Jupiter / Saturn / Uranus / Neptune / Pluto
-               ├─ Halley
-               └─ Eros
+      └─ Sun Primary -> Sun
+         ├─ Mars Junior Companion -> Phobos / Deimos
+         ├─ Venus Senior Solar Companion
+         ├─ Mercury Junior Solar Companion
+         ├─ Jupiter / Saturn / Uranus / Neptune / Pluto
+         ├─ Halley
+         └─ Eros
 ```
 
-### PVP interpretation
+`SystemCenter` is the fixed geometric reference of Earth's PVP path, not a body or
+barycentre. The model remains Tychonic: Earth follows the PVP path, the Sun is
+positioned relative to Earth, and the solar subsystem is organized beneath the
+Sun.
 
-`SystemCenter` has zero radius, speed, centre offsets and tilts. It is a coordinate
-reference, not a celestial body, physical barycentre or source of motion. The
-centre is best understood as a geometric attribute of Earth's PVP orbit. Using it
-to calculate the path does not assign it physical causality.
+## What is genuinely different
 
-The accepted model therefore does **not** place Earth and the Sun–Mars system in
-independently moving sibling branches. It retains the central Tychonic relationship:
-Earth follows the PVP path, the Sun system is positioned relative to Earth, and the
-solar bodies are organized beneath the Sun. Mars is an asymmetric Sun-relative
-junior companion, not one member of a conventional equal or barycentric binary.
-
-Do not elevate the PVP centre into an astronomical object. A compensated
-reparenting would only be a coordinate-preserving software rewrite; an
-uncompensated reparenting would be a different astronomical model.
-
-## What changed
-
-The former Earth-level Mars, Mercury, Venus and Eros chains were algebraically
-rewritten beneath the Sun without changing their world coordinates:
+Previously the code evaluated each affected body from its old absolute chain and
+subtracted the current Sun chain at runtime. Now the settings themselves contain
+the already-derived parent-relative quantities:
 
 ```text
-body world position = Sun world position + exact legacy (body - Sun) vector
+body world position
+  = inherited Sun world position
+  + direct relative centre
+  + direct annual residual
+  + local deferent / plane / body orbit
 ```
 
-The relative builders preserve every required centre, annual carrier, secondary
-deferent, plane and main-orbit component in its original matrix order. Simply
-reparenting the old nodes would add Sun transforms twice and is not equivalent.
+The migrated carrier IDs are:
 
-The model and parameter documents are now genuinely native and declarative:
+- `mars-deferent-e`
+- `mercury-deferent-a`
+- `venus-deferent-a`
+- `eros-deferent-a`
 
-- `celestial-model.json` defines topology, roles, render modes, settings registry
-  and Edit Settings groups.
-- `celestial-settings.json` stores parameters by stable ID.
-- `DeclarativeCelestialModel.jsx` builds both live and plot/export trees.
-- legacy flat settings remain importable; new saves use schema v2.
-- Edit Settings is generated from declared astronomical systems.
+All four have `orbitRadius: 0`. Their annual remainder is stored in
+`relativeAnnualCos*` and `relativeAnnualSin*` fields. The normal phase, speed and
+tilt fields retain the local orientation basis required by descendant stages.
 
-No numerical celestial parameter was changed merely to obtain this hierarchy.
+Old absolute-carrier files are rejected for these four entries rather than being
+silently mixed with the new model. Other stable-ID and legacy-name imports remain
+supported.
 
-## Equivalence evidence
+## Verification completed
 
-The authoritative pre-migration baseline is in `00-backup/new-baseline`.
-
-| Gate | Accepted result |
+| Gate | Result |
 |---|---|
-| Ten-body scientific summaries | Zero numerical deltas |
-| Derived numeric artifacts | 31 of 31 byte-identical |
-| Sun–Mars binary diagnostic | 9,497 rows exactly unchanged |
-| Direct Eros export | 75,969 rows matching every displayed field |
-| Source tests | 57 tests across 11 suites passed |
-| Production build | Passed; only pre-existing MediaPipe source-map warnings |
+| Dense direct-settings audit, -100 to +100 model years | PASS for all four carriers |
+| Maximum centre reconstruction error | `2.3e-16` |
+| Maximum annual reconstruction error | `2.9e-14` |
+| Source tests | 66 passed across 12 suites |
+| Production build | PASS; only third-party MediaPipe source-map warnings |
+| Complete ten-body TYCHOS export | PASS; 759,756 non-metadata lines identical |
+| Direct Eros export | PASS; 75,969 displayed rows identical |
+| Sun–Mars binary CSV | PASS within `1e-9`; differences are floating-point noise |
+| Ten-body apparent true-of-date summaries | PASS; zero numerical delta |
+| Residual, annual and FFT artifacts | PASS; 30 of 30 byte-identical |
 
-This proves structural equivalence to the accepted predecessor. It does not by
-itself prove a physical interpretation or improve agreement with JPL.
+Run the gates with:
 
-## Accepted astronomical settings
-
-### Moon
-
-```text
-Earth
-└─ Moon Node -> Moon Plane -> node counter-rotation
-   └─ Moon deferent A
-      └─ Moon
+```powershell
+node edits/scripts/derive_full_binary_settings.js
+npm test -- --watchAll=false --runInBand
+npm run build
 ```
 
-`Moon deferent B` was an all-zero identity layer and remains removed.
+## End-to-end result
 
-| Entry | Retained values |
-|---|---|
-| Moon Node | `startPos=-296`, `speed=-0.33780566` |
-| Moon Plane | centres `0.001, 0.002, 0`; tilts `0, -5.15` |
-| Moon deferent A | `startPos=167.51`, `speed=0.71015440177343`, `radius=0.02786` |
-| Moon | `startPos=318.0`, `speed=83.2851946`, `radius=0.25505129081458283` |
+The fresh exports use the baseline bodies, interval, cadence and native frame.
+They confirm complete displayed-coordinate equivalence with
+`00-backup/native-relative-baseline`.
 
-On the accepted 2000-2026 three-hour JPL ICRF comparison, lunar angular-separation
-RMS is `1.115662°`, longitude RMS `1.094302°`, latitude RMS `0.228328°`, RA RMS
-`1.098461°` and declination RMS `0.391893°`. Mean longitude error is `-0.002219°`.
-These values are in-sample and must be validated on another interval before further
-tuning is accepted.
+The combined files differ only in their `Generated on` timestamp. Eros is
+identical in RA, declination, distance and elongation. The high-precision binary
+CSV differs only around `1e-14`, plus `acos` endpoint sensitivity below
+`1.21e-6°`; both are numerical roundoff.
 
-### Mercury and Venus
+After exporting and running the normal analysis:
 
-Each planet has its own fixed plane inside its Sun-relative branch. Those planes
-are an equivalence-preserving expression of the original TYCHOS transforms; they
-are not a claim that the two current numerical planes are identical. Their main
-orbits, B stages and planes remain distinct.
+```powershell
+python.exe -B edits/scripts/compare_raw_tychos_exports.py
+python.exe -B edits/scripts/compare_tychos_body_exports.py
+```
 
-Mercury deferent B has zero orbital radius but is not automatically an identity:
-its centre and orientation affect descendants. Do not remove it without algebraic
-and export equivalence evidence.
+Both saved and candidate report sets now use JPL apparent true-of-date, so the
+scientific summary/artifact gate is valid and passes. Keep this reference product
+identical in future before/after comparisons; do not compare these values directly
+with an ICRF report set.
 
-A shared solar-equatorial-plane experiment would be new physical geometry. Evaluate
-it primarily with Mercury/Venus offsets relative to the Sun at transit epochs, with
-all-date ephemerides as a guard. Keep it separate from this frozen baseline.
-
-### Other bodies
-
-- Mars retains the exact Sun-relative component reconstruction established during
-  the binary audit; Phobos and Deimos inherit its final frame.
-- Jupiter, Saturn, Uranus, Neptune, Pluto and Halley remain Sun-hosted.
-- Pluto retains its original TYCHOS settings.
-- Eros is Sun-hosted through an exact four-component reconstruction. Its two
-  radius-100 annual carriers do not cancel completely because their planes differ.
-
-## Reference-frame contract
-
-The native TYCHOS export is not the same product as JPL astrometric ICRF RA/Dec.
-Do not interpret their residuals solely as orbital errors.
-
-- Use a TYCHOS J2000 comparison export with `--reference icrf`.
-- Use the native/PVP export with `--reference apparent-of-date` only as an
-  exploratory moving-frame comparison.
-- JPL apparent-of-date also includes light-time, deflection, aberration, precession
-  and nutation; matching coordinates would not establish matching mechanisms.
-- Translation along the PVP path and rotation of coordinate axes are separate.
-- Define origin, pole, zero-RA direction, epoch and time scale before changing
-  orbital settings to address a long-term coordinate trend.
-
-## Rules for future changes
-
-1. Preserve a reproducible baseline: settings, raw exports, configuration, reports
-   and label.
-2. State one geometric hypothesis and identify the layer it affects.
-3. Change one layer at a time and predict which descendants should move.
-4. Compare identical bodies, timestamps, cadence and reference products.
-5. Separate structural equivalence tests from accuracy experiments.
-6. Check RA, declination, angular separation, longitude, latitude and relevant
-   body-relative events.
-7. Validate retained parameter changes on a withheld interval.
-8. Never add fitted perturbations or empirical corrections to model output.
-
-For author-facing parameter guidance, see
-[edit_settings_instructions.md](edit_settings_instructions.md).
-
-## Next investigations
-
-1. **Solar-equatorial hypothesis:** test shared versus separate Mercury/Venus plane
-   orientations, prioritizing transit-relative offsets.
-2. **Lunar residual structure:** measure evection/variation arguments directly in
-   TYCHOS and JPL rather than treating fitted periods as corrections.
-3. **Reference-frame definition:** document the intended native axes and compare
-   equivalent observables before tuning long-term drift.
-4. **Out-of-sample validation:** verify accepted lunar and future planetary changes
-   on an interval not used for selection.
+The structural migration is therefore complete. Physical simplification or
+retuning of direct residuals/local geometry is separate future work.
 
 ## Key files
 
 | File | Responsibility |
 |---|---|
-| `src/settings/celestial-model.json` | Native topology, roles and editor groups |
-| `src/settings/celestial-settings.json` | Native stable-ID parameters |
-| `src/utils/celestialSettingsSchema.js` | Validation and legacy import |
-| `src/components/DeclarativeCelestialModel.jsx` | Live and plot model construction |
-| `src/components/SunMarsRelativeOrbit.jsx` | Sun-relative Mars reconstruction |
-| `src/components/VenusSunRelativeOrbit.jsx` | Sun-relative Venus reconstruction |
-| `src/components/MercurySunRelativeOrbit.jsx` | Sun-relative Mercury reconstruction |
-| `src/components/ErosSunRelativeOrbit.jsx` | Sun-relative Eros reconstruction |
-| `src/components/MoonOrbitalPlane.jsx` | Lunar node/plane transform |
-| `src/utils/plotModelFunctions.js` | Export-model updates and coordinates |
-| `edits/binary_tychos.md` | Focused architecture explanation |
+| `src/settings/celestial-model.json` | Full hierarchy and editor groups |
+| `src/settings/celestial-settings.json` | Direct parent-relative parameters |
+| `src/utils/nativeRelativeCarrier.js` | Direct centre/residual/orientation evaluator |
+| `src/utils/celestialSettingsSchema.js` | Serialization and safe import rules |
+| `src/components/*SunRelativeOrbit.jsx` | Local branch stages beneath the Sun |
+| `edits/scripts/derive_full_binary_settings.js` | Frozen-baseline migration audit |
+
+## Constraints
+
+- Do not tune parameters until the fresh-export equivalence gate passes.
+- Do not restore radius-100 carriers beneath the Sun.
+- Do not treat a zero-radius stage as redundant if it retains centre/orientation.
+- Keep reference-frame comparison separate from orbital tuning.
+- Preserve the baseline settings, exports, configuration and reports together.

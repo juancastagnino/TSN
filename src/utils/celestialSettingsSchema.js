@@ -4,6 +4,24 @@ export const CELESTIAL_SETTINGS_SCHEMA_VERSION = 2;
 export const CELESTIAL_MODEL_SCHEMA_VERSION = 2;
 export const CELESTIAL_MODEL_ID = celestialModel.id;
 
+const NATIVE_RELATIVE_CARRIER_IDS = new Set([
+  "mars-deferent-e",
+  "mercury-deferent-a",
+  "venus-deferent-a",
+  "eros-deferent-a",
+]);
+
+const NATIVE_RELATIVE_PROPERTIES = [
+  "relativeAnnualStart",
+  "relativeAnnualSpeed",
+  "relativeAnnualCosX",
+  "relativeAnnualCosY",
+  "relativeAnnualCosZ",
+  "relativeAnnualSinX",
+  "relativeAnnualSinY",
+  "relativeAnnualSinZ",
+];
+
 export const SAVED_SETTING_PROPERTIES = [
   "id",
   "name",
@@ -21,6 +39,14 @@ export const SAVED_SETTING_PROPERTIES = [
   "orbitCenterc",
   "orbitTilta",
   "orbitTiltb",
+  "relativeAnnualStart",
+  "relativeAnnualSpeed",
+  "relativeAnnualCosX",
+  "relativeAnnualCosY",
+  "relativeAnnualCosZ",
+  "relativeAnnualSinX",
+  "relativeAnnualSinY",
+  "relativeAnnualSinZ",
 ];
 
 const catalogById = new Map(
@@ -120,6 +146,17 @@ export const mergeCelestialSettings = (current, importedDocument) => {
   const importedById = new Map(imported.map((setting) => [setting.id, setting]));
   return current.map((setting) => {
     const update = importedById.get(setting.id);
+    if (
+      update &&
+      NATIVE_RELATIVE_CARRIER_IDS.has(setting.id) &&
+      !NATIVE_RELATIVE_PROPERTIES.every((property) =>
+        Object.prototype.hasOwnProperty.call(update, property)
+      )
+    ) {
+      throw new Error(
+        `Setting '${setting.id}' uses the former absolute carrier format and cannot be merged into '${CELESTIAL_MODEL_ID}'`
+      );
+    }
     return update
       ? { ...setting, ...update, id: setting.id, name: setting.name }
       : setting;
