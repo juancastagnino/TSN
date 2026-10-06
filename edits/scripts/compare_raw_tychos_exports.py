@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--baseline",
         type=Path,
-        default=ROOT / "00-backup/native-relative-baseline/tychos_ephemerides.txt",
+        default=ROOT / "00-backup/full-binary-baseline/tychos_ephemerides.txt",
     )
     parser.add_argument(
         "--candidate",

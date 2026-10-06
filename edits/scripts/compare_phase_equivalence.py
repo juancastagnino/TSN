@@ -235,9 +235,9 @@ def generate_report(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--baseline-reports", type=Path, default=ROOT / "00-backup" / "native-relative-baseline")
+    parser.add_argument("--baseline-reports", type=Path, default=ROOT / "00-backup" / "full-binary-baseline")
     parser.add_argument("--candidate-reports", type=Path, default=ROOT / "edits" / "reports")
-    parser.add_argument("--baseline-binary", type=Path, default=ROOT / "00-backup" / "native-relative-baseline" / "sun_mars_binary.csv")
+    parser.add_argument("--baseline-binary", type=Path, default=ROOT / "00-backup" / "full-binary-baseline" / "sun_mars_binary.csv")
     parser.add_argument("--candidate-binary", type=Path, default=ROOT / "edits" / "data" / "raw" / "sun_mars_binary.csv")
     parser.add_argument("--output", type=Path, default=ROOT / "edits" / "reports" / "full_binary_equivalence_report.md")
     parser.add_argument("--tolerance", type=float, default=1e-9)

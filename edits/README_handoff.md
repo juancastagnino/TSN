@@ -22,6 +22,12 @@ changing any accepted orbit:
 - Jupiter, Saturn, Uranus, Neptune, Pluto and Halley were already Sun-hosted.
 - The Moon remains Earth-hosted; Phobos and Deimos remain Mars-hosted.
 
+After equivalence was proven, the common annual cosine/sine residual of Mars,
+Mercury and Venus was intentionally set to zero. This is now the active setting.
+The exact equivalence version and reports remain in
+`00-backup/full-binary-baseline`, and its original residual values are preserved
+in [binary_tychos.md](binary_tychos.md).
+
 ```text
 SystemCenter
 └─ Earth
@@ -116,8 +122,10 @@ scientific summary/artifact gate is valid and passes. Keep this reference produc
 identical in future before/after comparisons; do not compare these values directly
 with an ICRF report set.
 
-The structural migration is therefore complete. Physical simplification or
-retuning of direct residuals/local geometry is separate future work.
+The structural migration is complete. The active zero-residual refinement improves
+several mean biases but worsens angular RMS by `0.42%` for Mercury, `3.0%` for
+Venus and `3.9%` for Mars. The decision currently prioritizes the cleaner geometry
+and mean values; local refinement and independent-interval validation remain open.
 
 ## Key files
 

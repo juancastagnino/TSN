@@ -160,7 +160,7 @@ def parse_args():
     parser.add_argument(
         "--baseline",
         type=Path,
-        default=ROOT / "00-backup/native-relative-baseline/eros_ephemerides_before.txt",
+        default=ROOT / "00-backup/full-binary-baseline/eros_ephemerides_after.txt",
     )
     parser.add_argument(
         "--candidate",

@@ -146,8 +146,8 @@
     "relativeAnnualCosY": 0,
     "relativeAnnualCosZ": 0,
     "relativeAnnualSinX": 0,
-    "relativeAnnualSinY": -0.4820580723705152,
-    "relativeAnnualSinZ": -0.0011619066758328245
+    "relativeAnnualSinY": 0,
+    "relativeAnnualSinZ": 0
   },
   {
     "id": "mercury-deferent-b",
@@ -213,8 +213,8 @@
     "relativeAnnualCosY": 0,
     "relativeAnnualCosZ": 0,
     "relativeAnnualSinX": 0,
-    "relativeAnnualSinY": -0.4820580723705152,
-    "relativeAnnualSinZ": -0.0011619066758328245
+    "relativeAnnualSinY": 0,
+    "relativeAnnualSinZ": 0
   },
   {
     "id": "venus-deferent-b",
@@ -280,8 +280,8 @@
     "relativeAnnualCosY": 0,
     "relativeAnnualCosZ": 0,
     "relativeAnnualSinX": 0,
-    "relativeAnnualSinY": -0.4820580723705152,
-    "relativeAnnualSinZ": -0.0011619066758328245
+    "relativeAnnualSinY": 0,
+    "relativeAnnualSinZ": 0
   },
   {
     "id": "mars-deferent-s",

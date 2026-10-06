@@ -8,7 +8,7 @@ Read the [developer handoff](../README_handoff.md) for the retained baseline and
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean -0.243878 deg; RMS 1.118789 deg.
 - Declination: mean -0.011961 deg; RMS 0.370266 deg.
@@ -20,7 +20,7 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean 0.009528 deg; RMS 0.054706 deg.
 - Declination: mean 0.003903 deg; RMS 0.014145 deg.
@@ -32,11 +32,11 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
-- RA: mean -0.070267 deg; RMS 2.582757 deg.
-- Declination: mean 0.213288 deg; RMS 1.046590 deg.
-- Angular separation: mean 2.157157 deg; RMS 2.677341 deg.
+- RA: mean -0.013502 deg; RMS 2.581201 deg.
+- Declination: mean 0.213978 deg; RMS 1.079607 deg.
+- Angular separation: mean 2.158891 deg; RMS 2.688517 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
@@ -44,11 +44,11 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
-- RA: mean -0.034407 deg; RMS 0.423323 deg.
-- Declination: mean 0.041715 deg; RMS 0.237351 deg.
-- Angular separation: mean 0.387534 deg; RMS 0.461426 deg.
+- RA: mean 0.023399 deg; RMS 0.426696 deg.
+- Declination: mean 0.036492 deg; RMS 0.257460 deg.
+- Angular separation: mean 0.375148 deg; RMS 0.475105 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
@@ -56,11 +56,11 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
-- RA: mean 0.103560 deg; RMS 0.507825 deg.
-- Declination: mean -0.285433 deg; RMS 0.442256 deg.
-- Angular separation: mean 0.552903 deg; RMS 0.648968 deg.
+- RA: mean 0.103899 deg; RMS 0.512334 deg.
+- Declination: mean -0.278396 deg; RMS 0.474214 deg.
+- Angular separation: mean 0.562940 deg; RMS 0.674290 deg.
 - J2000 ecliptic longitude/latitude diagnostics are omitted for true-of-date coordinates.
 - No FFT peaks available (insufficient samples or irregular cadence).
 
@@ -68,7 +68,7 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean -0.071695 deg; RMS 0.330077 deg.
 - Declination: mean -0.264183 deg; RMS 0.289047 deg.
@@ -80,7 +80,7 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean -0.081173 deg; RMS 0.681177 deg.
 - Declination: mean -0.026352 deg; RMS 0.172020 deg.
@@ -92,7 +92,7 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean -0.275236 deg; RMS 0.294406 deg.
 - Declination: mean -0.007081 deg; RMS 0.045188 deg.
@@ -104,7 +104,7 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean 0.065835 deg; RMS 0.073729 deg.
 - Declination: mean -0.135410 deg; RMS 0.149317 deg.
@@ -116,7 +116,7 @@ Export configuration: Full binary equivalence versus JPL apparent true-of-date
 
 Interval: 2000-06-21 00:00:00 to 2026-06-21 00:00:00; 75969 samples.
 
-Export configuration: Full binary equivalence versus JPL apparent true-of-date
+Export configuration: Zero common annual residual: Mercury Venus Mars
 
 - RA: mean -4.054771 deg; RMS 4.862810 deg.
 - Declination: mean 2.688729 deg; RMS 2.709348 deg.

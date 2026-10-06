@@ -10,6 +10,12 @@ The migration is intentionally equivalence preserving. It does not claim new
 astronomical accuracy and does not retune an orbit. Its purpose is to establish a
 clean native baseline from which later TYCHOS geometry can be investigated.
 
+The active settings now take one explicit refinement beyond that equivalence
+baseline: the common annual residual of Mars, Mercury and Venus is set to zero.
+This decision improves several mean biases but modestly worsens their aggregate
+RMS values. The exact equivalence-preserving values remain documented below and
+in `00-backup/full-binary-baseline`.
+
 ## Hierarchy
 
 ```text
@@ -90,17 +96,20 @@ where `C` is stored in `relativeAnnualCosX/Y/Z`, `S` in
 The table uses model XYZ order. JSON centre fields map as
 `X=orbitCentera`, `Y=orbitCenterc`, `Z=orbitCenterb`.
 
-The residual is not an empirical correction fitted to JPL. It is the exact
+The original residual was not an empirical correction fitted to JPL. It was the exact
 algebraic remainder of the accepted predecessor. A later physical experiment may
 try to explain or simplify it, but it must not be silently discarded during the
 migration.
 
-## Why the common annual residual is retained
+## Original common annual residual: restoration reference
 
-Mars, Mercury and Venus currently share this direct annual definition:
+The equivalence-preserving migration originally gave Mars, Mercury and Venus the
+same annual definition. The active settings now contain zero cosine/sine vectors,
+but these complete original blocks are retained for direct restoration:
 
 ```json
 {
+"mercury-deferent-a": {
   "relativeAnnualStart": 0,
   "relativeAnnualSpeed": 6.283185307179586,
   "relativeAnnualCosX": 0,
@@ -109,6 +118,27 @@ Mars, Mercury and Venus currently share this direct annual definition:
   "relativeAnnualSinX": 0,
   "relativeAnnualSinY": -0.4820580723705152,
   "relativeAnnualSinZ": -0.0011619066758328245
+},
+"venus-deferent-a": {
+  "relativeAnnualStart": 0,
+  "relativeAnnualSpeed": 6.283185307179586,
+  "relativeAnnualCosX": 0,
+  "relativeAnnualCosY": 0,
+  "relativeAnnualCosZ": 0,
+  "relativeAnnualSinX": 0,
+  "relativeAnnualSinY": -0.4820580723705152,
+  "relativeAnnualSinZ": -0.0011619066758328245
+},
+"mars-deferent-e": {
+  "relativeAnnualStart": 0,
+  "relativeAnnualSpeed": 6.283185307179586,
+  "relativeAnnualCosX": 0,
+  "relativeAnnualCosY": 0,
+  "relativeAnnualCosZ": 0,
+  "relativeAnnualSinX": 0,
+  "relativeAnnualSinY": -0.4820580723705152,
+  "relativeAnnualSinZ": -0.0011619066758328245
+}
 }
 ```
 
@@ -150,22 +180,24 @@ RMS changes. The observed effect is annual and depends on date, viewing directio
 and all later transforms. Removing the residual would therefore not shift every
 body by the same `0.4°`.
 
-The common term may ultimately prove to be an inherited frame convention rather
-than three independent physical motions. Conceptually, removing it or replacing
-it with a clearer shared solar-frame geometry is worth investigating. It remains
-in the present baseline so that this structural migration stays exactly
-equivalent to its accepted predecessor.
+The common term may represent an inherited frame convention rather than three
+independent physical motions. It has therefore been removed from the active
+settings while its original values remain above as a reversible reference.
 
-A controlled future experiment should:
+The zero-residual experiment found:
 
-1. create a separate branch from this baseline;
-2. set the `relativeAnnualCos*` and `relativeAnnualSin*` fields of Mars, Mercury
-   and Venus to zero, changing nothing else initially;
-3. regenerate identical-cadence exports;
-4. inspect Mercury/Venus Sun-relative positions at conjunctions and transits,
-   latitude, declination, full-period RA/Dec and angular separation; and
-5. decide whether the term should remain, be removed, or be replaced by an
-   explicitly defined shared geometry.
+- Mercury absolute RA mean improved by `80.8%`, while angular RMS worsened by
+  `0.42%`.
+- Venus absolute RA mean improved by `32.0%` and angular mean by `3.2%`, while
+  angular RMS worsened by `3.0%`.
+- Mars absolute declination mean improved by `2.5%`, while angular RMS worsened by
+  `3.9%`.
+- Sun, Moon and all outer planets remained unchanged.
+
+The active choice prioritizes the cleaner parent-relative geometry and improved
+mean biases, while retaining the option to restore the former values or refine
+local planes, centres and phases. Full results are in
+[`zero_common_annual_residual_report.md`](reports/zero_common_annual_residual_report.md).
 
 Eros must be investigated separately. Its larger and differently oriented
 residual comes from its own former carrier plane and is not the same common term.
@@ -215,10 +247,12 @@ over a dense -100 to +100 model-year grid.
 | Apparent true-of-date summaries | Zero numerical delta for all ten bodies |
 | Residual/annual/FFT artifacts | 30 of 30 byte-identical |
 
-The fresh simulator export also passes against
-`00-backup/native-relative-baseline`. The only difference in the combined
+The equivalence-baseline simulator export passes against
+`00-backup/full-binary-baseline`. The only difference in that combined
 ephemeris file is its generation timestamp. This completes the structural
-migration without a scientific coordinate change.
+migration without a scientific coordinate change. The active zero-residual
+settings are a subsequent, intentional ephemeris refinement and are not expected
+to pass this exact-equivalence gate.
 
 ## After equivalence is confirmed
 

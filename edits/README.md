@@ -118,9 +118,13 @@ This branch completes the settings-level migration begun by
 position and store only direct parent-relative centres, annual residuals and local
 orbital stages. Their former duplicated radius-100 absolute carriers are gone.
 
-The direct-settings derivation and fresh exports are equivalent to the saved
-native baseline. The dense 200-model-year audit passes below `3e-14`, and all
-759,756 non-metadata lines in the ten-body TYCHOS export are exactly identical.
+The direct-settings derivation and equivalence-baseline exports match the saved
+native predecessor. The dense 200-model-year audit passes below `3e-14`, and all
+759,756 non-metadata lines in that ten-body export are exactly identical. The
+active settings subsequently set the common Mars/Mercury/Venus annual residual to
+zero; see [binary_tychos.md](binary_tychos.md) for the retained original values and
+[zero_common_annual_residual_report.md](reports/zero_common_annual_residual_report.md)
+for the measured tradeoff.
 
 Run the source-level migration and software gates with:
 
