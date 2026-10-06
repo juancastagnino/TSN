@@ -14,12 +14,16 @@ const { Matrix4, Vector3 } = require("three");
 const ROOT = path.resolve(__dirname, "../..");
 const currentDocument = JSON.parse(
   fs.readFileSync(
-    path.join(ROOT, "src/settings/celestial-settings.json"),
+    path.join(ROOT, "src/settings/celestial-model.json"),
     "utf8"
   )
 );
+const currentEntries = [
+  currentDocument.referenceFrame,
+  ...currentDocument.bodies,
+].flatMap((owner) => Object.values(owner.motion));
 const current = new Map(
-  currentDocument.settings.map((setting) => [setting.id, setting])
+  currentEntries.map((setting) => [setting.id, setting])
 );
 
 const legacy = new Map(

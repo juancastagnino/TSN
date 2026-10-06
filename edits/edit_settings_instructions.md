@@ -10,16 +10,13 @@ Before beginning, read [binary_tychos.md](binary_tychos.md). This branch is a
 direct parent-relative migration whose algebraic and software gates pass. Complete
 the fresh-export equivalence gate before accepting any physical retuning.
 
-## The three layers of the model
+## The unified model
 
-Keep these layers separate when interpreting an edit:
-
-1. `src/settings/celestial-model.json` declares the topology, astronomical roles,
-   dependencies and Edit Settings groups.
-2. `src/settings/celestial-settings.json` contains the numerical parameters,
-   identified by stable IDs.
-3. Native relative evaluators combine the direct parent-relative carrier fields
-   with the local deferent, plane and body settings.
+`src/settings/celestial-model.json` is the only astronomical source file. Each
+real body appears once with its `parentId`, role and named `motion` components.
+Those components contain all numerical parameters formerly kept in a separate
+settings file. Native evaluators compile them into the ordered transforms used by
+the renderer and ephemeris exporter.
 
 Use the Edit Settings panel for ordinary parameter experiments. Change the model
 schema only when testing a different astronomical hierarchy.
@@ -35,7 +32,7 @@ part could produce the observed residual.
 | Orbital scale | Size of the local path | `orbitRadius` |
 | Orbit centre | Constant or rotating displacement of a stage | `orbitCentera`, `orbitCenterb`, `orbitCenterc` |
 | Orbital plane | Latitude/declination geometry and node orientation | `orbitTilta`, `orbitTiltb` |
-| Direct annual residual | Parent-relative annual vector that did not cancel in migration | `relativeAnnualCos*`, `relativeAnnualSin*`, `relativeAnnualSpeed`, `relativeAnnualStart` |
+| Optional annual harmonic | Body-specific parent-relative annual vector | Eros `relativeAnnualCos*`, `relativeAnnualSin*`, `relativeAnnualSpeed`, `relativeAnnualStart` |
 | Appearance/spin | Rendering or axial rotation, usually not orbital position | `size`, `actualSize`, `tilt`, `tiltb`, `rotationStart`, `rotationSpeed` |
 
 An Euler control such as `orbitTilta` is not automatically the physical
@@ -48,14 +45,15 @@ the parent axes, transform order and other rotations in the chain.
 - A Mars change also affects Phobos and Deimos because they inherit Mars's frame.
 - Mercury and Venus each have a carrier, secondary stage, fixed plane and leaf
   orbit. Edit only the layer associated with the hypothesis being tested.
-- The migrated Mars E, Mercury A, Venus A and Eros A carriers have zero orbital
-  radius. Their annual remainder is stored explicitly in `relativeAnnual*`; their
-  normal phase/speed/tilt fields still define the local orientation basis.
+- The migrated Mars E, Mercury A, Venus A and Eros A components have zero orbital
+  radius. Mars, Mercury and Venus have no annual-residual parameters. Eros keeps
+  its distinct harmonic. Their normal phase/speed/tilt fields still define the
+  local orientation basis.
 - Moon experiments are independent of solar-companion tuning and should be kept
   in a separate trial.
 - A zero `orbitRadius` does not guarantee that a stage is irrelevant. Its centre
   and orientation may still alter descendant coordinates.
-- Do not treat the `relativeAnnual*` vectors as generic correction knobs. They
+- Do not treat Eros's `relativeAnnual*` vectors as generic correction knobs. They
   encode an exact predecessor component; changing them requires a stated
   geometric hypothesis and a full descendant regression.
 - Former absolute carrier files cannot be merged into this model. Migrate the
@@ -114,7 +112,7 @@ For a Mercury/Venus/Sun experiment:
 python.exe -B edits/scripts/run_analysis.py mercury venus sun `
   --reference apparent-of-date `
   --label "Mercury Plane orbitTilta +0.25 deg; all other settings unchanged" `
-  --export-settings src/settings/celestial-settings.json
+  --export-settings src/settings/celestial-model.json
 ```
 
 The example assumes the normal TYCHOS native/PVP export. Use `--reference icrf`
@@ -166,8 +164,8 @@ not sufficient reason to make a setting permanent.
 
 ### Question
 
-The present coordinate-preserving baseline has separate Mercury and Venus plane
-objects. The author's structural notes propose that both solar companions are
+The present coordinate-preserving baseline gives Mercury and Venus separate plane
+components inside their body records. The author's structural notes propose that both solar companions are
 coplanar with the Sun's equatorial plane, approximately 6–7 degrees relative to
 the wider planetary reference.
 

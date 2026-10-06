@@ -1,8 +1,8 @@
-import nativeDocument from "../settings/celestial-settings.json";
 import celestialModel from "../settings/celestial-model.json";
 import {
   buildSettingsIndex,
   getCelestialEditorGroups,
+  getCelestialSettingsCatalog,
   mergeCelestialSettings,
   normalizeCelestialSettings,
   serializeCelestialSettings,
@@ -11,9 +11,9 @@ import {
 const numericSnapshot = (settings) =>
   settings.map(({ id, name, ...values }) => ({ id, name, values }));
 
-test("loads the complete versioned native settings document", () => {
-  const settings = normalizeCelestialSettings(nativeDocument);
-  expect(settings).toHaveLength(celestialModel.settingsCatalog.length);
+test("loads the complete unified native model", () => {
+  const settings = normalizeCelestialSettings(celestialModel);
+  expect(settings).toHaveLength(getCelestialSettingsCatalog().length);
   expect(new Set(settings.map((setting) => setting.id)).size).toBe(
     settings.length
   );
@@ -23,24 +23,27 @@ test("loads the complete versioned native settings document", () => {
 });
 
 test("imports a legacy flat settings array without changing its values", () => {
-  const native = normalizeCelestialSettings(nativeDocument);
+  const native = normalizeCelestialSettings(celestialModel);
   const legacy = native.map(({ id, ...setting }) => setting);
   const imported = normalizeCelestialSettings(legacy);
   expect(numericSnapshot(imported)).toEqual(numericSnapshot(native));
 });
 
-test("round-trips native settings and preserves rotationStart", () => {
-  const native = normalizeCelestialSettings(nativeDocument);
+test("round-trips a complete unified model and preserves rotationStart", () => {
+  const native = normalizeCelestialSettings(celestialModel);
   const document = serializeCelestialSettings(native);
-  expect(document.schemaVersion).toBe(2);
-  expect(document.settings.find((setting) => setting.id === "earth").rotationStart).toBe(0);
+  expect(document.schemaVersion).toBe(3);
+  expect(
+    document.bodies.find((body) => body.id === "earth").motion.orbit
+      .rotationStart
+  ).toBe(0);
   expect(numericSnapshot(normalizeCelestialSettings(document))).toEqual(
     numericSnapshot(native)
   );
 });
 
 test("applies partial legacy imports through stable IDs", () => {
-  const native = normalizeCelestialSettings(nativeDocument);
+  const native = normalizeCelestialSettings(celestialModel);
   const merged = mergeCelestialSettings(native, [
     { name: "Mercury", startPos: 123.5 },
   ]);
@@ -50,8 +53,8 @@ test("applies partial legacy imports through stable IDs", () => {
   );
 });
 
-test("preserves every direct parent-relative carrier field", () => {
-  const native = normalizeCelestialSettings(nativeDocument);
+test("removes the common residual while retaining the Eros harmonic", () => {
+  const native = normalizeCelestialSettings(celestialModel);
   const serialized = serializeCelestialSettings(native);
   const roundTrip = buildSettingsIndex(normalizeCelestialSettings(serialized));
 
@@ -59,27 +62,22 @@ test("preserves every direct parent-relative carrier field", () => {
     "mars-deferent-e",
     "mercury-deferent-a",
     "venus-deferent-a",
-    "eros-deferent-a",
   ].forEach((id) => {
     const carrier = roundTrip.get(id);
     expect(carrier.orbitRadius).toBe(0);
-    expect(carrier).toEqual(
-      expect.objectContaining({
-        relativeAnnualStart: expect.any(Number),
-        relativeAnnualSpeed: expect.any(Number),
-        relativeAnnualCosX: expect.any(Number),
-        relativeAnnualCosY: expect.any(Number),
-        relativeAnnualCosZ: expect.any(Number),
-        relativeAnnualSinX: expect.any(Number),
-        relativeAnnualSinY: expect.any(Number),
-        relativeAnnualSinZ: expect.any(Number),
-      })
-    );
+    expect(carrier.relativeAnnualSpeed).toBeUndefined();
   });
+  expect(roundTrip.get("eros-deferent-a")).toEqual(
+    expect.objectContaining({
+      relativeAnnualSpeed: expect.any(Number),
+      relativeAnnualCosY: expect.any(Number),
+      relativeAnnualSinY: expect.any(Number),
+    })
+  );
 });
 
-test("rejects a former absolute carrier import in the full binary model", () => {
-  const native = normalizeCelestialSettings(nativeDocument);
+test("rejects a former absolute carrier import in the unified model", () => {
+  const native = normalizeCelestialSettings(celestialModel);
   expect(() =>
     mergeCelestialSettings(native, [
       {
@@ -91,8 +89,8 @@ test("rejects a former absolute carrier import in the full binary model", () => 
   ).toThrow(/former absolute carrier format/);
 });
 
-test("declares every setting exactly once in the hierarchy-aware editor", () => {
-  const settings = normalizeCelestialSettings(nativeDocument);
+test("declares every motion component exactly once in the body-aware editor", () => {
+  const settings = normalizeCelestialSettings(celestialModel);
   const grouped = getCelestialEditorGroups(settings).flatMap(
     (group) => group.settings
   );
@@ -100,4 +98,3 @@ test("declares every setting exactly once in the hierarchy-aware editor", () => 
     settings.map((setting) => setting.id).sort()
   );
 });
-

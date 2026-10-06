@@ -42,7 +42,7 @@ from analyze_solar_companion_phase4a import (
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUT = ROOT / "00-backup/phase4c/eros_ephemerides_before.txt"
-DEFAULT_SETTINGS = ROOT / "src/settings/celestial-settings.json"
+DEFAULT_SETTINGS = ROOT / "src/settings/celestial-model.json"
 DEFAULT_REPORT = ROOT / "edits/reports/eros_phase4d_report.md"
 EROS_CHAIN = ["Eros deferent A", "Eros deferent B", "Eros"]
 SUN_CHAIN = ["Sun deferent", "Sun"]

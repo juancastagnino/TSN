@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getDefaultSpeedFact, sDay } from "./utils/time-date-functions.js";
 import miscSettings from "./settings/misc-settings.json";
-import celestialSettings from "./settings/celestial-settings.json";
+import celestialModel from "./settings/celestial-model.json";
 import starSettings from "./settings/star-settings.json";
 import {
   findCelestialSetting,
@@ -248,7 +248,7 @@ export const usePlotStore = create((set, get) => ({
     })),
 }));
 
-const nativeCelestialSettings = normalizeCelestialSettings(celestialSettings);
+const nativeCelestialSettings = normalizeCelestialSettings(celestialModel);
 const createDefaultCelestialSettings = () =>
   nativeCelestialSettings.map((setting) => {
     const matching = miscSettings.find((item) => item.name === setting.name);

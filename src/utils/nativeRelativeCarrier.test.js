@@ -1,4 +1,4 @@
-import settingsDocument from "../settings/celestial-settings.json";
+import settingsDocument from "../settings/celestial-model.json";
 import {
   buildSettingsIndex,
   normalizeCelestialSettings,
@@ -31,14 +31,14 @@ test("evaluates the stored cosine and sine vectors at quarter phases", () => {
   expect(state.annualResidual.z).toBeCloseTo(carrier.relativeAnnualSinZ, 12);
 });
 
-test("requires a complete native relative carrier definition", () => {
-  expect(hasNativeRelativeCarrier(settings.get("mars-deferent-e"))).toBe(true);
-  expect(hasNativeRelativeCarrier(settings.get("sun-deferent"))).toBe(false);
+test("treats an omitted annual harmonic as an exact zero vector", () => {
+  const mars = settings.get("mars-deferent-e");
+  const state = createNativeRelativeCarrierState();
+  expect(hasNativeRelativeCarrier(mars)).toBe(true);
+  expect(mars.relativeAnnualSpeed).toBeUndefined();
+  updateNativeRelativeCarrier(state, mars, 123.5);
+  expect(state.annualResidual.toArray()).toEqual([0, 0, 0]);
   expect(() =>
-    updateNativeRelativeCarrier(
-      createNativeRelativeCarrierState(),
-      settings.get("sun-deferent"),
-      0
-    )
+    updateNativeRelativeCarrier(createNativeRelativeCarrierState(), undefined, 0)
   ).toThrow(/not a native relative carrier/);
 });

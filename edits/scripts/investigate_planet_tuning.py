@@ -1,6 +1,6 @@
 """Screen planet geometry against the saved ephemeris comparisons.
 
-This is an analysis aid. It never edits celestial-settings.json. Simulator
+This is an analysis aid. It never edits celestial-model.json. Simulator
 exports remain the authoritative validation for any candidate parameter.
 """
 
@@ -195,7 +195,7 @@ def main():
     args = parser.parse_args()
 
     dates, positions, reference, exported = load_comparison(args.body, args.stride)
-    settings = settings_map(ROOT / "src/settings/celestial-settings.json")
+    settings = settings_map(ROOT / "src/settings/celestial-model.json")
     reconstructed = model(settings, args.body, positions)
     print("samples", len(positions), "stride", args.stride)
     print("reconstruction_vs_export", metrics(reconstructed, exported))

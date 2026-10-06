@@ -20,7 +20,7 @@ from settings_schema import settings_map
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SETTINGS = ROOT / "src/settings/celestial-settings.json"
+DEFAULT_SETTINGS = ROOT / "src/settings/celestial-model.json"
 DEFAULT_REPORT = ROOT / "edits/reports/solar_companion_phase4a_report.md"
 DERIVED = ROOT / "edits/data/derived"
 EPOCH = datetime(2000, 6, 21, 12)

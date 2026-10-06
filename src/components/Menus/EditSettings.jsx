@@ -193,6 +193,11 @@ const getControls = (s, updateSetting) => ({
   ),
 });
 
+const componentLabel = (component) =>
+  component
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/^./, (letter) => letter.toUpperCase());
+
 // The inner component containing the hooks only mounts when the menu is active
 const EditSettingsPanel = () => {
   const showPlanets = useStore((s) => s.showPlanets);
@@ -356,11 +361,15 @@ const EditSettingsPanel = () => {
     // inferring parentage from display-name substrings.
     getCelestialEditorGroups(settings).forEach((editorGroup) => {
       const groupControls = {};
-      editorGroup.settings.forEach((setting) => {
-        groupControls[setting.name] = folder(
-          getControls(setting, updateSetting),
-          { collapsed: true }
-        );
+      editorGroup.bodies.forEach((body) => {
+        const bodyControls = {};
+        body.settings.forEach((setting) => {
+          bodyControls[componentLabel(setting.component)] = folder(
+            getControls(setting, updateSetting),
+            { collapsed: true }
+          );
+        });
+        groupControls[body.name] = folder(bodyControls, { collapsed: true });
       });
       settingsMenu[editorGroup.name] = folder(groupControls, {
         collapsed: true,

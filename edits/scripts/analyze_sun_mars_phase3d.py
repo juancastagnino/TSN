@@ -16,7 +16,7 @@ from settings_schema import settings_map
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUT = ROOT / "edits" / "data" / "raw" / "sun_mars_binary.csv"
-DEFAULT_SETTINGS = ROOT / "src" / "settings" / "celestial-settings.json"
+DEFAULT_SETTINGS = ROOT / "src" / "settings" / "celestial-model.json"
 DEFAULT_REPORT = ROOT / "edits" / "reports" / "sun_mars_phase3d_report.md"
 DEFAULT_COMPONENTS = ROOT / "edits" / "data" / "derived" / "sun_mars_phase3d_components.csv"
 EPOCH = datetime(2000, 6, 21, 12)

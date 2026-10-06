@@ -1,4 +1,4 @@
-import settings from "../settings/celestial-settings.json";
+import settings from "../settings/celestial-model.json";
 import {
   buildSettingsIndex,
   normalizeCelestialSettings,

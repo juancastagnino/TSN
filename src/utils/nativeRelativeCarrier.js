@@ -14,11 +14,7 @@ export const NATIVE_RELATIVE_ANNUAL_PROPERTIES = [
   "relativeAnnualSinZ",
 ];
 
-export const hasNativeRelativeCarrier = (setting) =>
-  Boolean(setting) &&
-  NATIVE_RELATIVE_ANNUAL_PROPERTIES.every((property) =>
-    Object.prototype.hasOwnProperty.call(setting, property)
-  );
+export const hasNativeRelativeCarrier = (setting) => Boolean(setting);
 
 export const createNativeRelativeCarrierState = () => ({
   centre: new Vector3(),
@@ -37,7 +33,7 @@ export const createNativeRelativeCarrierState = () => ({
  * orbital fields retain only the orientation used by the local descendant chain.
  */
 export const updateNativeRelativeCarrier = (state, setting, position) => {
-  if (!hasNativeRelativeCarrier(setting)) {
+  if (!setting) {
     throw new Error(
       `Setting '${setting?.id || setting?.name}' is not a native relative carrier`
     );

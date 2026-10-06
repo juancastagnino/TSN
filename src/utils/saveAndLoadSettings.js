@@ -2,8 +2,8 @@ import { useSettingsStore } from "../store";
 import { serializeCelestialSettings } from "./celestialSettingsSchema";
 
 export const saveSettingsAsJson = (settings) => {
-  // Native schema v2 retains stable IDs and rotationStart. Older flat arrays
-  // remain accepted by the loader for compatibility with existing authors.
+  // Schema v3 exports the complete body hierarchy and its numerical motion
+  // parameters as one directly reusable celestial-model document.
   const jsonString = JSON.stringify(serializeCelestialSettings(settings), null, 2);
 
   // Create a Blob with the JSON content
@@ -52,7 +52,7 @@ export const loadSettingsFromFile = async () => {
     const fileContents = await file.text();
     const parsedSettings = JSON.parse(fileContents);
 
-    // One atomic update supports both schema-v2 documents and legacy arrays.
+    // One atomic update supports unified models and former settings exports.
     useSettingsStore.getState().loadSettings(parsedSettings);
 
     return true; // Success

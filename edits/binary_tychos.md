@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-`full-binary-tychos` is an experimental completion of the accepted
+`full-send-binary-tychos` is an experimental completion of the accepted
 `native-binary-system` hierarchy. It makes the numerical settings parent-relative,
 not only the visible tree.
 
@@ -10,8 +10,8 @@ The migration is intentionally equivalence preserving. It does not claim new
 astronomical accuracy and does not retune an orbit. Its purpose is to establish a
 clean native baseline from which later TYCHOS geometry can be investigated.
 
-The active settings now take one explicit refinement beyond that equivalence
-baseline: the common annual residual of Mars, Mercury and Venus is set to zero.
+The active model now takes one explicit refinement beyond that equivalence
+baseline: the common annual residual of Mars, Mercury and Venus is absent.
 This decision improves several mean biases but modestly worsens their aggregate
 RMS values. The exact equivalence-preserving values remain documented below and
 in `00-backup/full-binary-baseline`.
@@ -101,11 +101,11 @@ algebraic remainder of the accepted predecessor. A later physical experiment may
 try to explain or simplify it, but it must not be silently discarded during the
 migration.
 
-## Original common annual residual: restoration reference
+## Original common annual residual: historical restoration reference
 
 The equivalence-preserving migration originally gave Mars, Mercury and Venus the
-same annual definition. The active settings now contain zero cosine/sine vectors,
-but these complete original blocks are retained for direct restoration:
+same annual definition. Schema v3 removes these parameters entirely; these
+complete original blocks are retained here for deliberate restoration:
 
 ```json
 {
@@ -219,16 +219,31 @@ The remaining local stages are still meaningful:
 
 ## Settings and import contract
 
-[celestial-model.json](../src/settings/celestial-model.json) declares the topology,
-roles and Edit Settings groups. [celestial-settings.json](../src/settings/celestial-settings.json)
-stores the numerical model under ID `tychos-full-binary-system`.
+[celestial-model.json](../src/settings/celestial-model.json) is the schema-v3
+single source of truth under ID `tychos-unified-binary-system`. It contains:
 
-The new annual fields are serialized and exposed in Edit Settings. Imports that
-try to replace one of the four direct carriers with the former absolute format are
-rejected. This prevents an invalid hybrid of old radius-100 values and new residual
-fields. Ordinary legacy-name imports for other settings remain supported.
+- the PVP reference frame;
+- one record for each real celestial body and its `parentId`;
+- every body's named `motion` components and numerical parameters;
+- hierarchy-aware Edit Settings groups; and
+- an internal `renderTree` that compiles the ordered transforms.
+
+There is no separate `celestial-settings.json`. Nodes, planes and deferents are
+motion terms owned by a body rather than entries in the astronomical body list.
+The Edit Settings panel follows this same body/component structure, and its Save
+action writes a complete reusable unified model.
+
+Mercury, Venus and Mars have no `relativeAnnual*` properties. Eros retains those
+fields because its distinct non-zero harmonic remains active and is exposed in
+Edit Settings. Imports that try to restore any former radius-100 absolute carrier
+are rejected. Stable component IDs and legacy-name imports remain supported.
 
 ## Verification
+
+The final schema-v3 unification was exported and compared with the saved
+zero-residual full-binary baseline. Moving hierarchy and settings into one file,
+and nesting the 36 motion components inside 15 real body records, caused no
+coordinate change.
 
 The frozen source values in
 `edits/scripts/derive_full_binary_settings.js` reproduce the accepted predecessor
@@ -239,11 +254,11 @@ over a dense -100 to +100 model-year grid.
 | Four direct carrier derivations | PASS |
 | Maximum centre error | `2.3e-16` |
 | Maximum annual error | `2.9e-14` |
-| Source tests | 66 / 66 passed |
+| Source tests | 67 / 67 passed |
 | Production build | PASS |
 | Complete ten-body export | 759,756 non-metadata lines exactly identical |
 | Direct Eros export | 75,969 displayed rows exactly identical |
-| Sun–Mars diagnostic | Within `1e-9`; only floating-point roundoff |
+| Sun–Mars diagnostic | All recorded numeric deltas exactly zero |
 | Apparent true-of-date summaries | Zero numerical delta for all ten bodies |
 | Residual/annual/FFT artifacts | 30 of 30 byte-identical |
 

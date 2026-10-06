@@ -87,12 +87,12 @@ True-of-date reports contain RA, declination and angular separation. They omit
 ecliptic coordinates and lunar periodic fits because rotating them with a fixed
 J2000 obliquity would mix frames.
 
-## Full parent-relative hierarchy trial
+## Unified parent-relative hierarchy
 
-The `full-binary-tychos` branch uses schema-v2
-[celestial-model.json](../src/settings/celestial-model.json) and
-[celestial-settings.json](../src/settings/celestial-settings.json). Its hierarchy
-is:
+The `full-send-binary-tychos` branch uses the schema-v3 single source of truth
+[celestial-model.json](../src/settings/celestial-model.json). It contains both the
+astronomical hierarchy and every numerical motion parameter; the former separate
+`celestial-settings.json` no longer exists. Its hierarchy is:
 
 ```text
 SystemCenter                         (PVP coordinate reference)
@@ -113,10 +113,15 @@ of Earth's PVP orbit. It is not a body, barycentre or cause of motion. The Sun
 system remains inside Earth's branch: Earth follows the PVP path, the Sun orbits
 Earth, and the remaining solar bodies are organized beneath the Sun.
 
-This branch completes the settings-level migration begun by
-`native-binary-system`. Mars, Mercury, Venus and Eros now inherit the Sun's world
-position and store only direct parent-relative centres, annual residuals and local
-orbital stages. Their former duplicated radius-100 absolute carriers are gone.
+Each real body appears once in `bodies` and owns named `motion` components. Nodes,
+planes and deferents are no longer catalogued as celestial bodies: they are
+mathematical terms inside their owner. A separate internal `renderTree` compiles
+those terms into the transformation order needed by the renderer.
+
+Mars, Mercury, Venus and Eros inherit the Sun's world position and store only
+direct parent-relative centres and local orbital stages. Their former duplicated
+radius-100 absolute carriers are gone. Mercury, Venus and Mars contain no
+`relativeAnnual*` parameters; Eros retains its distinct non-zero harmonic.
 
 The direct-settings derivation and equivalence-baseline exports match the saved
 native predecessor. The dense 200-model-year audit passes below `3e-14`, and all
@@ -125,6 +130,11 @@ active settings subsequently set the common Mars/Mercury/Venus annual residual t
 zero; see [binary_tychos.md](binary_tychos.md) for the retained original values and
 [zero_common_annual_residual_report.md](reports/zero_common_annual_residual_report.md)
 for the measured tradeoff.
+
+The later schema-v3 single-file migration was also re-exported against its saved
+zero-residual baseline: all 759,756 body lines, all ten summary sets and all 30
+per-sample/spectral artifacts are unchanged, and the Sun–Mars diagnostic has zero
+numeric delta.
 
 Run the source-level migration and software gates with:
 
@@ -135,7 +145,7 @@ npm run build
 ```
 
 Then export the same bodies, timestamps and cadence and compare them with the
-saved pre-migration baseline under `00-backup/native-relative-baseline`.
+saved pre-migration baseline under `00-backup/full-binary-baseline`.
 
 ```powershell
 python.exe -B edits/scripts/compare_raw_tychos_exports.py

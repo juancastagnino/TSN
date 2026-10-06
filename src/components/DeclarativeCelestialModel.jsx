@@ -1,6 +1,5 @@
 import React from "react";
 import celestialModel from "../settings/celestial-model.json";
-import celestialSettings from "../settings/celestial-settings.json";
 import { normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
 import MercurySunRelativeOrbit from "./MercurySunRelativeOrbit";
@@ -12,6 +11,8 @@ import VenusSunRelativeOrbit from "./VenusSunRelativeOrbit";
 export const CELESTIAL_NODE_KINDS = new Set([
   "group",
   "object",
+  "motion-stage",
+  "reference-frame",
   "moon-orbital-plane",
   "sun-mars-relative",
   "venus-sun-relative",
@@ -23,7 +24,7 @@ export const CELESTIAL_NODE_KINDS = new Set([
 const modeAllows = (node, mode) =>
   !node.modes || node.modes.length === 0 || node.modes.includes(mode);
 
-export const findCelestialNode = (id, node = celestialModel.root) => {
+export const findCelestialNode = (id, node = celestialModel.renderTree) => {
   if (node.id === id) return node;
   for (const child of node.children || []) {
     const found = findCelestialNode(id, child);
@@ -33,38 +34,54 @@ export const findCelestialNode = (id, node = celestialModel.root) => {
 };
 
 export const validateCelestialModel = (model = celestialModel, settingIds) => {
-  if (model.schemaVersion !== 2) {
+  if (model.schemaVersion !== 3) {
     throw new Error(`Unsupported celestial model schema ${model.schemaVersion}`);
   }
   if (
-    model.id !== "tychos-full-binary-system" ||
-    model.settingsSchemaVersion !== 2
+    model.id !== "tychos-unified-binary-system"
   ) {
     throw new Error("Celestial model identity or settings schema is invalid");
   }
-  if (!model.root) throw new Error("Celestial model has no root node");
+  if (!model.renderTree) throw new Error("Celestial model has no render tree");
   if (
-    !Array.isArray(model.settingsCatalog) ||
+    !model.referenceFrame ||
+    !Array.isArray(model.bodies) ||
     !Array.isArray(model.editorGroups)
   ) {
-    throw new Error("Celestial model has no settings catalog or editor groups");
+    throw new Error("Celestial model has no bodies or editor groups");
   }
 
+  const owners = [model.referenceFrame, ...model.bodies];
+  const ownerIds = new Set();
   const catalogIds = new Set();
   const catalogNames = new Set();
-  model.settingsCatalog.forEach(({ id, name }) => {
-    if (!id || !name) throw new Error("Invalid celestial settings catalog entry");
-    if (catalogIds.has(id) || catalogNames.has(name)) {
-      throw new Error(`Duplicate celestial settings catalog entry '${id}'`);
+  owners.forEach((owner) => {
+    if (!owner.id || !owner.name || !owner.motion) {
+      throw new Error("Invalid celestial owner definition");
     }
-    catalogIds.add(id);
-    catalogNames.add(name);
+    if (ownerIds.has(owner.id)) {
+      throw new Error(`Duplicate celestial owner '${owner.id}'`);
+    }
+    ownerIds.add(owner.id);
+    Object.values(owner.motion).forEach(({ id, name }) => {
+      if (!id || !name) throw new Error(`Invalid motion component on '${owner.id}'`);
+      if (catalogIds.has(id) || catalogNames.has(name)) {
+        throw new Error(`Duplicate celestial motion component '${id}'`);
+      }
+      catalogIds.add(id);
+      catalogNames.add(name);
+    });
+  });
+  model.bodies.forEach((body) => {
+    if (!ownerIds.has(body.parentId)) {
+      throw new Error(`Body '${body.id}' has unknown parent '${body.parentId}'`);
+    }
   });
   model.editorGroups.forEach((group) =>
-    group.settingIds.forEach((id) => {
-      if (!catalogIds.has(id)) {
+    group.bodyIds.forEach((id) => {
+      if (!ownerIds.has(id)) {
         throw new Error(
-          `Editor group '${group.id}' references unknown setting '${id}'`
+          `Editor group '${group.id}' references unknown body '${id}'`
         );
       }
     })
@@ -79,7 +96,12 @@ export const validateCelestialModel = (model = celestialModel, settingIds) => {
     if (!CELESTIAL_NODE_KINDS.has(node.kind)) {
       throw new Error(`Unknown celestial node kind '${node.kind}' at ${path}`);
     }
-    if ((node.kind === "group" || node.kind === "object") && !node.name) {
+    if (
+      ["group", "object", "motion-stage", "reference-frame"].includes(
+        node.kind
+      ) &&
+      !node.name
+    ) {
       throw new Error(`Celestial ${node.kind} at ${path} has no name`);
     }
     if (node.modes?.some((mode) => !["live", "plot"].includes(mode))) {
@@ -88,7 +110,9 @@ export const validateCelestialModel = (model = celestialModel, settingIds) => {
     if (settingIds) {
       const required =
         node.settingIds ||
-        (node.kind === "object" ? [node.settingId || node.id] : []);
+        (["object", "motion-stage", "reference-frame"].includes(node.kind)
+          ? [node.settingId || node.id]
+          : []);
       required.forEach((id) => {
         if (!settingIds.has(id)) {
           throw new Error(`Unknown setting '${id}' referenced at ${path}`);
@@ -98,14 +122,14 @@ export const validateCelestialModel = (model = celestialModel, settingIds) => {
     (node.children || []).forEach((child) => visit(child, path));
   };
 
-  visit(model.root);
+  visit(model.renderTree);
   return true;
 };
 
 validateCelestialModel(
   celestialModel,
   new Set(
-    normalizeCelestialSettings(celestialSettings).map((setting) => setting.id)
+    normalizeCelestialSettings(celestialModel).map((setting) => setting.id)
   )
 );
 
@@ -135,6 +159,8 @@ export const renderCelestialNode = (
     case "group":
       return React.createElement("group", props, children);
     case "object":
+    case "motion-stage":
+    case "reference-frame":
       return React.createElement(ObjectComponent, props, children);
     case "moon-orbital-plane":
       return React.createElement(
@@ -178,7 +204,7 @@ const DeclarativeCelestialModel = ({ ObjectComponent, mode }) => {
   if (!["live", "plot"].includes(mode)) {
     throw new Error(`Unsupported declarative model mode: ${mode}`);
   }
-  return renderCelestialNode(celestialModel.root, { ObjectComponent, mode });
+  return renderCelestialNode(celestialModel.renderTree, { ObjectComponent, mode });
 };
 
 export default DeclarativeCelestialModel;

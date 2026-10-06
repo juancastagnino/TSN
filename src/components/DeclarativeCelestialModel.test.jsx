@@ -1,6 +1,5 @@
 import React from "react";
 import celestialModel from "../settings/celestial-model.json";
-import celestialSettings from "../settings/celestial-settings.json";
 import { normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import {
   findCelestialNode,
@@ -26,12 +25,14 @@ const descendantNames = (element) => {
 
 const objectNames = (node, mode, result = []) => {
   if (node.modes && !node.modes.includes(mode)) return result;
-  if (node.kind === "object") result.push(node.name);
+  if (node.kind === "object" || node.kind === "reference-frame") {
+    result.push(node.name);
+  }
   (node.children || []).forEach((child) => objectNames(child, mode, result));
   return result;
 };
 
-const pathTo = (targetId, node = celestialModel.root, parents = []) => {
+const pathTo = (targetId, node = celestialModel.renderTree, parents = []) => {
   const path = [...parents, node.name];
   if (node.id === targetId) return path;
   for (const child of node.children || []) {
@@ -43,7 +44,7 @@ const pathTo = (targetId, node = celestialModel.root, parents = []) => {
 
 test("validates every declarative node and settings dependency", () => {
   const settingIds = new Set(
-    normalizeCelestialSettings(celestialSettings).map((setting) => setting.id)
+    normalizeCelestialSettings(celestialModel).map((setting) => setting.id)
   );
   expect(validateCelestialModel(celestialModel, settingIds)).toBe(true);
 });
@@ -57,6 +58,23 @@ test("declares one shared Sun-Mars hierarchy with the accepted branches", () => 
   expect(findCelestialNode("eros").role).toBe("sun-hosted-asteroid");
   expect(findCelestialNode("phobos").role).toBe("mars-satellite");
   expect(findCelestialNode("deimos").role).toBe("mars-satellite");
+});
+
+test("declares real bodies once and keeps motion stages inside their owners", () => {
+  const moon = celestialModel.bodies.find((body) => body.id === "moon");
+  const mars = celestialModel.bodies.find((body) => body.id === "mars");
+  expect(moon.parentId).toBe("earth");
+  expect(Object.keys(moon.motion)).toEqual([
+    "node",
+    "plane",
+    "deferentA",
+    "orbit",
+  ]);
+  expect(mars.parentId).toBe("sun");
+  expect(mars.motion.parentRelativeCarrier.id).toBe("mars-deferent-e");
+  expect(celestialModel.bodies.some((body) => body.id.includes("deferent"))).toBe(
+    false
+  );
 });
 
 test("preserves the accepted parent path for every reparented body", () => {
@@ -96,21 +114,18 @@ test("preserves the accepted parent path for every reparented body", () => {
 });
 
 test("keeps live-only physical Moon and tracker nodes out of the plot model", () => {
-  const liveObjects = objectNames(celestialModel.root, "live");
-  const plotObjects = objectNames(celestialModel.root, "plot");
+  const liveObjects = objectNames(celestialModel.renderTree, "live");
+  const plotObjects = objectNames(celestialModel.renderTree, "plot");
 
-  expect(liveObjects).toEqual(
-    expect.arrayContaining(["Actual Moon deferent A", "Actual Moon"])
-  );
-  expect(plotObjects).not.toEqual(
-    expect.arrayContaining(["Actual Moon deferent A", "Actual Moon"])
-  );
+  expect(liveObjects).toContain("Actual Moon");
+  expect(liveObjects).not.toContain("Actual Moon deferent A");
+  expect(plotObjects).not.toContain("Actual Moon");
 
-  const liveTree = renderCelestialNode(celestialModel.root, {
+  const liveTree = renderCelestialNode(celestialModel.renderTree, {
     ObjectComponent: StubObject,
     mode: "live",
   });
-  const plotTree = renderCelestialNode(celestialModel.root, {
+  const plotTree = renderCelestialNode(celestialModel.renderTree, {
     ObjectComponent: StubObject,
     mode: "plot",
   });
@@ -119,26 +134,17 @@ test("keeps live-only physical Moon and tracker nodes out of the plot model", ()
 });
 
 test("declares the same physical object order used by the accepted JSX trees", () => {
-  expect(objectNames(celestialModel.root, "live")).toEqual([
+  expect(objectNames(celestialModel.renderTree, "live")).toEqual([
     "SystemCenter",
     "Earth",
-    "Moon deferent A",
     "Moon",
-    "Actual Moon deferent A",
     "Actual Moon",
-    "Sun deferent",
     "Sun",
-    "Halleys deferent",
     "Halleys",
-    "Jupiter deferent",
     "Jupiter",
-    "Saturn deferent",
     "Saturn",
-    "Uranus deferent",
     "Uranus",
-    "Neptune deferent",
     "Neptune",
-    "Pluto deferent",
     "Pluto",
     "Mars",
     "Phobos",
@@ -147,24 +153,16 @@ test("declares the same physical object order used by the accepted JSX trees", (
     "Mercury",
     "Eros",
   ]);
-  expect(objectNames(celestialModel.root, "plot")).toEqual([
+  expect(objectNames(celestialModel.renderTree, "plot")).toEqual([
     "SystemCenter",
     "Earth",
-    "Moon deferent A",
     "Moon",
-    "Sun deferent",
     "Sun",
-    "Halleys deferent",
     "Halleys",
-    "Jupiter deferent",
     "Jupiter",
-    "Saturn deferent",
     "Saturn",
-    "Uranus deferent",
     "Uranus",
-    "Neptune deferent",
     "Neptune",
-    "Pluto deferent",
     "Pluto",
     "Mars",
     "Phobos",

@@ -1,13 +1,13 @@
 # Developer / AI handoff
 
-This handoff describes the experimental **`full-binary-tychos`** branch. See
+This handoff describes the experimental **`full-send-binary-tychos`** branch. See
 [README.md](README.md) for analysis commands and [binary_tychos.md](binary_tychos.md)
 for the design rationale.
 
 ## Current state
 
-The accepted predecessor is `native-binary-system`. Its complete reports and raw
-exports are preserved under `00-backup/native-relative-baseline`.
+The exact-equivalence predecessor reports and raw exports are preserved under
+`00-backup/full-binary-baseline`.
 
 This branch completes the parent-relative settings migration without deliberately
 changing any accepted orbit:
@@ -16,14 +16,15 @@ changing any accepted orbit:
 - The Sun inherits Earth and supplies the solar-system position.
 - Mars, Mercury, Venus and Eros inherit the Sun's world position.
 - Their former absolute radius-100 A/E carriers have been replaced by direct
-  parent-relative centres and explicit annual residual vectors.
+  parent-relative centres and local motion terms.
 - Their local S/B stages, fixed planes and body orbits retain the accepted values
   and matrix order.
 - Jupiter, Saturn, Uranus, Neptune, Pluto and Halley were already Sun-hosted.
 - The Moon remains Earth-hosted; Phobos and Deimos remain Mars-hosted.
 
 After equivalence was proven, the common annual cosine/sine residual of Mars,
-Mercury and Venus was intentionally set to zero. This is now the active setting.
+Mercury and Venus was intentionally set to zero. Schema v3 now removes those
+parameters entirely rather than storing eight inactive zero fields.
 The exact equivalence version and reports remain in
 `00-backup/full-binary-baseline`, and its original residual values are preserved
 in [binary_tychos.md](binary_tychos.md).
@@ -49,6 +50,17 @@ Sun.
 
 ## What is genuinely different
 
+The complete astronomical source of truth is now the schema-v3
+`src/settings/celestial-model.json`. It contains the reference frame, one record
+per real body, parent relationships, every numerical motion component, editor
+groups and the internal render tree. The separate `celestial-settings.json` has
+been removed.
+
+Node, plane and deferent terms remain available for geometric adjustment inside
+their owning body's `motion` object, but they are no longer declared as celestial
+bodies. Stable component IDs are retained for runtime and legacy import
+compatibility.
+
 Previously the code evaluated each affected body from its old absolute chain and
 subtracted the current Sun chain at runtime. Now the settings themselves contain
 the already-derived parent-relative quantities:
@@ -57,7 +69,7 @@ the already-derived parent-relative quantities:
 body world position
   = inherited Sun world position
   + direct relative centre
-  + direct annual residual
+  + optional parent-relative annual harmonic
   + local deferent / plane / body orbit
 ```
 
@@ -68,9 +80,10 @@ The migrated carrier IDs are:
 - `venus-deferent-a`
 - `eros-deferent-a`
 
-All four have `orbitRadius: 0`. Their annual remainder is stored in
-`relativeAnnualCos*` and `relativeAnnualSin*` fields. The normal phase, speed and
-tilt fields retain the local orientation basis required by descendant stages.
+All four have `orbitRadius: 0`. Only Eros retains `relativeAnnualCos*` and
+`relativeAnnualSin*`, because its distinct non-zero harmonic was not part of the
+common-residual removal. The normal phase, speed and tilt fields retain the local
+orientation basis required by descendant stages.
 
 Old absolute-carrier files are rejected for these four entries rather than being
 silently mixed with the new model. Other stable-ID and legacy-name imports remain
@@ -78,32 +91,40 @@ supported.
 
 ## Verification completed
 
+The schema-v3 single-file migration was re-exported over the complete baseline
+grid on 2026-10-06. It is numerically identical to the immediately preceding
+zero-residual full-binary baseline; therefore reorganizing the data into body
+records introduced no ephemeris change.
+
 | Gate | Result |
 |---|---|
 | Dense direct-settings audit, -100 to +100 model years | PASS for all four carriers |
 | Maximum centre reconstruction error | `2.3e-16` |
 | Maximum annual reconstruction error | `2.9e-14` |
-| Source tests | 66 passed across 12 suites |
+| Source tests | 67 passed across 12 suites |
 | Production build | PASS; only third-party MediaPipe source-map warnings |
 | Complete ten-body TYCHOS export | PASS; 759,756 non-metadata lines identical |
 | Direct Eros export | PASS; 75,969 displayed rows identical |
-| Sun–Mars binary CSV | PASS within `1e-9`; differences are floating-point noise |
+| Sun–Mars binary CSV | PASS; all recorded numeric deltas exactly zero |
 | Ten-body apparent true-of-date summaries | PASS; zero numerical delta |
 | Residual, annual and FFT artifacts | PASS; 30 of 30 byte-identical |
 
-Run the gates with:
+Run the software gates with:
 
 ```powershell
-node edits/scripts/derive_full_binary_settings.js
 npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
+`derive_full_binary_settings.js` is now a historical exact-equivalence audit and
+is expected to report the intentional Mercury/Venus/Mars residual removal.
+
 ## End-to-end result
 
 The fresh exports use the baseline bodies, interval, cadence and native frame.
-They confirm complete displayed-coordinate equivalence with
-`00-backup/native-relative-baseline`.
+The archived exact-equivalence run confirms the parent-relative derivation against
+`00-backup/full-binary-baseline`. The later common-residual removal is an
+intentional scientific change and should not pass that particular raw-output gate.
 
 The combined files differ only in their `Generated on` timestamp. Eros is
 identical in RA, declination, distance and elongation. The high-precision binary
@@ -131,8 +152,7 @@ and mean values; local refinement and independent-interval validation remain ope
 
 | File | Responsibility |
 |---|---|
-| `src/settings/celestial-model.json` | Full hierarchy and editor groups |
-| `src/settings/celestial-settings.json` | Direct parent-relative parameters |
+| `src/settings/celestial-model.json` | Single source: bodies, hierarchy, editor groups and all numerical motion parameters |
 | `src/utils/nativeRelativeCarrier.js` | Direct centre/residual/orientation evaluator |
 | `src/utils/celestialSettingsSchema.js` | Serialization and safe import rules |
 | `src/components/*SunRelativeOrbit.jsx` | Local branch stages beneath the Sun |

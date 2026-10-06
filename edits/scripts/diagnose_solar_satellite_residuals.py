@@ -287,7 +287,7 @@ def main():
     parser.add_argument("--report-dir", type=Path, default=DEFAULT_REPORT_DIR)
     args = parser.parse_args()
 
-    settings_path = ROOT / "src" / "settings" / "celestial-settings.json"
+    settings_path = ROOT / "src" / "settings" / "celestial-model.json"
     settings = settings_entries(settings_path)
     data = {
         body: load_body(args.data_dir / f"{body}_comparison.csv")

@@ -110,7 +110,7 @@ def score(pred, ref):
 
 def main():
     pos, ref, exported = load_reference()
-    settings = settings_map(ROOT / "src/settings/celestial-settings.json")
+    settings = settings_map(ROOT / "src/settings/celestial-model.json")
     print("reconstruction_vs_export", score(model(settings,pos), exported))
     print("current_vs_jpl", score(model(settings,pos), ref))
 

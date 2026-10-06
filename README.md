@@ -133,7 +133,7 @@ src/
 │   └── UserInterface.jsx# HUD and overlays
 ├── settings/
 │   ├── BSC.json         # Bright Star Catalog Data
-│   ├── celestial-settings.json # Planet orbits and constants
+│   ├── celestial-model.json    # Unified hierarchy, motion and constants
 │   └── star-settings.json      # Visual configuration for stars
 ├── utils/
 │   ├── celestial-functions.js  # Tychos model math & logic
@@ -147,7 +147,7 @@ src/
 
 You can customize the simulation logic by editing files in the `src/settings/` directory:
 
-- **`celestial-settings.json`**: Modify orbital speeds, distances, sizes, and starting positions for planets.
+- **`celestial-model.json`**: Modify the body hierarchy and each body's orbital speeds, distances, planes, centres, sizes and starting positions.
 - **`star-settings.json`**: Adjust the rendering scale, brightness, and colors of stars.
 - **`BSC.json`**: The raw data for the stars.
 

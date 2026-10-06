@@ -1,26 +1,20 @@
 import celestialModel from "../settings/celestial-model.json";
 
-export const CELESTIAL_SETTINGS_SCHEMA_VERSION = 2;
-export const CELESTIAL_MODEL_SCHEMA_VERSION = 2;
+export const CELESTIAL_MODEL_SCHEMA_VERSION = 3;
+export const CELESTIAL_SETTINGS_SCHEMA_VERSION = 3;
 export const CELESTIAL_MODEL_ID = celestialModel.id;
 
-const NATIVE_RELATIVE_CARRIER_IDS = new Set([
+const LEGACY_MODEL_IDS = new Set([
+  "tychos-full-binary-system",
+  "tychos-native-binary-system",
+]);
+
+const DIRECT_PARENT_RELATIVE_IDS = new Set([
   "mars-deferent-e",
   "mercury-deferent-a",
   "venus-deferent-a",
   "eros-deferent-a",
 ]);
-
-const NATIVE_RELATIVE_PROPERTIES = [
-  "relativeAnnualStart",
-  "relativeAnnualSpeed",
-  "relativeAnnualCosX",
-  "relativeAnnualCosY",
-  "relativeAnnualCosZ",
-  "relativeAnnualSinX",
-  "relativeAnnualSinY",
-  "relativeAnnualSinZ",
-];
 
 export const SAVED_SETTING_PROPERTIES = [
   "id",
@@ -39,6 +33,8 @@ export const SAVED_SETTING_PROPERTIES = [
   "orbitCenterc",
   "orbitTilta",
   "orbitTiltb",
+  // Eros still uses a non-zero parent-relative annual harmonic. The common
+  // Mercury/Venus/Mars residual was deliberately removed from schema v3.
   "relativeAnnualStart",
   "relativeAnnualSpeed",
   "relativeAnnualCosX",
@@ -49,37 +45,55 @@ export const SAVED_SETTING_PROPERTIES = [
   "relativeAnnualSinZ",
 ];
 
-const catalogById = new Map(
-  celestialModel.settingsCatalog.map((entry) => [entry.id, entry])
-);
-const catalogByName = new Map(
-  celestialModel.settingsCatalog.map((entry) => [entry.name, entry])
-);
+const motionEntries = (owner) =>
+  Object.entries(owner?.motion || {}).map(([component, setting]) => ({
+    component,
+    setting,
+  }));
+
+export const getCelestialOwners = (model = celestialModel) => [
+  model.referenceFrame,
+  ...(model.bodies || []),
+].filter(Boolean);
+
+export const getNativeCelestialSettings = (model = celestialModel) =>
+  getCelestialOwners(model).flatMap((owner) =>
+    motionEntries(owner).map(({ setting }) => ({ ...setting }))
+  );
+
+const nativeSettings = getNativeCelestialSettings();
+const catalog = nativeSettings.map(({ id, name }) => ({ id, name }));
+const catalogById = new Map(catalog.map((entry) => [entry.id, entry]));
+const catalogByName = new Map(catalog.map((entry) => [entry.name, entry]));
 
 const settingsArrayFromDocument = (document) => {
   if (Array.isArray(document)) return document;
   if (!document || typeof document !== "object") {
     throw new Error("Celestial settings must be an object or legacy array");
   }
-  if (document.schemaVersion !== CELESTIAL_SETTINGS_SCHEMA_VERSION) {
-    throw new Error(
-      `Unsupported celestial settings schema ${document.schemaVersion}`
-    );
+
+  if (
+    document.schemaVersion === CELESTIAL_MODEL_SCHEMA_VERSION &&
+    Array.isArray(document.bodies) &&
+    document.referenceFrame
+  ) {
+    if (document.id !== CELESTIAL_MODEL_ID) {
+      throw new Error(
+        `Settings target '${document.id}', expected '${CELESTIAL_MODEL_ID}'`
+      );
+    }
+    return getNativeCelestialSettings(document);
   }
-  if (document.modelSchemaVersion !== CELESTIAL_MODEL_SCHEMA_VERSION) {
-    throw new Error(
-      `Settings require model schema ${document.modelSchemaVersion}, expected ${CELESTIAL_MODEL_SCHEMA_VERSION}`
-    );
+
+  // Compatibility with the former split schema and author settings exports.
+  if (document.schemaVersion === 2 && Array.isArray(document.settings)) {
+    if (document.modelId && !LEGACY_MODEL_IDS.has(document.modelId)) {
+      throw new Error(`Unsupported legacy model '${document.modelId}'`);
+    }
+    return document.settings;
   }
-  if (document.modelId !== CELESTIAL_MODEL_ID) {
-    throw new Error(
-      `Settings target '${document.modelId}', expected '${CELESTIAL_MODEL_ID}'`
-    );
-  }
-  if (!Array.isArray(document.settings)) {
-    throw new Error("Versioned celestial settings have no settings array");
-  }
-  return document.settings;
+
+  throw new Error("Unsupported celestial model/settings document");
 };
 
 export const normalizeCelestialSettings = (
@@ -103,7 +117,7 @@ export const normalizeCelestialSettings = (
     }
     if (item.name && item.name !== catalogEntry.name) {
       throw new Error(
-        `Setting '${catalogEntry.id}' must retain legacy name '${catalogEntry.name}'`
+        `Setting '${catalogEntry.id}' must retain name '${catalogEntry.name}'`
       );
     }
     if (ids.has(catalogEntry.id) || names.has(catalogEntry.name)) {
@@ -115,7 +129,7 @@ export const normalizeCelestialSettings = (
   });
 
   if (requireComplete) {
-    const missing = celestialModel.settingsCatalog
+    const missing = catalog
       .filter((entry) => !ids.has(entry.id))
       .map((entry) => entry.id);
     if (missing.length) {
@@ -148,10 +162,8 @@ export const mergeCelestialSettings = (current, importedDocument) => {
     const update = importedById.get(setting.id);
     if (
       update &&
-      NATIVE_RELATIVE_CARRIER_IDS.has(setting.id) &&
-      !NATIVE_RELATIVE_PROPERTIES.every((property) =>
-        Object.prototype.hasOwnProperty.call(update, property)
-      )
+      DIRECT_PARENT_RELATIVE_IDS.has(setting.id) &&
+      Number(update.orbitRadius || 0) !== 0
     ) {
       throw new Error(
         `Setting '${setting.id}' uses the former absolute carrier format and cannot be merged into '${CELESTIAL_MODEL_ID}'`
@@ -163,32 +175,63 @@ export const mergeCelestialSettings = (current, importedDocument) => {
   });
 };
 
-export const serializeCelestialSettings = (settings) => ({
-  schemaVersion: CELESTIAL_SETTINGS_SCHEMA_VERSION,
-  modelSchemaVersion: CELESTIAL_MODEL_SCHEMA_VERSION,
-  modelId: CELESTIAL_MODEL_ID,
-  settings: settings.map((item) => {
-    const filtered = {};
-    SAVED_SETTING_PROPERTIES.forEach((property) => {
-      if (Object.prototype.hasOwnProperty.call(item, property)) {
-        filtered[property] = item[property];
-      }
+const filteredSetting = (item) => {
+  const filtered = {};
+  SAVED_SETTING_PROPERTIES.forEach((property) => {
+    if (Object.prototype.hasOwnProperty.call(item, property)) {
+      filtered[property] = item[property];
+    }
+  });
+  return filtered;
+};
+
+/** Return a complete, directly reusable unified model document. */
+export const serializeCelestialModel = (settings) => {
+  const byId = buildSettingsIndex(settings);
+  const document = JSON.parse(JSON.stringify(celestialModel));
+  getCelestialOwners(document).forEach((owner) => {
+    Object.entries(owner.motion || {}).forEach(([component, original]) => {
+      const current = byId.get(original.id);
+      if (!current) throw new Error(`Missing setting '${original.id}'`);
+      owner.motion[component] = filteredSetting(current);
     });
-    return filtered;
-  }),
-});
+  });
+  return document;
+};
+
+// Compatibility name used by existing UI code and third-party extensions.
+export const serializeCelestialSettings = serializeCelestialModel;
 
 export const getCelestialEditorGroups = (settings) => {
   const byId = buildSettingsIndex(settings);
+  const owners = new Map(
+    getCelestialOwners().map((owner) => [owner.id, owner])
+  );
   return celestialModel.editorGroups.map((group) => ({
     ...group,
-    settings: group.settingIds.map((id) => {
-      const setting = byId.get(id);
-      if (!setting) throw new Error(`Editor references unknown setting '${id}'`);
-      return setting;
+    bodies: group.bodyIds.map((bodyId) => {
+      const owner = owners.get(bodyId);
+      if (!owner) {
+        throw new Error(`Editor references unknown body '${bodyId}'`);
+      }
+      return {
+        id: owner.id,
+        name: owner.name,
+        settings: motionEntries(owner).map(({ component, setting }) => {
+          const current = byId.get(setting.id);
+          if (!current) {
+            throw new Error(`Editor references unknown setting '${setting.id}'`);
+          }
+          return { ...current, component };
+        }),
+      };
+    }),
+    settings: group.bodyIds.flatMap((bodyId) => {
+      const owner = owners.get(bodyId);
+      return motionEntries(owner).map(({ setting }) => byId.get(setting.id));
     }),
   }));
 };
 
 export const getCelestialSettingsCatalog = () =>
-  celestialModel.settingsCatalog.map((entry) => ({ ...entry }));
+  catalog.map((entry) => ({ ...entry }));

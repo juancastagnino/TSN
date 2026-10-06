@@ -1,5 +1,5 @@
 import { Matrix4, Object3D, Vector3 } from "three";
-import settings from "../settings/celestial-settings.json";
+import settings from "../settings/celestial-model.json";
 import {
   buildSettingsIndex,
   normalizeCelestialSettings,
