@@ -95,6 +95,81 @@ algebraic remainder of the accepted predecessor. A later physical experiment may
 try to explain or simplify it, but it must not be silently discarded during the
 migration.
 
+## Why the common annual residual is retained
+
+Mars, Mercury and Venus currently share this direct annual definition:
+
+```json
+{
+  "relativeAnnualStart": 0,
+  "relativeAnnualSpeed": 6.283185307179586,
+  "relativeAnnualCosX": 0,
+  "relativeAnnualCosY": 0,
+  "relativeAnnualCosZ": 0,
+  "relativeAnnualSinX": 0,
+  "relativeAnnualSinY": -0.4820580723705152,
+  "relativeAnnualSinZ": -0.0011619066758328245
+}
+```
+
+It is evaluated as:
+
+```text
+R(t) = C cos(wt - phase) + S sin(wt - phase)
+```
+
+`relativeAnnualSpeed = 2π` gives one cycle per model year. The maximum
+displacement is approximately `0.482` internal model units and lies almost
+entirely along model Y.
+
+In the preceding implementation, Mars, Mercury and Venus each contained an
+untilted annual carrier of radius `100`. The Sun also had a radius-100 annual
+motion, but with a small inclination of approximately `0.2762°`. Their
+body-minus-Sun calculation therefore cancelled almost all of the two carriers,
+but not this small component:
+
+```text
+100 × sin(0.2762°) ≈ 0.48206
+```
+
+The explicit residual fields were introduced solely to retain that component
+after removing the duplicated absolute carriers. They were not fitted to JPL and
+do not represent a newly proposed perturbation. Keeping them is what allowed the
+full hierarchy migration to preserve every accepted ephemeris value.
+
+Relative to the current local orbital radii, their approximate maximum scale is:
+
+| Body | Relative displacement | Simplified maximum angular scale |
+|---|---:|---:|
+| Mercury | `1.25%` | about `0.71°` |
+| Venus | `0.67%` | about `0.38°` |
+| Mars | `0.32%` | about `0.18°` |
+
+These angles are geometric scale estimates, not predicted constant offsets or
+RMS changes. The observed effect is annual and depends on date, viewing direction
+and all later transforms. Removing the residual would therefore not shift every
+body by the same `0.4°`.
+
+The common term may ultimately prove to be an inherited frame convention rather
+than three independent physical motions. Conceptually, removing it or replacing
+it with a clearer shared solar-frame geometry is worth investigating. It remains
+in the present baseline so that this structural migration stays exactly
+equivalent to its accepted predecessor.
+
+A controlled future experiment should:
+
+1. create a separate branch from this baseline;
+2. set the `relativeAnnualCos*` and `relativeAnnualSin*` fields of Mars, Mercury
+   and Venus to zero, changing nothing else initially;
+3. regenerate identical-cadence exports;
+4. inspect Mercury/Venus Sun-relative positions at conjunctions and transits,
+   latitude, declination, full-period RA/Dec and angular separation; and
+5. decide whether the term should remain, be removed, or be replaced by an
+   explicitly defined shared geometry.
+
+Eros must be investigated separately. Its larger and differently oriented
+residual comes from its own former carrier plane and is not the same common term.
+
 ## Inheritance semantics
 
 The relative-frame adapter inherits the Sun's world **position** while retaining
