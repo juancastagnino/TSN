@@ -145,10 +145,11 @@ def write_notes(summaries):
         with (REPORTS/f"{prefix}_fft_peaks.csv").open(encoding='utf-8', newline='') as stream:
             peaks = list(csv.DictReader(stream))[:4]
         if peaks:
-            lines += ["- Largest longitude FFT peaks (finite-window estimates, not fitted orbital periods):"]
+            observable = s.get("fft_observable", "ecliptic longitude residual")
+            lines += [f"- Largest {observable} FFT peaks (finite-window estimates, not fitted orbital periods):"]
             lines += [f"  - {float(p['period_days']):.3f} days, approximately {float(p['amplitude_deg']):.4f} deg." for p in peaks]
         else:
-            lines.append("- No FFT peaks available (insufficient samples or irregular cadence).")
+            lines.append("- No FFT peaks available; verify sample count and cadence regularity.")
         lines += [""]
     lines += ["## Questions to investigate", "",
               "- Test whether biases and fitted coefficients transfer to a separate time interval.",

@@ -276,6 +276,7 @@ def main(argv=None):
     ty_dec = np.array([r["ty_dec_deg"] for r in rows])
     jp_ra = np.array([r["jpl_ra_deg"] for r in rows])
     jp_dec = np.array([r["jpl_dec_deg"] for r in rows])
+    dra = np.array([wrap_deg(v) for v in (ty_ra - jp_ra)])
     ddec = np.array([r["ddec_deg"] for r in rows])
     sep = np.array([r["sep_deg"] for r in rows])
 
@@ -285,6 +286,9 @@ def main(argv=None):
         jp_lon, jp_lat = equatorial_to_ecliptic(jp_ra, jp_dec)
         dlon = np.array([wrap_deg(v) for v in (ty_lon - jp_lon)])
         dlat = ty_lat - jp_lat
+
+    fft_values = dlon if ecliptic_enabled else dra
+    fft_observable = "ecliptic longitude residual" if ecliptic_enabled else "right ascension residual"
 
     cadence_hours = None
     if len(dates) > 1:
@@ -323,7 +327,8 @@ def main(argv=None):
         "cadence_hours_median": cadence_hours,
         "cadence_regular": bool(len(t_days) < 2 or np.allclose(np.diff(t_days), np.diff(t_days)[0], rtol=0, atol=1e-9)),
         "fft_period_range_days": [1.0, 500.0],
-        "ra_residual": stats(wrap_deg(ty_ra - jp_ra)),
+        "fft_observable": fft_observable,
+        "ra_residual": stats(dra),
         "declination_residual": stats(ddec),
         "angular_separation": stats(sep),
     }
@@ -376,7 +381,7 @@ def main(argv=None):
                 })
 
     # FFT discovery table.
-    peaks = fft_peaks(t_days, dlon) if ecliptic_enabled else []
+    peaks = fft_peaks(t_days, fft_values)
     with (out_dir / f"{prefix}_fft_peaks.csv").open("w", newline="", encoding="utf-8") as f:
         fields = ["rank", "period_days", "amplitude_deg", "frequency_cycles_per_day"]
         w = csv.DictWriter(f, fieldnames=fields)
@@ -411,7 +416,7 @@ def main(argv=None):
                     "rms_dlat_deg": rms(dlat[idx]),
                 })
             else:
-                row["rms_dra_deg"] = rms(wrap_deg(ty_ra[idx] - jp_ra[idx]))
+                row["rms_dra_deg"] = rms(dra[idx])
             w.writerow(row)
 
     # Row-level residual file for follow-up plots or external checks.
@@ -449,7 +454,7 @@ def main(argv=None):
                     "ty_dec_deg": ty_dec[i],
                     "jpl_ra_deg": jp_ra[i],
                     "jpl_dec_deg": jp_dec[i],
-                    "dra_deg": wrap_deg(ty_ra[i] - jp_ra[i]),
+                    "dra_deg": dra[i],
                     "ddec_deg": ddec[i],
                     "sep_deg": sep[i],
                 }
@@ -463,7 +468,7 @@ def main(argv=None):
         print(f"Longitude RMS: {rms(dlon):.6f} deg")
         print(f"Latitude RMS : {rms(dlat):.6f} deg")
     else:
-        print(f"RA RMS        : {rms(wrap_deg(ty_ra - jp_ra)):.6f} deg")
+        print(f"RA RMS        : {rms(dra):.6f} deg")
     print(f"Dec RMS      : {rms(ddec):.6f} deg")
     print(f"Separation RMS: {rms(sep):.6f} deg")
     if lunar:
