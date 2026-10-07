@@ -133,8 +133,8 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   expect(Number(initialMercuryPlane.orbitCentera)).toBe(10.8);
   expect(Number(initialMercuryPlane.orbitCenterb)).toBe(4);
   expect(Number(initialMercuryPlane.orbitCenterc)).toBe(0);
-  expect(Number(initialMercuryPlane.orbitTilta)).toBe(-4);
-  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(-3);
+  expect(Number(initialMercuryPlane.orbitTilta)).toBe(-4.5);
+  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(-2.5);
   expect(Number(initialMercury.orbitCentera)).toBe(-2);
   expect(Number(initialMercury.orbitCenterb)).toBe(-4.9);
   expect(Number(initialMercury.orbitCenterc)).toBe(0);
@@ -144,7 +144,7 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   expect(Number(initialVenusPlane.orbitCentera)).toBe(1.8);
   expect(Number(initialVenusPlane.orbitCenterb)).toBe(-0.4);
   expect(Number(initialVenusPlane.orbitTilta)).toBe(3.4);
-  expect(Number(initialVenusPlane.orbitTiltb)).toBe(0.3);
+  expect(Number(initialVenusPlane.orbitTiltb)).toBe(0.2);
   expect(Number(initialVenus.orbitCenterb)).toBe(0);
   expect(Number(initialVenus.orbitTilta)).toBe(0);
   expect(Number(initialVenus.orbitTiltb)).toBe(0);
