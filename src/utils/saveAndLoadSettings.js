@@ -37,6 +37,11 @@ export const saveSettingsAsJson = () => {
   URL.revokeObjectURL(url);
 };
 
+export const applyCelestialSettingsDocument = (document) => {
+  useSettingsStore.getState().loadSettings(document);
+  return true;
+};
+
 export const loadSettingsFromFile = async () => {
   try {
     // Create file input element
@@ -57,7 +62,7 @@ export const loadSettingsFromFile = async () => {
     const parsedSettings = JSON.parse(fileContents);
 
     // One atomic update supports unified models and former settings exports.
-    useSettingsStore.getState().loadSettings(parsedSettings);
+    applyCelestialSettingsDocument(parsedSettings);
 
     return true; // Success
   } catch (error) {
