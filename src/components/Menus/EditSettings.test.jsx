@@ -2,6 +2,7 @@ import { act } from "react-dom/test-utils";
 import { createRoot } from "react-dom/client";
 import EditSettings from "./EditSettings";
 import { useStore, useSettingsStore } from "../../store";
+import { getCurrentCelestialSettingsDocument } from "../../utils/saveAndLoadSettings";
 
 let mockLevaStore;
 
@@ -104,6 +105,19 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
   expect(Number(mockLevaStore.get(planePath).replace(/\u200B/g, ""))).toBe(
     Number(initialMoonPlane.orbitTilta)
   );
+});
+
+test("serializes the latest edited value rather than the menu's initial snapshot", () => {
+  act(() => root.render(<EditSettings />));
+  const speedPath = "Settings.Earth-Moon System.Moon.Orbit.Moonspeed";
+
+  act(() =>
+    mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
+  );
+
+  const document = getCurrentCelestialSettingsDocument();
+  const moon = document.bodies.find((body) => body.id === "moon");
+  expect(Number(moon.motion.orbit.speed)).toBe(83.2851946888);
 });
 
 test("exposes fixed solar-satellite planes without visibility toggles", () => {

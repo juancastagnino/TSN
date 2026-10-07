@@ -1,10 +1,14 @@
 import { useSettingsStore } from "../store";
 import { serializeCelestialSettings } from "./celestialSettingsSchema";
 
-export const saveSettingsAsJson = (settings) => {
+export const getCurrentCelestialSettingsDocument = () =>
+  serializeCelestialSettings(useSettingsStore.getState().settings);
+
+export const saveSettingsAsJson = () => {
   // Schema v3 exports the complete body hierarchy and its numerical motion
-  // parameters as one directly reusable celestial-model document.
-  const jsonString = JSON.stringify(serializeCelestialSettings(settings), null, 2);
+  // parameters as one directly reusable celestial-model document. Read from
+  // Zustand at click time so Leva cannot retain an obsolete settings snapshot.
+  const jsonString = JSON.stringify(getCurrentCelestialSettingsDocument(), null, 2);
 
   // Create a Blob with the JSON content
   const blob = new Blob([jsonString], { type: "application/json" });

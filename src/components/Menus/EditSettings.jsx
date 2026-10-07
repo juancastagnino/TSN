@@ -378,7 +378,7 @@ const EditSettingsPanel = () => {
 
     return {
       "Load settings": button(() => loadSettingsFromFile()),
-      "Save settings": button(() => saveSettingsAsJson(settings)),
+      "Save settings": button(() => saveSettingsAsJson()),
       "Reset settings": button(() => resetSettings()),
       "Show / Hide Planets": {
         value: showPlanets,
