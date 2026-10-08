@@ -116,8 +116,9 @@ npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-`derive_full_binary_settings.js` is now a historical exact-equivalence audit and
-is expected to report the intentional Mercury/Venus/Mars residual removal.
+The phase-specific derivation scripts used during this migration have been
+retired from the active script directory. Their results remain preserved in this
+document, `binary_tychos.md`, the archived baselines and Git history.
 
 ## End-to-end result
 
@@ -131,17 +132,10 @@ identical in RA, declination, distance and elongation. The high-precision binary
 CSV differs only around `1e-14`, plus `acos` endpoint sensitivity below
 `1.21e-6°`; both are numerical roundoff.
 
-After exporting and running the normal analysis:
-
-```powershell
-python.exe -B edits/scripts/compare_raw_tychos_exports.py
-python.exe -B edits/scripts/compare_tychos_body_exports.py
-```
-
 Both saved and candidate report sets now use JPL apparent true-of-date, so the
-scientific summary/artifact gate is valid and passes. Keep this reference product
-identical in future before/after comparisons; do not compare these values directly
-with an ICRF report set.
+scientific comparison is valid. Keep this reference product identical in future
+before/after comparisons; do not compare these values directly with an ICRF
+report set. Use `compare_summary_metrics.py` for current report baselines.
 
 The structural migration is complete. The active zero-residual refinement improves
 several mean biases but worsens angular RMS by `0.42%` for Mercury, `3.0%` for
@@ -156,7 +150,7 @@ and mean values; local refinement and independent-interval validation remain ope
 | `src/utils/nativeRelativeCarrier.js` | Direct centre/residual/orientation evaluator |
 | `src/utils/celestialSettingsSchema.js` | Serialization and safe import rules |
 | `src/components/*SunRelativeOrbit.jsx` | Local branch stages beneath the Sun |
-| `edits/scripts/derive_full_binary_settings.js` | Frozen-baseline migration audit |
+| `edits/scripts/` | Maintained ephemeris workflow; see its local `README.md` |
 
 ## Constraints
 

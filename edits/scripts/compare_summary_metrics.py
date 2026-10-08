@@ -44,7 +44,7 @@ def main() -> None:
         for path in args.baseline.glob("*_apparent_of_date_summary.json")
     )
 
-    print("| Body | Metric | Baseline | Zero residual | Change | Assessment |")
+    print("| Body | Metric | Baseline | Candidate | Change | Assessment |")
     print("|---|---|---:|---:|---:|---|")
     for body in bodies:
         name = f"{body}_apparent_of_date_summary.json"
