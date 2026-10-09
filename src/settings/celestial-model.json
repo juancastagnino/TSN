@@ -325,14 +325,14 @@
           "orbitCenterb": 0,
           "orbitCenterc": 0,
           "orbitTilta": 0,
-          "orbitTiltb": -0.1
+          "orbitTiltb": -0.3
         },
         "orbit": {
           "id": "mars",
           "name": "Mars",
           "size": 2.13,
           "actualSize": 0.00227,
-          "startPos": 119.15,
+          "startPos": 119.2,
           "speed": -3.33985,
           "rotationStart": 0,
           "rotationSpeed": 2301.169494864719,
@@ -342,7 +342,7 @@
           "orbitCenterb": 0,
           "orbitCenterc": 0,
           "orbitTilta": 0,
-          "orbitTiltb": -1.95
+          "orbitTiltb": -2.16
         }
       }
     },
@@ -355,17 +355,17 @@
         "orbit": {
           "id": "phobos",
           "name": "Phobos",
-          "size": 0.5,
-          "actualSize": 0.00000742,
-          "startPos": 122,
-          "speed": 6986.5,
-          "tilt": 0,
-          "orbitRadius": 5,
-          "orbitCentera": 0,
-          "orbitCenterb": 0,
-          "orbitCenterc": 0,
-          "orbitTilta": 0,
-          "orbitTiltb": 0
+          "size": "0.5",
+          "actualSize": "0.00000742",
+          "startPos": "122",
+          "speed": "6986.5",
+          "tilt": "0",
+          "orbitRadius": "5",
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
         }
       }
     },
@@ -378,17 +378,17 @@
         "orbit": {
           "id": "deimos",
           "name": "Deimos",
-          "size": 0.5,
-          "actualSize": 0.00000414,
-          "startPos": 0,
-          "speed": 1802,
-          "tilt": 0,
-          "orbitRadius": 10,
-          "orbitCentera": 0,
-          "orbitCenterb": 0,
-          "orbitCenterc": 0,
-          "orbitTilta": 0,
-          "orbitTiltb": 0
+          "size": "0.5",
+          "actualSize": "0.00000414",
+          "startPos": "0",
+          "speed": "1802",
+          "tilt": "0",
+          "orbitRadius": "10",
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
         }
       }
     },
