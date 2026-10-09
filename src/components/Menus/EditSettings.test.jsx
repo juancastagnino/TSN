@@ -147,6 +147,27 @@ test("loads a saved unified model back into the store and visible controls", () 
   );
 });
 
+test("editing Pluto does not restore a stale hidden state", () => {
+  act(() => root.render(<EditSettings />));
+
+  const visibilityPath = "Show / Hide settings.Plutovisible";
+  const speedPath = Object.keys(mockLevaStore.getData()).find((path) =>
+    path.endsWith(".Plutospeed")
+  );
+  expect(speedPath).toBeDefined();
+
+  // Pluto starts hidden. Reproduce the author's sequence: show it, then edit it.
+  act(() => mockLevaStore.set({ [visibilityPath]: true }, true));
+  expect(useSettingsStore.getState().getSetting("Pluto").visible).toBe(true);
+
+  act(() => mockLevaStore.set({ [speedPath]: "\u200B0.123456" }, true));
+
+  const pluto = useSettingsStore.getState().getSetting("Pluto");
+  expect(pluto.visible).toBe(true);
+  expect(Number(pluto.speed)).toBe(0.123456);
+  expect(mockLevaStore.get(visibilityPath)).toBe(true);
+});
+
 test("exposes fixed solar-satellite planes without visibility toggles", () => {
   act(() => root.render(<EditSettings />));
 

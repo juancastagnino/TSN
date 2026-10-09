@@ -8,15 +8,18 @@ import {
 } from "../../utils/saveAndLoadSettings";
 import { getCelestialEditorGroups } from "../../utils/celestialSettingsSchema";
 
+const updateSettingField = (setting, property, value, updateSetting) => {
+  const cleanValue = value.replace(/\u200B/g, "");
+  updateSetting({ id: setting.id, [property]: cleanValue });
+};
+
 const getControls = (s, updateSetting) => ({
   [`${s.name}size`]: {
     label: "size",
     value: "\u200B" + s.size,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.size = cleanValue;
-      updateSetting({ ...s, size: cleanValue });
+      updateSettingField(s, "size", value, updateSetting);
     },
   },
   ...(s.actualSize !== undefined
@@ -26,9 +29,7 @@ const getControls = (s, updateSetting) => ({
           value: "\u200B" + s.actualSize,
           editable: true,
           onChange: (value) => {
-            const cleanValue = value.replace(/\u200B/g, "");
-            s.actualSize = cleanValue;
-            updateSetting({ ...s, actualSize: cleanValue });
+            updateSettingField(s, "actualSize", value, updateSetting);
           },
         },
       }
@@ -38,9 +39,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.startPos,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.startPos = cleanValue;
-      updateSetting({ ...s, startPos: cleanValue });
+      updateSettingField(s, "startPos", value, updateSetting);
     },
   },
   [`${s.name}speed`]: {
@@ -48,9 +47,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.speed,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.speed = cleanValue;
-      updateSetting({ ...s, speed: cleanValue });
+      updateSettingField(s, "speed", value, updateSetting);
     },
   },
   ...(s.rotationStart !== undefined
@@ -60,9 +57,7 @@ const getControls = (s, updateSetting) => ({
           value: "\u200B" + s.rotationStart,
           editable: true,
           onChange: (value) => {
-            const cleanValue = value.replace(/\u200B/g, "");
-            s.rotationStart = cleanValue;
-            updateSetting({ ...s, rotationStart: cleanValue });
+            updateSettingField(s, "rotationStart", value, updateSetting);
           },
         },
       }
@@ -74,9 +69,7 @@ const getControls = (s, updateSetting) => ({
           value: "\u200B" + s.rotationSpeed,
           editable: true,
           onChange: (value) => {
-            const cleanValue = value.replace(/\u200B/g, "");
-            s.rotationSpeed = cleanValue;
-            updateSetting({ ...s, rotationSpeed: cleanValue });
+            updateSettingField(s, "rotationSpeed", value, updateSetting);
           },
         },
       }
@@ -86,9 +79,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.tilt,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.tilt = cleanValue;
-      updateSetting({ ...s, tilt: cleanValue });
+      updateSettingField(s, "tilt", value, updateSetting);
     },
   },
   ...(s.tiltb !== undefined
@@ -98,9 +89,7 @@ const getControls = (s, updateSetting) => ({
           value: "\u200B" + s.tiltb,
           editable: true,
           onChange: (value) => {
-            const cleanValue = value.replace(/\u200B/g, "");
-            s.tiltb = cleanValue;
-            updateSetting({ ...s, tiltb: cleanValue });
+            updateSettingField(s, "tiltb", value, updateSetting);
           },
         },
       }
@@ -110,9 +99,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.orbitRadius,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.orbitRadius = cleanValue;
-      updateSetting({ ...s, orbitRadius: cleanValue });
+      updateSettingField(s, "orbitRadius", value, updateSetting);
     },
   },
   [`${s.name}orbitCentera`]: {
@@ -120,9 +107,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.orbitCentera,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.orbitCentera = cleanValue;
-      updateSetting({ ...s, orbitCentera: cleanValue });
+      updateSettingField(s, "orbitCentera", value, updateSetting);
     },
   },
   [`${s.name}orbitCenterb`]: {
@@ -130,9 +115,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.orbitCenterb,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.orbitCenterb = cleanValue;
-      updateSetting({ ...s, orbitCenterb: cleanValue });
+      updateSettingField(s, "orbitCenterb", value, updateSetting);
     },
   },
   [`${s.name}orbitCenterc`]: {
@@ -140,9 +123,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.orbitCenterc,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.orbitCenterc = cleanValue;
-      updateSetting({ ...s, orbitCenterc: cleanValue });
+      updateSettingField(s, "orbitCenterc", value, updateSetting);
     },
   },
   [`${s.name}orbitTilta`]: {
@@ -150,9 +131,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.orbitTilta,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.orbitTilta = cleanValue;
-      updateSetting({ ...s, orbitTilta: cleanValue });
+      updateSettingField(s, "orbitTilta", value, updateSetting);
     },
   },
   [`${s.name}orbitTiltb`]: {
@@ -160,9 +139,7 @@ const getControls = (s, updateSetting) => ({
     value: "\u200B" + s.orbitTiltb,
     editable: true,
     onChange: (value) => {
-      const cleanValue = value.replace(/\u200B/g, "");
-      s.orbitTiltb = cleanValue;
-      updateSetting({ ...s, orbitTiltb: cleanValue });
+      updateSettingField(s, "orbitTiltb", value, updateSetting);
     },
   },
   ...Object.fromEntries(
@@ -184,9 +161,7 @@ const getControls = (s, updateSetting) => ({
           value: "\u200B" + s[property],
           editable: true,
           onChange: (value) => {
-            const cleanValue = value.replace(/\u200B/g, "");
-            s[property] = cleanValue;
-            updateSetting({ ...s, [property]: cleanValue });
+            updateSettingField(s, property, value, updateSetting);
           },
         },
       ])
@@ -338,12 +313,10 @@ const EditSettingsPanel = () => {
               : group.deferents[0]?.visible === value;
 
             if (group.main) {
-              group.main.visible = value;
-              updateSetting({ ...group.main, visible: value });
+              updateSetting({ id: group.main.id, visible: value });
             }
             group.deferents.forEach((def) => {
-              def.visible = value;
-              updateSetting({ ...def, visible: value });
+              updateSetting({ id: def.id, visible: value });
 
               // FIX: If the user explicitly clicked the toggle, save it as the new "initial state"
               // so the cleanup effect doesn't erase their action!
