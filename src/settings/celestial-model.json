@@ -307,9 +307,9 @@
           "speed": 6.283185307179586,
           "tilt": 0,
           "orbitRadius": 0,
-          "orbitCentera": 7,
+          "orbitCentera": 7.62,
           "orbitCenterb": -20,
-          "orbitCenterc": 0,
+          "orbitCenterc": 0.232,
           "orbitTilta": 0,
           "orbitTiltb": 0
         },
@@ -332,7 +332,7 @@
           "name": "Mars",
           "size": 2.13,
           "actualSize": 0.00227,
-          "startPos": 119.2,
+          "startPos": 119.358,
           "speed": -3.33985,
           "rotationStart": 0,
           "rotationSpeed": 2301.169494864719,
@@ -342,7 +342,7 @@
           "orbitCenterb": 0,
           "orbitCenterc": 0,
           "orbitTilta": 0,
-          "orbitTiltb": -2.16
+          "orbitTiltb": -2.109
         }
       }
     },

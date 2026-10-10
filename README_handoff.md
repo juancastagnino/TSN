@@ -142,7 +142,7 @@ several mean biases but worsens angular RMS by `0.42%` for Mercury, `3.0%` for
 Venus and `3.9%` for Mars. The decision currently prioritizes the cleaner geometry
 and mean values; local refinement and independent-interval validation remain open.
 
-## Retained Pluto, Jupiter and Saturn refinements
+## Retained Pluto, Jupiter, Saturn and Mars refinements
 
 These are empirical adjustments of existing TYCHOS parameters. They do not alter
 the hierarchy, restore an absolute carrier, introduce a fitted correction term or
@@ -165,14 +165,21 @@ change the Sun. All quoted comparisons use JPL apparent true-of-date coordinates
 | Saturn deferent | `orbitRadius` | `89` | `98` |
 | Saturn deferent | `orbitCenterc` | `0` | `1.68` |
 | Saturn orbit | `orbitCenterb` | `40` | `35.87` |
+| Mars orbit | `startPos` | `119.2` | `119.358` |
+| Mars deferent E | `orbitCentera` | `7` | `7.62` |
+| Mars deferent E | `orbitCenterc` | `0` | `0.232` |
+| Mars orbit | `orbitTiltb` | `-2.16` | `-2.109` |
 
 Pluto's speed, radius and tilts were retained. Jupiter's other geometry was
 retained. A Saturn speed change was tested and rejected, so its original
-`0.21351984` remains active.
+`0.21351984` remains active. Mars's speeds, secondary deferent and
+`Mars deferent E orbitCenterb = -20` were retained. Fractional adjustment of
+that `orbitCenterb` was deliberately rejected in favour of the directly measured
+and conceptually established value.
 
 ### Long-baseline results
 
-The Pluto, Jupiter and Saturn long comparisons cover `1800-06-21` through
+The Pluto, Jupiter, Saturn and Mars long comparisons cover `1800-06-21` through
 `2026-06-21` at one-day cadence.
 
 | Body | Metric | Previous | Retained | Improvement |
@@ -189,11 +196,17 @@ The Pluto, Jupiter and Saturn long comparisons cover `1800-06-21` through
 | Saturn | Dec RMS | `0.2277°` | `0.1763°` | `22.6%` |
 | Saturn | Angular mean | `0.7209°` | `0.4997°` | `30.7%` |
 | Saturn | Angular RMS | `0.9150°` | `0.6066°` | `33.7%` |
+| Mars | RA RMS | `0.6287°` | `0.5708°` | `9.2%` |
+| Mars | Dec RMS | `0.3614°` | `0.3041°` | `15.8%` |
+| Mars | Angular mean | `0.5820°` | `0.5166°` | `11.2%` |
+| Mars | Angular RMS | `0.6950°` | `0.6202°` | `10.8%` |
 
 The fitted Jupiter and Saturn center values were confirmed by fresh exports:
 Jupiter's predicted angular RMS was `0.41068°` and the measured value was
 `0.41065°`; Saturn's predicted value was `0.60660°` and the measured value was
-`0.60661°`.
+`0.60661°`. Mars's fitted phase, vertical center, plane tilt and `orbitCentera`
+were also confirmed by fresh exports; the retained combined result is the
+directly measured `0.62019°` angular RMS with `orbitCenterb = -20`.
 
 ### Independent validation status
 
@@ -203,11 +216,12 @@ cadence. Its angular mean improved from `5.509°` to `2.649°`, angular RMS from
 `2.554°` to `2.007°`. The modern Dec mean became worse, so the retained Pluto
 setting is a global-fit choice rather than a claim that every metric improved.
 
-Jupiter and Saturn still require the equivalent dense `2000-2026`, three-hour
-validation before their refinements should be considered final. Their remaining
-largest RA residuals are near `365.25` and `439.07` days for Jupiter, and
-`378.65` days for Saturn. Those peaks are diagnostic fingerprints, not evidence
-that another arbitrary parameter should be added.
+Jupiter, Saturn and Mars still require the equivalent dense `2000-2026`,
+three-hour validation before their refinements should be considered final. Their
+remaining largest RA residuals are near `365.25` and `439.07` days for Jupiter,
+`378.65` days for Saturn, and `365.25` and `248.63` days for Mars. Those peaks
+are diagnostic fingerprints, not evidence that another arbitrary parameter
+should be added.
 
 ## Key files
 
