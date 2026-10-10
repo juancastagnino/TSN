@@ -152,27 +152,35 @@ change the Sun. All quoted comparisons use JPL apparent true-of-date coordinates
 
 | Body / component | Parameter | Previous | Retained |
 |---|---|---:|---:|
-| Pluto orbit | `startPos` | `200` | `204.5` |
+| Pluto orbit | `startPos` | `200` | `204` |
 | Pluto orbit | `orbitCentera` | `877` | `1387.5` |
 | Pluto orbit | `orbitCenterb` | `667` | `1110` |
 | Pluto orbit | `orbitCenterc` | `-333` | `-525.5` |
+| Pluto deferent | `orbitTilta` | `0` | `-1.5` |
+| Pluto deferent | `orbitTiltb` | `0` | `1.2` |
 | Jupiter orbit | `startPos` | `-34` | `-34.09` |
 | Jupiter orbit | `speed` | `0.52994136` | `0.52989` |
 | Jupiter orbit | `orbitCentera` | `-49` | `-49.95` |
 | Jupiter orbit | `orbitCenterc` | `-1` | `1.1` |
 | Jupiter orbit | `orbitTiltb` | `-1.2` | `-1.24` |
-| Saturn orbit | `startPos` | `-123.8` | `-123.28` |
+| Saturn orbit | `startPos` | `-123.8` | `-123.7` |
+| Saturn orbit | `speed` | `0.21351984` | `0.21357` |
 | Saturn deferent | `orbitRadius` | `89` | `98` |
-| Saturn deferent | `orbitCenterc` | `0` | `1.68` |
+| Saturn deferent | `orbitCenterc` | `0` | `1.6` |
 | Saturn orbit | `orbitCenterb` | `40` | `35.87` |
 | Mars orbit | `startPos` | `119.2` | `119.358` |
 | Mars deferent E | `orbitCentera` | `7` | `7.62` |
 | Mars deferent E | `orbitCenterc` | `0` | `0.232` |
 | Mars orbit | `orbitTiltb` | `-2.16` | `-2.109` |
 
-Pluto's speed, radius and tilts were retained. Jupiter's other geometry was
-retained. A Saturn speed change was tested and rejected, so its original
-`0.21351984` remains active. Mars's speeds, secondary deferent and
+The active Pluto configuration follows the author's preferred revision. The
+research-optimized alternative remains documented for later comparison:
+`startPos = 204.5`, with deferent `orbitTilta = 0` and `orbitTiltb = 0`; its
+centres were the same active `1387.5 / 1110 / -525.5`. The author-selected
+Pluto values are being retained despite the long-baseline JPL comparison
+favouring that alternative. Jupiter's other geometry was retained. The active
+Saturn phase, speed and deferent C value are the later author refinement shown
+above. Mars's speeds, secondary deferent and
 `Mars deferent E orbitCenterb = -20` were retained. Fractional adjustment of
 that `orbitCenterb` was deliberately rejected in favour of the directly measured
 and conceptually established value.

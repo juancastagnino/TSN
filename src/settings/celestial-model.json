@@ -565,15 +565,15 @@
           "orbitCentera": "0",
           "orbitCenterb": "0",
           "orbitCenterc": "0",
-          "orbitTilta": "0",
-          "orbitTiltb": "0"
+          "orbitTilta": "-1.5",
+          "orbitTiltb": "1.2"
         },
         "orbit": {
           "id": "pluto",
           "name": "Pluto",
           "size": "0.9",
           "actualSize": "0.00079",
-          "startPos": "204.5",
+          "startPos": "204",
           "speed": "0.0253303",
           "rotationSpeed": "1000",
           "tilt": "122.5",
