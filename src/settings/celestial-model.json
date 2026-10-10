@@ -573,14 +573,14 @@
           "name": "Pluto",
           "size": "0.9",
           "actualSize": "0.00079",
-          "startPos": "200",
+          "startPos": "204.5",
           "speed": "0.0253303",
           "rotationSpeed": "1000",
           "tilt": "122.5",
           "orbitRadius": "3948.2",
-          "orbitCentera": "877",
-          "orbitCenterb": "667",
-          "orbitCenterc": "-333",
+          "orbitCentera": "1387.5",
+          "orbitCenterb": "1110",
+          "orbitCenterc": "-525.5",
           "orbitTilta": "15",
           "orbitTiltb": "-10"
         }
