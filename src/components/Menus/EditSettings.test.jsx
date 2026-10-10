@@ -174,12 +174,12 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   const data = mockLevaStore.getData();
   expect(
     data[
-      "Settings.Mercury Junior Solar Companion.Mercury.Plane.Mercury PlaneorbitTilta"
+      "Settings.Mercury Junior Solar Moon.Mercury.Plane.Mercury PlaneorbitTilta"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Venus Senior Solar Companion.Venus.Plane.Venus PlaneorbitTilta"
+      "Settings.Venus Senior Solar Moon.Venus.Plane.Venus PlaneorbitTilta"
     ]
   ).toBeDefined();
   expect(data["Show / Hide settings.Mercury Planevisible"]).toBeUndefined();

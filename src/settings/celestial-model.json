@@ -54,7 +54,7 @@
       }
     },
     {
-      "id": "moon",
+     "id": "moon",
       "name": "Moon",
       "parentId": "earth",
       "role": "earth-satellite",
@@ -81,8 +81,8 @@
           "speed": "0",
           "tilt": "0",
           "orbitRadius": "0",
-          "orbitCentera": "0",
-          "orbitCenterb": "0",
+          "orbitCentera": "0.001",
+          "orbitCenterb": "0.01",
           "orbitCenterc": "0",
           "orbitTilta": "0.1",
           "orbitTiltb": "-5.2"
@@ -90,32 +90,32 @@
         "deferentA": {
           "id": "moon-deferent-a",
           "name": "Moon deferent A",
-          "size": 0.6,
-          "startPos": 167.51,
-          "speed": 0.71015440177343,
-          "tilt": 0,
-          "orbitRadius": 0.02786,
-          "orbitCentera": 0,
-          "orbitCenterb": 0,
-          "orbitCenterc": 0,
-          "orbitTilta": 0,
-          "orbitTiltb": 0
+          "size": "0.6",
+          "startPos": "157.3",
+          "speed": "0.71015440177343",
+          "tilt": "0",
+          "orbitRadius": "0.0215",
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
         },
         "orbit": {
           "id": "moon",
           "name": "Moon",
-          "size": 1,
-          "actualSize": 0.00116,
-          "startPos": 318,
-          "speed": 83.2851946,
-          "rotationSpeed": 0,
-          "tilt": 0,
-          "orbitRadius": 0.25505129081458283,
-          "orbitCentera": 0,
-          "orbitCenterb": 0,
-          "orbitCenterc": 0,
-          "orbitTilta": 0,
-          "orbitTiltb": 0
+          "size": "1",
+          "actualSize": "0.00116",
+          "startPos": "328",
+          "speed": "83.2851946",
+          "rotationSpeed": "0",
+          "tilt": "0",
+          "orbitRadius": "0.25505129081458283",
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
         }
       }
     },
@@ -309,7 +309,7 @@
           "orbitRadius": 0,
           "orbitCentera": 7.62,
           "orbitCenterb": -20,
-          "orbitCenterc": 0.232,
+          "orbitCenterc": 0,
           "orbitTilta": 0,
           "orbitTiltb": 0
         },
@@ -712,7 +712,7 @@
     },
     {
       "id": "mars-companion",
-      "name": "Mars Junior Companion",
+      "name": "Mars Binary Companion",
       "bodyIds": [
         "mars",
         "phobos",
@@ -721,14 +721,14 @@
     },
     {
       "id": "venus-companion",
-      "name": "Venus Senior Solar Companion",
+      "name": "Venus Senior Solar Moon",
       "bodyIds": [
         "venus"
       ]
     },
     {
       "id": "mercury-companion",
-      "name": "Mercury Junior Solar Companion",
+      "name": "Mercury Junior Solar Moon",
       "bodyIds": [
         "mercury"
       ]
@@ -941,7 +941,7 @@
                                   {
                                     "id": "mars-companion-branch",
                                     "kind": "group",
-                                    "name": "Mars Junior Companion Branch",
+                                    "name": "Mars Binary Companion Branch",
                                     "role": "junior-companion-branch",
                                     "children": [
                                       {
@@ -983,7 +983,7 @@
                                   {
                                     "id": "venus-companion-branch",
                                     "kind": "group",
-                                    "name": "Venus Senior Solar Companion Branch",
+                                    "name": "Venus Senior Solar Moon Branch",
                                     "role": "senior-solar-companion-branch",
                                     "children": [
                                       {
@@ -1011,7 +1011,7 @@
                                   {
                                     "id": "mercury-companion-branch",
                                     "kind": "group",
-                                    "name": "Mercury Junior Solar Companion Branch",
+                                    "name": "Mercury Junior Solar Moon Branch",
                                     "role": "junior-solar-companion-branch",
                                     "children": [
                                       {

@@ -41,7 +41,7 @@ test("models the Sun as primary and Mars as its junior companion branch", () => 
   const sunBranch = directChildNamed(binaryFrame, "Sun Primary Branch");
   const marsBranch = descendantNamed(
     binaryFrame,
-    "Mars Junior Companion Branch"
+    "Mars Binary Companion Branch"
   );
 
   expect(binaryFrame.props.name).toBe("Sun-Mars Binary Frame");
@@ -62,7 +62,7 @@ test("keeps the Martian moons in the Mars companion branch", () => {
   const binaryFrame = SunMarsBinarySystem({ ObjectComponent: StubObject });
   const marsBranch = descendantNamed(
     binaryFrame,
-    "Mars Junior Companion Branch"
+    "Mars Binary Companion Branch"
   );
 
   expect(descendantNames(marsBranch)).toEqual(
@@ -75,7 +75,7 @@ test("keeps the accepted Venus companion beneath the Sun", () => {
   const sunBranch = directChildNamed(binaryFrame, "Sun Primary Branch");
   const venusBranch = descendantNamed(
     sunBranch,
-    "Venus Senior Solar Companion Branch"
+    "Venus Senior Solar Moon Branch"
   );
 
   expect(venusBranch).toBeDefined();
@@ -91,7 +91,7 @@ test("makes Mercury an explicit Sun-hosted companion", () => {
   const sunBranch = directChildNamed(binaryFrame, "Sun Primary Branch");
   const mercuryBranch = descendantNamed(
     sunBranch,
-    "Mercury Junior Solar Companion Branch"
+    "Mercury Junior Solar Moon Branch"
   );
 
   expect(mercuryBranch).toBeDefined();
