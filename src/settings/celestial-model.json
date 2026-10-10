@@ -568,6 +568,34 @@
           "orbitTilta": "-1.5",
           "orbitTiltb": "1.2"
         },
+        "eccentric": {
+          "id": "pluto-eccentric",
+          "name": "Pluto Eccentric",
+          "size": "0",
+          "startPos": "189.34",
+          "speed": "0.0506606",
+          "tilt": "0",
+          "orbitRadius": "134.260927266641",
+          "orbitCentera": "1387.5",
+          "orbitCenterb": "1110",
+          "orbitCenterc": "-525.5",
+          "orbitTilta": "15",
+          "orbitTiltb": "-10"
+        },
+        "eccentricCounterrotation": {
+          "id": "pluto-eccentric-counterrotation",
+          "name": "Pluto Eccentric Counterrotation",
+          "size": "0",
+          "startPos": "-189.34",
+          "speed": "-0.0506606",
+          "tilt": "0",
+          "orbitRadius": "0",
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
+        },
         "orbit": {
           "id": "pluto",
           "name": "Pluto",
@@ -578,11 +606,11 @@
           "rotationSpeed": "1000",
           "tilt": "122.5",
           "orbitRadius": "3948.2",
-          "orbitCentera": "1387.5",
-          "orbitCenterb": "1110",
-          "orbitCenterc": "-525.5",
-          "orbitTilta": "15",
-          "orbitTiltb": "-10"
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
         }
       }
     },
@@ -920,10 +948,26 @@
                                 "role": "outer-planet-deferent",
                                 "children": [
                                   {
-                                    "id": "pluto",
-                                    "kind": "object",
-                                    "name": "Pluto",
-                                    "role": "sun-hosted-outer-body"
+                                    "id": "pluto-eccentric",
+                                    "kind": "motion-stage",
+                                    "name": "Pluto Eccentric",
+                                    "role": "pluto-eccentric-geometry",
+                                    "children": [
+                                      {
+                                        "id": "pluto-eccentric-counterrotation",
+                                        "kind": "motion-stage",
+                                        "name": "Pluto Eccentric Counterrotation",
+                                        "role": "pluto-eccentric-orientation-cancellation",
+                                        "children": [
+                                          {
+                                            "id": "pluto",
+                                            "kind": "object",
+                                            "name": "Pluto",
+                                            "role": "sun-hosted-outer-body"
+                                          }
+                                        ]
+                                      }
+                                    ]
                                   }
                                 ]
                               },
