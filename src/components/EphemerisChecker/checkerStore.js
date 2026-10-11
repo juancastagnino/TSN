@@ -1,17 +1,12 @@
 /// src/components/EphemerisChecker/checkerStore.js
 import { create } from "zustand";
-import { EPHEMERIS_REFERENCE_FRAMES } from "../../utils/plotModelFunctions";
 
 export const useCheckerStore = create((set) => ({
   showChecker: false,
   setShowChecker: (v) => set({ showChecker: v }),
 
   parsedData: null,
-  referenceFrame: EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
-  setParsedData: (
-    data,
-    referenceFrame = EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE
-  ) => set({ parsedData: data, referenceFrame }),
+  setParsedData: (data) => set({ parsedData: data }),
 
   triggerCheck: false,
   setTriggerCheck: (v) => set({ triggerCheck: v }),
@@ -43,7 +38,6 @@ export const useCheckerStore = create((set) => ({
   resetChecker: () =>
     set({
       parsedData: null,
-      referenceFrame: EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
       results: null,
       visualPoints: null,
       modelPoints: null,
@@ -120,12 +114,4 @@ export function parseEphemerisText(text) {
     }
   }
   return data;
-}
-
-export function parseEphemerisReferenceFrame(text) {
-  const match = text.match(/^Reference frame:\s*(.+)$/im);
-  if (match && /J2000|ICRF/i.test(match[1])) {
-    return EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF;
-  }
-  return EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE;
 }

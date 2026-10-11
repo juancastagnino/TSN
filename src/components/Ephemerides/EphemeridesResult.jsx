@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useEphemeridesStore } from "./ephemeridesStore";
 import { FaSave, FaExclamationTriangle } from "react-icons/fa";
 import { speedFactOpts } from "../../utils/time-date-functions";
+import { formatSunMarsBinaryCsv } from "../../utils/sunMarsBinaryCsv";
 import {
   EPHEMERIS_REFERENCE_FRAMES,
   EPHEMERIS_REFERENCE_FRAME_OPTIONS,
@@ -14,13 +15,20 @@ const getReferenceFrameLabel = (referenceFrame) =>
   )?.[0] || "TYCHOS native (moving PVP)";
 
 const EphemeridesResult = () => {
-  const { showResult, generatedData, generationError, params, closeResult } =
-    useEphemeridesStore();
+  const {
+    showResult,
+    generatedData,
+    generatedBinaryDiagnostics,
+    generationError,
+    params,
+    closeResult,
+  } = useEphemeridesStore();
 
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [previewText, setPreviewText] = useState("");
+  const [binaryPreviewText, setBinaryPreviewText] = useState("");
 
   // --- Formatting Logic ---
   const formatDataToText = (data, parameters) => {
@@ -67,7 +75,14 @@ const EphemeridesResult = () => {
     if (generatedData && params) {
       setPreviewText(formatDataToText(generatedData, params));
     }
-  }, [generatedData, params]);
+    if (generatedBinaryDiagnostics?.length) {
+      setBinaryPreviewText(
+        formatSunMarsBinaryCsv(generatedBinaryDiagnostics)
+      );
+    } else {
+      setBinaryPreviewText("");
+    }
+  }, [generatedData, generatedBinaryDiagnostics, params]);
 
   // --- Dragging Logic ---
   useEffect(() => {
@@ -99,17 +114,10 @@ const EphemeridesResult = () => {
     }
   };
 
-  const handleSave = () => {
-    if (!previewText || !params) return;
-    const blob = new Blob([previewText], { type: "text/plain" });
+  const download = (contents, mimeType, filename) => {
+    if (!contents) return;
+    const blob = new Blob([contents], { type: mimeType });
     const url = URL.createObjectURL(blob);
-    const safeStart = params.startDate.replace(/[:/]/g, "-");
-    const safeEnd = params.endDate.replace(/[:/]/g, "-");
-    const frameSuffix =
-      params.referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF
-        ? "J2000_ICRF"
-        : "TYCHOS_NATIVE";
-    const filename = `Ephemerides_${safeStart}_to_${safeEnd}_${frameSuffix}.txt`;
     const link = document.createElement("a");
     link.href = url;
     link.download = filename;
@@ -118,6 +126,34 @@ const EphemeridesResult = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  const handleSave = () => {
+    if (!previewText || !params) return;
+    const safeStart = params.startDate.replace(/[:/]/g, "-");
+    const safeEnd = params.endDate.replace(/[:/]/g, "-");
+    const frameSuffix =
+      params.referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF
+        ? "J2000_ICRF"
+        : "TYCHOS_NATIVE";
+    const filename = `Ephemerides_${safeStart}_to_${safeEnd}_${frameSuffix}.txt`;
+    download(previewText, "text/plain", filename);
+  };
+
+  const handleSaveBinary = () => {
+    if (!binaryPreviewText || !params) return;
+    const safeStart = params.startDate.replace(/[:/]/g, "-");
+    const safeEnd = params.endDate.replace(/[:/]/g, "-");
+    download(
+      binaryPreviewText,
+      "text/csv",
+      `SunMarsBinary_${safeStart}_to_${safeEnd}.csv`
+    );
+  };
+
+  const hasPlanetData =
+    generatedData && Object.keys(generatedData).length > 0;
+  const hasBinaryData = Boolean(binaryPreviewText);
+  const displayedPreview = hasPlanetData ? previewText : binaryPreviewText;
 
   if (!showResult) return null;
 
@@ -215,11 +251,15 @@ const EphemeridesResult = () => {
                 fontSize: "14px",
               }}
             >
-              Click 'Save' to download as a text file.
+              {hasPlanetData && hasBinaryData
+                ? `Planet ephemerides are previewed below. The separate binary CSV contains ${generatedBinaryDiagnostics.length} samples.`
+                : hasBinaryData
+                ? `Binary diagnostics CSV: ${generatedBinaryDiagnostics.length} samples.`
+                : "Click 'Save' to download as a text file."}
             </p>
             <textarea
               readOnly
-              value={previewText}
+              value={displayedPreview}
               style={{
                 width: "100%",
                 flexGrow: 1,
@@ -283,23 +323,44 @@ const EphemeridesResult = () => {
             >
               Close
             </button>
-            <button
-              onClick={handleSave}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "6px",
-                border: "none",
-                background: "#2563eb",
-                color: "white",
-                cursor: "pointer",
-                fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <FaSave /> Save to File
-            </button>
+            {hasPlanetData && (
+              <button
+                onClick={handleSave}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  border: "none",
+                  background: "#2563eb",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaSave /> Save ephemerides
+              </button>
+            )}
+            {hasBinaryData && (
+              <button
+                onClick={handleSaveBinary}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  border: "none",
+                  background: "#059669",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaSave /> Save binary CSV
+              </button>
+            )}
           </>
         )}
       </div>

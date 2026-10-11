@@ -1,11 +1,20 @@
 import { Quaternion, Spherical, Vector3 } from "three";
 import { radToRa, radToDec } from "../utils/celestial-functions";
 import { dateTimeToPos } from "./time-date-functions";
+import {
+  createSunMarsBinaryDiagnostics,
+  createSunMarsBinaryState,
+  createSunMarsPrimaryCompanionState,
+  updateSunMarsBinaryDiagnostics,
+  updateSunMarsBinaryState,
+  updateSunMarsPrimaryCompanionState,
+} from "./sunMarsBinaryState";
 
 // Helper to convert degrees to radians
 const D2R = Math.PI / 180;
 const Y_AXIS = new Vector3(0, 1, 0);
 const J2000_PLOT_POS = dateTimeToPos("2000-01-01", "12:00:00");
+const plotBinaryState = createSunMarsBinaryState();
 
 export const EPHEMERIS_REFERENCE_FRAMES = Object.freeze({
   TYCHOS_NATIVE: "tychos-native",
@@ -24,38 +33,122 @@ export function movePlotModel(plotObjects, plotPos) {
         pObj.speed * plotPos - pObj.startPos * D2R;
     }
   });
+
+  // Coordinate adapters depend on the final orbital rotations for this sample.
+  plotObjects.forEach((pObj) => pObj.updateAfterMotion?.(plotPos));
+
+  return getPlotSunMarsBinaryState(plotObjects, plotBinaryState);
 }
 
 /**
- * Return the orientation of Earth's equatorial frame at J2000 without moving
- * the live plot model. The current Earth-orbit rotation is removed from the
- * measured world quaternion and replaced with its value at J2000.
- *
- * The ancestors of Earth.orbitRef are static in the current model
- * (SystemCenter has zero speed). Keeping this calculation here makes the
- * reference-frame convention explicit and avoids using the star components as
- * an ephemeris reference.
+ * Derive the same common-centre companion vectors from the hidden plot model.
+ * Callers may pass a reusable target when sampling many ephemeris positions.
  */
+export function getPlotSunMarsBinaryState(
+  plotObjects,
+  target = createSunMarsBinaryState()
+) {
+  const earthObj = plotObjects.find((p) => p.name === "Earth");
+  const sunObj = plotObjects.find((p) => p.name === "Sun");
+  const marsObj = plotObjects.find((p) => p.name === "Mars");
+
+  const earthPivot = earthObj?.pivotRef?.current;
+  const sunPivot = sunObj?.pivotRef?.current;
+  const marsPivot = marsObj?.pivotRef?.current;
+  if (!earthPivot || !sunPivot || !marsPivot) {
+    target.valid = false;
+    return target;
+  }
+
+  earthPivot.getWorldPosition(target.centerWorld);
+  sunPivot.getWorldPosition(target.sunWorld);
+  marsPivot.getWorldPosition(target.marsWorld);
+  return updateSunMarsBinaryState(
+    target,
+    target.centerWorld,
+    target.sunWorld,
+    target.marsWorld
+  );
+}
+
+export function getPlotSunMarsBinaryDiagnostics(
+  plotObjects,
+  target = createSunMarsBinaryDiagnostics()
+) {
+  const systemCenterObj = plotObjects.find((p) => p.name === "SystemCenter");
+  const earthObj = plotObjects.find((p) => p.name === "Earth");
+  const sunObj = plotObjects.find((p) => p.name === "Sun");
+  const marsObj = plotObjects.find((p) => p.name === "Mars");
+
+  const systemCenterPivot = systemCenterObj?.pivotRef?.current;
+  const earthPivot = earthObj?.pivotRef?.current;
+  const sunPivot = sunObj?.pivotRef?.current;
+  const marsPivot = marsObj?.pivotRef?.current;
+  if (!systemCenterPivot || !earthPivot || !sunPivot || !marsPivot) {
+    target.valid = false;
+    return target;
+  }
+
+  systemCenterPivot.getWorldPosition(target.sample.pvpWorld);
+  earthPivot.getWorldPosition(target.sample.earthWorld);
+  sunPivot.getWorldPosition(target.sample.sunWorld);
+  marsPivot.getWorldPosition(target.sample.marsWorld);
+  return updateSunMarsBinaryDiagnostics(
+    target,
+    target.sample.earthWorld,
+    target.sample.pvpWorld,
+    target.sample.sunWorld,
+    target.sample.marsWorld
+  );
+}
+
+/**
+ * Express the hidden model's existing Mars position relative to the Sun.
+ * No transform is changed and world-space reconstruction remains exact.
+ */
+export function getPlotSunMarsPrimaryCompanionState(
+  plotObjects,
+  target = createSunMarsPrimaryCompanionState()
+) {
+  const sunObj = plotObjects.find((p) => p.name === "Sun");
+  const marsObj = plotObjects.find((p) => p.name === "Mars");
+  const sunPivot = sunObj?.pivotRef?.current;
+  const marsPivot = marsObj?.pivotRef?.current;
+  if (!sunPivot || !marsPivot) {
+    target.valid = false;
+    return target;
+  }
+
+  sunPivot.getWorldPosition(target.primaryWorld);
+  marsPivot.getWorldPosition(target.companionWorld);
+  return updateSunMarsPrimaryCompanionState(
+    target,
+    target.primaryWorld,
+    target.companionWorld
+  );
+}
+
 export function getJ2000EarthFrameQuaternion(plotObjects) {
   const earthObj = plotObjects.find((p) => p.name === "Earth");
   const orbit = earthObj?.orbitRef?.current;
   const cSphere = earthObj?.cSphereRef?.current;
-
   if (!earthObj || !orbit || !cSphere || !orbit.parent) return null;
 
   const orbitWorld = new Quaternion();
   const sphereWorld = new Quaternion();
   const orbitParentWorld = new Quaternion();
-
   orbit.getWorldQuaternion(orbitWorld);
   cSphere.getWorldQuaternion(sphereWorld);
   orbit.parent.getWorldQuaternion(orbitParentWorld);
 
-  // Constant orientation from Earth.orbitRef down to Earth.cSphereRef.
   const orbitToSphere = orbitWorld.clone().invert().multiply(sphereWorld);
   const j2000OrbitAngle =
-    Number(earthObj.speed) * J2000_PLOT_POS - Number(earthObj.startPos) * D2R;
-  const j2000Orbit = new Quaternion().setFromAxisAngle(Y_AXIS, j2000OrbitAngle);
+    Number(earthObj.speed) * J2000_PLOT_POS -
+    Number(earthObj.startPos) * D2R;
+  const j2000Orbit = new Quaternion().setFromAxisAngle(
+    Y_AXIS,
+    j2000OrbitAngle
+  );
 
   return orbitParentWorld
     .multiply(j2000Orbit)
@@ -63,11 +156,6 @@ export function getJ2000EarthFrameQuaternion(plotObjects) {
     .normalize();
 }
 
-/**
- * Express a world-space target position in an Earth-centred reference frame.
- * Native mode deliberately preserves the historical TYCHOS calculation.
- * J2000 mode keeps Earth's current origin but uses a fixed J2000 orientation.
- */
 export function getEarthFrameVector(
   targetPosition,
   earthObj,
@@ -81,7 +169,6 @@ export function getEarthFrameVector(
   if (referenceFrame === EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE) {
     return earthObj.cSphereRef.current.worldToLocal(targetPosition.clone());
   }
-
   if (
     referenceFrame !== EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF ||
     !j2000Quaternion
@@ -91,42 +178,10 @@ export function getEarthFrameVector(
 
   const earthPosition = new Vector3();
   earthObj.pivotRef.current.getWorldPosition(earthPosition);
-
   return targetPosition
     .clone()
     .sub(earthPosition)
     .applyQuaternion(j2000Quaternion.clone().invert());
-}
-
-/** Convert an Earth-frame vector back to a world-space position for plotting. */
-export function earthFrameVectorToWorld(
-  earthFrameVector,
-  earthObj,
-  referenceFrame = EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
-  j2000Quaternion = null
-) {
-  if (!earthObj?.pivotRef?.current || !earthObj?.cSphereRef?.current) {
-    return null;
-  }
-
-  if (referenceFrame === EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE) {
-    return earthObj.cSphereRef.current.localToWorld(earthFrameVector.clone());
-  }
-
-  if (
-    referenceFrame !== EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF ||
-    !j2000Quaternion
-  ) {
-    return null;
-  }
-
-  const earthPosition = new Vector3();
-  earthObj.pivotRef.current.getWorldPosition(earthPosition);
-
-  return earthFrameVector
-    .clone()
-    .applyQuaternion(j2000Quaternion)
-    .add(earthPosition);
 }
 
 export function getPlotModelRaDecDistance(name, plotObjects, options = {}) {
@@ -152,17 +207,17 @@ export function getPlotRaDecDistanceFromPosition(
   // 1. Get World Positions
   const sunPos = new Vector3();
   const targetPos = new Vector3();
-
-  if (sunObj.pivotRef?.current)
-    sunObj.pivotRef.current.getWorldPosition(sunPos);
-  if (targetObj.pivotRef?.current)
-    targetObj.pivotRef.current.getWorldPosition(targetPos);
-
+  
+  if (sunObj.pivotRef?.current) sunObj.pivotRef.current.getWorldPosition(sunPos);
+  if (targetObj.pivotRef?.current) targetObj.pivotRef.current.getWorldPosition(targetPos);
+  
   const earthPos = new Vector3();
-  if (earthObj.pivotRef?.current)
-    earthObj.pivotRef.current.getWorldPosition(earthPos);
+  if (earthObj.pivotRef?.current) earthObj.pivotRef.current.getWorldPosition(earthPos);
 
-  // 2. Transform to the explicitly selected Earth-centred reference frame.
+  // 2. TRANSFORM TO EARTH EQUATORIAL FRAME
+  // We convert the target's World Position into the local space of Earth's tilted sphere (cSphereRef).
+  // This automatically accounts for Earth's axial tilt without manual quaternion math.
+  
   const referenceFrame =
     options.referenceFrame || EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE;
   const j2000Quaternion =
@@ -176,7 +231,6 @@ export function getPlotRaDecDistanceFromPosition(
     referenceFrame,
     j2000Quaternion
   );
-
   if (!localVec) return null;
 
   // 3. Convert Local Vector to Spherical Coordinates (RA/Dec)
@@ -187,7 +241,7 @@ export function getPlotRaDecDistanceFromPosition(
 
   // 4. Calculate Distances & Elongation
   const radius = sphericalPos.radius / 100;
-
+  
   // Calculate distances for Elongation formula
   const earthSunDist = earthPos.distanceTo(sunPos);
   const sunTargetDist = sunPos.distanceTo(targetPos);
@@ -198,13 +252,13 @@ export function getPlotRaDecDistanceFromPosition(
     earthSunDist * earthSunDist + // <--- FIXED: Typos corrected here
     earthTargetDist * earthTargetDist -
     sunTargetDist * sunTargetDist;
-
+  
   const denominator = 2.0 * earthSunDist * earthTargetDist;
 
   // Clamp to [-1, 1] to prevent NaN from floating point errors
   const cosElong = Math.min(Math.max(numerator / denominator, -1), 1);
   const elongationRadians = Math.acos(cosElong);
-
+  
   let elongation = ((180.0 * elongationRadians) / Math.PI).toFixed(3);
   elongation = isNaN(elongation) ? "-" : `${elongation}\u00B0`;
 

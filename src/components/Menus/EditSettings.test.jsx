@@ -2,6 +2,10 @@ import { act } from "react-dom/test-utils";
 import { createRoot } from "react-dom/client";
 import EditSettings from "./EditSettings";
 import { useStore, useSettingsStore } from "../../store";
+import {
+  applyCelestialSettingsDocument,
+  getCurrentCelestialSettingsDocument,
+} from "../../utils/saveAndLoadSettings";
 
 let mockLevaStore;
 
@@ -23,9 +27,11 @@ const initialSettings = JSON.parse(
 );
 const initialMoonNode = initialSettings.find((s) => s.name === "Moon Node");
 const initialMoonPlane = initialSettings.find((s) => s.name === "Moon Plane");
+const initialMercury = initialSettings.find((s) => s.name === "Mercury");
 const initialMercuryPlane = initialSettings.find(
   (s) => s.name === "Mercury Plane"
 );
+const initialVenus = initialSettings.find((s) => s.name === "Venus");
 const initialVenusPlane = initialSettings.find((s) => s.name === "Venus Plane");
 let root;
 let container;
@@ -53,9 +59,11 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   act(() => root.render(<EditSettings />));
 
   const data = mockLevaStore.getData();
-  expect(data["Settings.Moon Node.Main Orbit.Moon Nodespeed"]).toBeDefined();
   expect(
-    data["Settings.Moon Plane.Main Orbit.Moon PlaneorbitTilta"]
+    data["Settings.Earth-Moon System.Moon.Node.Moon Nodespeed"]
+  ).toBeDefined();
+  expect(
+    data["Settings.Earth-Moon System.Moon.Plane.Moon PlaneorbitTilta"]
   ).toBeDefined();
   expect(data["Show / Hide settings.Moonvisible"].value).toBe(true);
   expect(data["Show / Hide settings.Moon Nodevisible"]).toBeUndefined();
@@ -67,8 +75,9 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
 
 test("edits, resets and reopens lunar controls without losing synchronization", () => {
   act(() => root.render(<EditSettings />));
-  const nodePath = "Settings.Moon Node.Main Orbit.Moon Nodespeed";
-  const planePath = "Settings.Moon Plane.Main Orbit.Moon PlaneorbitTilta";
+  const nodePath = "Settings.Earth-Moon System.Moon.Node.Moon Nodespeed";
+  const planePath =
+    "Settings.Earth-Moon System.Moon.Plane.Moon PlaneorbitTilta";
 
   act(() =>
     mockLevaStore.set(
@@ -101,15 +110,77 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
   );
 });
 
+test("serializes the latest edited value rather than the menu's initial snapshot", () => {
+  act(() => root.render(<EditSettings />));
+  const speedPath = "Settings.Earth-Moon System.Moon.Orbit.Moonspeed";
+
+  act(() =>
+    mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
+  );
+
+  const document = getCurrentCelestialSettingsDocument();
+  const moon = document.bodies.find((body) => body.id === "moon");
+  expect(Number(moon.motion.orbit.speed)).toBe(83.2851946888);
+});
+
+test("loads a saved unified model back into the store and visible controls", () => {
+  act(() => root.render(<EditSettings />));
+  const speedPath = "Settings.Earth-Moon System.Moon.Orbit.Moonspeed";
+
+  act(() =>
+    mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
+  );
+  const savedDocument = getCurrentCelestialSettingsDocument();
+  const parsedDownloadedFile = JSON.parse(JSON.stringify(savedDocument));
+
+  act(() => useSettingsStore.getState().resetSettings());
+  expect(Number(useSettingsStore.getState().getSetting("Moon").speed)).toBe(
+    Number(initialSettings.find((setting) => setting.name === "Moon").speed)
+  );
+
+  act(() => applyCelestialSettingsDocument(parsedDownloadedFile));
+  expect(Number(useSettingsStore.getState().getSetting("Moon").speed)).toBe(
+    83.2851946888
+  );
+  expect(Number(mockLevaStore.get(speedPath).replace(/\u200B/g, ""))).toBe(
+    83.2851946888
+  );
+});
+
+test("editing Pluto does not restore a stale hidden state", () => {
+  act(() => root.render(<EditSettings />));
+
+  const visibilityPath = "Show / Hide settings.Plutovisible";
+  const speedPath = Object.keys(mockLevaStore.getData()).find((path) =>
+    path.endsWith(".Plutospeed")
+  );
+  expect(speedPath).toBeDefined();
+
+  // Pluto starts hidden. Reproduce the author's sequence: show it, then edit it.
+  act(() => mockLevaStore.set({ [visibilityPath]: true }, true));
+  expect(useSettingsStore.getState().getSetting("Pluto").visible).toBe(true);
+
+  act(() => mockLevaStore.set({ [speedPath]: "\u200B0.123456" }, true));
+
+  const pluto = useSettingsStore.getState().getSetting("Pluto");
+  expect(pluto.visible).toBe(true);
+  expect(Number(pluto.speed)).toBe(0.123456);
+  expect(mockLevaStore.get(visibilityPath)).toBe(true);
+});
+
 test("exposes fixed solar-satellite planes without visibility toggles", () => {
   act(() => root.render(<EditSettings />));
 
   const data = mockLevaStore.getData();
   expect(
-    data["Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTilta"]
+    data[
+      "Settings.Mercury Junior Solar Moon.Mercury.Plane.Mercury PlaneorbitTilta"
+    ]
   ).toBeDefined();
   expect(
-    data["Settings.Venus Plane.Main Orbit.Venus PlaneorbitTilta"]
+    data[
+      "Settings.Venus Senior Solar Moon.Venus.Plane.Venus PlaneorbitTilta"
+    ]
   ).toBeDefined();
   expect(data["Show / Hide settings.Mercury Planevisible"]).toBeUndefined();
   expect(data["Show / Hide settings.Venus Planevisible"]).toBeUndefined();
@@ -120,34 +191,23 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
     Object.keys(data).some((path) => path.includes("Mercury Synodic"))
   ).toBe(false);
 
-  // Plane controls must reflect the loaded candidate rather than hard-coded
-  // research values; celestial-settings.json legitimately changes between trials.
-  const controlNumber = (path) =>
-    Number(String(data[path].value).replace(/\u200B/g, ""));
-  expect(
-    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitCenterb")
-  ).toBe(Number(initialMercuryPlane.orbitCenterb));
-  expect(
-    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitCenterc")
-  ).toBe(Number(initialMercuryPlane.orbitCenterc));
-  expect(
-    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTilta")
-  ).toBe(Number(initialMercuryPlane.orbitTilta));
-  expect(
-    controlNumber("Settings.Mercury Plane.Main Orbit.Mercury PlaneorbitTiltb")
-  ).toBe(Number(initialMercuryPlane.orbitTiltb));
-  expect(
-    controlNumber("Settings.Venus Plane.Main Orbit.Venus PlaneorbitCenterb")
-  ).toBe(Number(initialVenusPlane.orbitCenterb));
-  expect(
-    controlNumber("Settings.Venus Plane.Main Orbit.Venus PlaneorbitTilta")
-  ).toBe(Number(initialVenusPlane.orbitTilta));
-  expect(
-    controlNumber("Settings.Venus Plane.Main Orbit.Venus PlaneorbitTiltb")
-  ).toBe(Number(initialVenusPlane.orbitTiltb));
+  // Preserve the calibrated split between each fixed plane and its planet.
+  expect(Number(initialMercuryPlane.orbitCentera)).toBe(10.8);
+  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(4);
+  expect(Number(initialMercuryPlane.orbitCenterc)).toBe(0);
+  expect(Number(initialMercuryPlane.orbitTilta)).toBe(-4.5);
+  expect(Number(initialMercuryPlane.orbitTiltb)).toBe(-2.5);
+  expect(Number(initialMercury.orbitCentera)).toBe(-2);
+  expect(Number(initialMercury.orbitCenterb)).toBe(-4.9);
+  expect(Number(initialMercury.orbitCenterc)).toBe(0);
+  expect(Number(initialMercury.orbitTilta)).toBe(0);
+  expect(Number(initialMercury.orbitTiltb)).toBe(0.5);
 
-  expect(Number(initialMercuryPlane.speed)).toBe(0);
-  expect(Number(initialMercuryPlane.orbitRadius)).toBe(0);
-  expect(Number(initialVenusPlane.speed)).toBe(0);
-  expect(Number(initialVenusPlane.orbitRadius)).toBe(0);
+  expect(Number(initialVenusPlane.orbitCentera)).toBe(1.8);
+  expect(Number(initialVenusPlane.orbitCenterb)).toBe(-0.4);
+  expect(Number(initialVenusPlane.orbitTilta)).toBe(3.4);
+  expect(Number(initialVenusPlane.orbitTiltb)).toBe(0.2);
+  expect(Number(initialVenus.orbitCenterb)).toBe(0);
+  expect(Number(initialVenus.orbitTilta)).toBe(0);
+  expect(Number(initialVenus.orbitTiltb)).toBe(0);
 });

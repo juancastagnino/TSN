@@ -14,12 +14,15 @@ import {
 import {
   EPHEMERIS_REFERENCE_FRAMES,
   getJ2000EarthFrameQuaternion,
+  getPlotSunMarsBinaryDiagnostics,
   movePlotModel,
   getPlotModelRaDecDistance,
 } from "../../utils/plotModelFunctions";
+import { createSunMarsBinaryDiagnostics } from "../../utils/sunMarsBinaryState";
+import { sunMarsBinaryDiagnosticsToRow } from "../../utils/sunMarsBinaryCsv";
 
 const EphController = () => {
-  const { invalidate } = useThree(); // invalidate is grabbed here
+  const { invalidate } = useThree();
   const plotObjects = usePlotStore((s) => s.plotObjects);
 
   const {
@@ -33,6 +36,7 @@ const EphController = () => {
   } = useEphemeridesStore();
 
   const [generating, setGenerating] = useState(false);
+  const binaryDiagnosticsRef = useRef(createSunMarsBinaryDiagnostics());
 
   const jobRef = useRef({
     startPos: 0,
@@ -43,6 +47,8 @@ const EphController = () => {
     referenceFrame: EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
     j2000Quaternion: null,
     data: {},
+    binaryDiagnostics: false,
+    binaryRows: [],
     lastProgress: 0,
   });
 
@@ -68,7 +74,6 @@ const EphController = () => {
         referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF
           ? getJ2000EarthFrameQuaternion(plotObjects)
           : null;
-
       if (
         referenceFrame === EPHEMERIS_REFERENCE_FRAMES.J2000_ICRF &&
         !j2000Quaternion
@@ -99,6 +104,8 @@ const EphController = () => {
         referenceFrame,
         j2000Quaternion,
         data: initialData,
+        binaryDiagnostics: params.binaryDiagnostics === true,
+        binaryRows: [],
         lastProgress: 0,
       };
 
@@ -109,10 +116,10 @@ const EphController = () => {
     trigger,
     params,
     resetTrigger,
-    plotObjects,
     setGenerationError,
     setIsGenerating,
     setProgress,
+    plotObjects,
   ]);
 
   // 2. Process Job in Chunks
@@ -164,6 +171,19 @@ const EphController = () => {
 
       movePlotModel(plotObjects, currentPos);
 
+      if (job.binaryDiagnostics) {
+        const diagnostics = getPlotSunMarsBinaryDiagnostics(
+          plotObjects,
+          binaryDiagnosticsRef.current
+        );
+        const row = sunMarsBinaryDiagnosticsToRow(
+          currentDate,
+          currentTime,
+          diagnostics
+        );
+        if (row) job.binaryRows.push(row);
+      }
+
       job.checkedPlanets.forEach((name) => {
         const data = getPlotModelRaDecDistance(name, plotObjects, {
           referenceFrame: job.referenceFrame,
@@ -197,7 +217,13 @@ const EphController = () => {
 
     // Completion Check
     if (job.currentStep > job.totalSteps) {
-      setGeneratedData(job.data);
+      if (job.binaryDiagnostics && job.binaryRows.length === 0) {
+        setGenerationError(
+          "Sun-Mars binary diagnostics could not find the SystemCenter, Earth, Sun and Mars pivots."
+        );
+      } else {
+        setGeneratedData(job.data, job.binaryRows);
+      }
       setGenerating(false);
       setProgress(100);
     }

@@ -8,11 +8,11 @@ import {
   speedFactOpts,
   sDay,
 } from "../../utils/time-date-functions";
+import { useEphemeridesStore } from "./ephemeridesStore";
 import {
   EPHEMERIS_REFERENCE_FRAMES,
   EPHEMERIS_REFERENCE_FRAME_OPTIONS,
 } from "../../utils/plotModelFunctions";
-import { useEphemeridesStore } from "./ephemeridesStore";
 
 const Ephemerides = () => {
   const { ephimerides, setEphemerides, posRef } = useStore();
@@ -30,6 +30,7 @@ const Ephemerides = () => {
     "Step size": 1,
     "\u{000D}": sDay,
     "Reference frame": EPHEMERIS_REFERENCE_FRAMES.TYCHOS_NATIVE,
+    "Sun-Mars binary CSV": false,
   });
 
   const checkboxes = {};
@@ -56,10 +57,12 @@ const Ephemerides = () => {
       .filter((s) => s.type === "planet" && s.name !== "Earth")
       .filter((s) => formValues[s.name] === true)
       .map((s) => s.name);
+    const binaryDiagnostics =
+      formValues["Sun-Mars binary CSV"] === true;
 
-    if (checkedPlanets.length === 0) {
+    if (checkedPlanets.length === 0 && !binaryDiagnostics) {
       setGenerationError(
-        "No planets selected.\nPlease select at least one planet to generate data."
+        "No output selected.\nSelect at least one planet or Sun-Mars binary CSV."
       );
       return;
     }
@@ -71,6 +74,7 @@ const Ephemerides = () => {
       stepFactor: formValues["\u{000D}"],
       referenceFrame: formValues["Reference frame"],
       checkedPlanets,
+      binaryDiagnostics,
     });
   };
 
@@ -200,6 +204,12 @@ const Ephemerides = () => {
         options: EPHEMERIS_REFERENCE_FRAME_OPTIONS,
         onChange: (v) => {
           valuesRef.current["Reference frame"] = v;
+        },
+      },
+      "Sun-Mars binary CSV": {
+        value: false,
+        onChange: (v) => {
+          valuesRef.current["Sun-Mars binary CSV"] = v;
         },
       },
       ...checkboxes,
