@@ -952,6 +952,7 @@
                                     "kind": "motion-stage",
                                     "name": "Pluto Eccentric",
                                     "role": "pluto-eccentric-geometry",
+                                    "renderOrbit": false,
                                     "children": [
                                       {
                                         "id": "pluto-eccentric-counterrotation",

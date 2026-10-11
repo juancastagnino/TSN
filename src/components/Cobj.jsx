@@ -21,7 +21,7 @@ const spriteMaterial = new THREE.SpriteMaterial({
   sizeAttenuation: false,
 });
 
-const Cobj = ({ name, settingId, children }) => {
+const Cobj = ({ name, settingId, renderOrbit = true, children }) => {
   const { settings } = useSettingsStore();
   const { scene } = useThree();
 
@@ -107,7 +107,7 @@ const Cobj = ({ name, settingId, children }) => {
         rotation-z={s.orbitTiltb * (Math.PI / 180)}
       >
         <group name="Orbit" ref={orbitRef}>
-          {orbitRadius !== undefined && orbitRadius !== null ? (
+          {renderOrbit && orbitRadius !== undefined && orbitRadius !== null ? (
             <group rotation-x={-Math.PI / 2}>
               {s.type === "deferent" ? (
                 <Deferent radius={orbitRadius} visible={visible} s={s} />

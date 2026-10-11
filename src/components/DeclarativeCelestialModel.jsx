@@ -153,6 +153,7 @@ export const renderCelestialNode = (
     key: keyPath,
     name: node.name,
     settingId: node.settingId || (node.kind === "object" ? node.id : undefined),
+    renderOrbit: node.renderOrbit,
   };
 
   switch (node.kind) {

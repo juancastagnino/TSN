@@ -60,6 +60,15 @@ test("declares one shared Sun-Mars hierarchy with the accepted branches", () => 
   expect(findCelestialNode("deimos").role).toBe("mars-satellite");
 });
 
+test("keeps Pluto eccentric geometry active without rendering its helper orbit", () => {
+  const eccentric = findCelestialNode("pluto-eccentric");
+  const pluto = celestialModel.bodies.find((body) => body.id === "pluto");
+  expect(eccentric.kind).toBe("motion-stage");
+  expect(eccentric.renderOrbit).toBe(false);
+  expect(pluto.motion.eccentric.orbitRadius).toBe("134.260927266641");
+  expect(pluto.motion.eccentric.children).toBeUndefined();
+});
+
 test("declares real bodies once and keeps motion stages inside their owners", () => {
   const moon = celestialModel.bodies.find((body) => body.id === "moon");
   const mars = celestialModel.bodies.find((body) => body.id === "mars");
