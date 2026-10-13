@@ -59,8 +59,8 @@ const Cobj = ({ name, settingId, renderOrbit = true, children }) => {
 
   if (!actualPlanetSizes && !actualMoon) {
     if (
-      s.name === "Moon" ||
-      s.name === "Moon deferent A"
+      s.id === "moon" ||
+      s.id === "moon-deferent-a"
     ) {
       orbitRadius = s.orbitRadius === 0 ? 0 : s.orbitRadius * 39.2078;
       orbitCentera = s.orbitCentera === 0 ? 0 : s.orbitCentera * 39.2078;

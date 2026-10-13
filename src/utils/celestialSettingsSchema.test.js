@@ -53,6 +53,25 @@ test("applies partial legacy imports through stable IDs", () => {
   );
 });
 
+test("accepts former Moon component names while normalizing to the new frame vocabulary", () => {
+  const native = normalizeCelestialSettings(celestialModel);
+  const merged = mergeCelestialSettings(native, [
+    { name: "Moon Node", speed: -0.4 },
+    { name: "Moon Plane", orbitTiltb: -5.3 },
+    { name: "Moon deferent A", startPos: 166 },
+  ]);
+  const index = buildSettingsIndex(merged);
+  expect(index.get("moon-node")).toEqual(
+    expect.objectContaining({ name: "Lunar Nodal Deferent", speed: -0.4 })
+  );
+  expect(index.get("moon-plane")).toEqual(
+    expect.objectContaining({ name: "Lunar Plane Deferent", orbitTiltb: -5.3 })
+  );
+  expect(index.get("moon-deferent-a")).toEqual(
+    expect.objectContaining({ name: "Lunar Apsidal Deferent", startPos: 166 })
+  );
+});
+
 test("removes the common residual while retaining the Eros harmonic", () => {
   const native = normalizeCelestialSettings(celestialModel);
   const serialized = serializeCelestialSettings(native);

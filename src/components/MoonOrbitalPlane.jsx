@@ -115,14 +115,14 @@ const LunarBranch = ({
 
     // Outer rotation: +Omega(t)
     addPlotObj({
-      name: "Moon Node Outer",
+      name: "Lunar Nodal Frame Outer",
       speed: nodeSpeed,
       startPos: nodeStart,
       orbitRef: outerRef,
     });
 
     addPlotObj({
-      name: "Moon Plane",
+      name: "Lunar Plane Deferent",
       speed: planeSpeed,
       startPos: planeStart,
       orbitRef: planeRef,
@@ -130,16 +130,16 @@ const LunarBranch = ({
 
     // Inner counter-rotation: -Omega(t)
     addPlotObj({
-      name: "Moon Node Inner",
+      name: "Lunar Nodal Frame Inner",
       speed: -nodeSpeed,
       startPos: -nodeStart,
       orbitRef: innerRef,
     });
 
     return () => {
-      removePlotObj("Moon Node Outer");
-      removePlotObj("Moon Plane");
-      removePlotObj("Moon Node Inner");
+      removePlotObj("Lunar Nodal Frame Outer");
+      removePlotObj("Lunar Plane Deferent");
+      removePlotObj("Lunar Nodal Frame Inner");
     };
   }, [
     live,

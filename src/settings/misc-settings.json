@@ -23,7 +23,7 @@
     "horizonColor": "#000080"
   },
   {
-    "name": "Moon deferent A",
+    "name": "Lunar Apsidal Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false

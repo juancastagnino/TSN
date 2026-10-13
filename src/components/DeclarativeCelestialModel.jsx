@@ -5,6 +5,7 @@ import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
 import MercurySunRelativeOrbit from "./MercurySunRelativeOrbit";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
 import MoonSolarCoupledEccentric from "./MoonSolarCoupledEccentric";
+import PlutoEccentricFrame from "./PlutoEccentricFrame";
 import SunMarsBinaryTracker from "./SunMarsBinaryTracker";
 import SunMarsRelativeOrbit from "./SunMarsRelativeOrbit";
 import VenusSunRelativeOrbit from "./VenusSunRelativeOrbit";
@@ -16,6 +17,7 @@ export const CELESTIAL_NODE_KINDS = new Set([
   "reference-frame",
   "moon-orbital-plane",
   "moon-solar-eccentric",
+  "pluto-eccentric-frame",
   "sun-mars-relative",
   "venus-sun-relative",
   "mercury-sun-relative",
@@ -154,7 +156,11 @@ export const renderCelestialNode = (
   const props = {
     key: keyPath,
     name: node.name,
-    settingId: node.settingId || (node.kind === "object" ? node.id : undefined),
+    settingId:
+      node.settingId ||
+      (["object", "motion-stage", "reference-frame"].includes(node.kind)
+        ? node.id
+        : undefined),
     renderOrbit: node.renderOrbit,
     targetName: node.targetName,
   };
@@ -175,6 +181,12 @@ export const renderCelestialNode = (
     case "moon-solar-eccentric":
       return React.createElement(
         MoonSolarCoupledEccentric,
+        { ...props, plotMode: mode === "plot" },
+        children
+      );
+    case "pluto-eccentric-frame":
+      return React.createElement(
+        PlutoEccentricFrame,
         { ...props, plotMode: mode === "plot" },
         children
       );

@@ -9,6 +9,18 @@ const LEGACY_MODEL_IDS = new Set([
   "tychos-native-binary-system",
 ]);
 
+const LEGACY_SETTING_NAMES_BY_ID = new Map([
+  ["moon-node", new Set(["Moon Node"])],
+  ["moon-plane", new Set(["Moon Plane"])],
+  ["moon-deferent-a", new Set(["Moon deferent A"])],
+  ["moon-solar-eccentric", new Set(["Moon Solar-Coupled Eccentric"])],
+  ["moon-solar-variation", new Set(["Moon Solar Variation"])],
+  [
+    "moon-anomalistic-tangent",
+    new Set(["Moon Anomalistic Tangential Frame"]),
+  ],
+]);
+
 const DIRECT_PARENT_RELATIVE_IDS = new Set([
   "mars-deferent-e",
   "mercury-deferent-a",
@@ -65,6 +77,10 @@ const nativeSettings = getNativeCelestialSettings();
 const catalog = nativeSettings.map(({ id, name }) => ({ id, name }));
 const catalogById = new Map(catalog.map((entry) => [entry.id, entry]));
 const catalogByName = new Map(catalog.map((entry) => [entry.name, entry]));
+LEGACY_SETTING_NAMES_BY_ID.forEach((names, id) => {
+  const entry = catalogById.get(id);
+  names.forEach((name) => catalogByName.set(name, entry));
+});
 
 const settingsArrayFromDocument = (document) => {
   if (Array.isArray(document)) return document;
@@ -115,7 +131,12 @@ export const normalizeCelestialSettings = (
         `Unknown celestial setting '${item.id || item.name || index}'`
       );
     }
-    if (item.name && item.name !== catalogEntry.name) {
+    const legacyNames = LEGACY_SETTING_NAMES_BY_ID.get(catalogEntry.id);
+    if (
+      item.name &&
+      item.name !== catalogEntry.name &&
+      !legacyNames?.has(item.name)
+    ) {
       throw new Error(
         `Setting '${catalogEntry.id}' must retain name '${catalogEntry.name}'`
       );
@@ -217,6 +238,22 @@ export const getCelestialEditorGroups = (settings) => {
       return {
         id: owner.id,
         name: owner.name,
+        frames: (owner.editorFrames || []).map((frame) => ({
+          ...frame,
+          settings: frame.components.map((component) => {
+            const setting = owner.motion[component];
+            if (!setting) {
+              throw new Error(
+                `Editor frame '${frame.name}' references unknown component '${component}'`
+              );
+            }
+            const current = byId.get(setting.id);
+            if (!current) {
+              throw new Error(`Editor references unknown setting '${setting.id}'`);
+            }
+            return { ...current, component };
+          }),
+        })),
         settings: motionEntries(owner).map(({ component, setting }) => {
           const current = byId.get(setting.id);
           if (!current) {

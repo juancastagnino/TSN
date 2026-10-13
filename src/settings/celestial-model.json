@@ -61,7 +61,7 @@
       "motion": {
         "node": {
           "id": "moon-node",
-          "name": "Moon Node",
+          "name": "Lunar Nodal Deferent",
           "size": "0",
           "startPos": "-296",
           "speed": "-0.33780566",
@@ -75,7 +75,7 @@
         },
         "plane": {
           "id": "moon-plane",
-          "name": "Moon Plane",
+          "name": "Lunar Plane Deferent",
           "size": "0",
           "startPos": "0",
           "speed": "0",
@@ -89,7 +89,7 @@
         },
         "deferentA": {
           "id": "moon-deferent-a",
-          "name": "Moon deferent A",
+          "name": "Lunar Apsidal Deferent",
           "size": "0.6",
           "startPos": "167.51",
           "speed": "0.71015440177343",
@@ -103,7 +103,7 @@
         },
         "solarCoupledEccentric": {
           "id": "moon-solar-eccentric",
-          "name": "Moon Solar-Coupled Eccentric",
+          "name": "Lunar 2D-M Eccentric Action",
           "size": "0",
           "startPos": "0",
           "speed": "0",
@@ -117,7 +117,7 @@
         },
         "solarVariation": {
           "id": "moon-solar-variation",
-          "name": "Moon Solar Variation",
+          "name": "Lunar Solar 2D Variation",
           "size": "0",
           "startPos": "0",
           "speed": "0",
@@ -131,7 +131,7 @@
         },
         "anomalisticTangent": {
           "id": "moon-anomalistic-tangent",
-          "name": "Moon Anomalistic Tangential Frame",
+          "name": "Lunar Apsidal Tangential Action",
           "size": "0",
           "startPos": "0",
           "speed": "0",
@@ -159,7 +159,31 @@
           "orbitTilta": "0",
           "orbitTiltb": "0"
         }
-      }
+      },
+      "editorFrames": [
+        {
+          "name": "Lunar Nodal / Plane Frame",
+          "components": [
+            "node",
+            "plane"
+          ]
+        },
+        {
+          "name": "Lunar Apsidal Frame",
+          "components": [
+            "deferentA"
+          ]
+        },
+        {
+          "name": "Solar-Coupled Lunar Frame",
+          "components": [
+            "solarCoupledEccentric",
+            "solarVariation",
+            "anomalisticTangent",
+            "orbit"
+          ]
+        }
+      ]
     },
     {
       "id": "sun",
@@ -624,20 +648,6 @@
           "orbitTilta": "15",
           "orbitTiltb": "-10"
         },
-        "eccentricCounterrotation": {
-          "id": "pluto-eccentric-counterrotation",
-          "name": "Pluto Eccentric Counterrotation",
-          "size": "0",
-          "startPos": "-189.34",
-          "speed": "-0.0506606",
-          "tilt": "0",
-          "orbitRadius": "0",
-          "orbitCentera": "0",
-          "orbitCenterb": "0",
-          "orbitCenterc": "0",
-          "orbitTilta": "0",
-          "orbitTiltb": "0"
-        },
         "orbit": {
           "id": "pluto",
           "name": "Pluto",
@@ -654,7 +664,22 @@
           "orbitTilta": "0",
           "orbitTiltb": "0"
         }
-      }
+      },
+      "editorFrames": [
+        {
+          "name": "Pluto Deferent Frame",
+          "components": [
+            "deferent"
+          ]
+        },
+        {
+          "name": "Pluto Eccentric Frame",
+          "components": [
+            "eccentric",
+            "orbit"
+          ]
+        }
+      ]
     },
     {
       "id": "halley",
@@ -844,8 +869,8 @@
               {
                 "id": "moon-orbital-frame",
                 "kind": "moon-orbital-plane",
-                "name": "Moon Orbital Node and Plane",
-                "role": "earth-satellite-plane",
+                "name": "Lunar Nodal / Plane Frame",
+                "role": "lunar-nodal-plane-frame",
                 "settingIds": [
                   "moon-node",
                   "moon-plane"
@@ -854,14 +879,14 @@
                   {
                     "id": "moon-deferent-a",
                     "kind": "motion-stage",
-                    "name": "Moon deferent A",
-                    "role": "moon-deferent",
+                    "name": "Lunar Apsidal Frame",
+                    "role": "lunar-apsidal-frame",
                     "children": [
                       {
                         "id": "moon-solar-eccentric-frame",
                         "kind": "moon-solar-eccentric",
-                        "name": "Moon Solar-Coupled Eccentric Frame",
-                        "role": "solar-coupled-lunar-inequality",
+                        "name": "Solar-Coupled Lunar Frame",
+                        "role": "solar-coupled-lunar-frame",
                         "settingIds": [
                           "moon-solar-eccentric",
                           "moon-solar-variation",
@@ -883,7 +908,7 @@
                   {
                     "id": "actual-moon-deferent-a",
                     "kind": "motion-stage",
-                    "name": "Actual Moon deferent A",
+                    "name": "Actual Lunar Apsidal Frame",
                     "settingId": "moon-deferent-a",
                     "role": "physical-coordinate-moon-deferent",
                     "modes": [
@@ -893,7 +918,7 @@
                       {
                         "id": "actual-moon-solar-eccentric-frame",
                         "kind": "moon-solar-eccentric",
-                        "name": "Actual Moon Solar-Coupled Eccentric Frame",
+                        "name": "Actual Solar-Coupled Lunar Frame",
                         "role": "physical-coordinate-solar-lunar-inequality",
                         "settingIds": [
                           "moon-solar-eccentric",
@@ -1024,24 +1049,20 @@
                                 "children": [
                                   {
                                     "id": "pluto-eccentric",
-                                    "kind": "motion-stage",
+                                    "kind": "pluto-eccentric-frame",
                                     "name": "Pluto Eccentric",
                                     "role": "pluto-eccentric-geometry",
+                                    "settingId": "pluto-eccentric",
+                                    "settingIds": [
+                                      "pluto-eccentric"
+                                    ],
                                     "renderOrbit": false,
                                     "children": [
                                       {
-                                        "id": "pluto-eccentric-counterrotation",
-                                        "kind": "motion-stage",
-                                        "name": "Pluto Eccentric Counterrotation",
-                                        "role": "pluto-eccentric-orientation-cancellation",
-                                        "children": [
-                                          {
-                                            "id": "pluto",
-                                            "kind": "object",
-                                            "name": "Pluto",
-                                            "role": "sun-hosted-outer-body"
-                                          }
-                                        ]
+                                        "id": "pluto",
+                                        "kind": "object",
+                                        "name": "Pluto",
+                                        "role": "sun-hosted-outer-body"
                                       }
                                     ]
                                   }

@@ -63,9 +63,11 @@ test("declares one shared Sun-Mars hierarchy with the accepted branches", () => 
 test("keeps Pluto eccentric geometry active without rendering its helper orbit", () => {
   const eccentric = findCelestialNode("pluto-eccentric");
   const pluto = celestialModel.bodies.find((body) => body.id === "pluto");
-  expect(eccentric.kind).toBe("motion-stage");
+  expect(eccentric.kind).toBe("pluto-eccentric-frame");
   expect(eccentric.renderOrbit).toBe(false);
+  expect(eccentric.children.map((child) => child.id)).toEqual(["pluto"]);
   expect(pluto.motion.eccentric.orbitRadius).toBe("134.260927266641");
+  expect(pluto.motion.eccentricCounterrotation).toBeUndefined();
   expect(pluto.motion.eccentric.children).toBeUndefined();
 });
 
@@ -87,6 +89,15 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
       kind: "moon-solar-eccentric",
       targetName: "Moon",
     })
+  );
+  expect(findCelestialNode("moon-orbital-frame").name).toBe(
+    "Lunar Nodal / Plane Frame"
+  );
+  expect(findCelestialNode("moon-deferent-a").name).toBe(
+    "Lunar Apsidal Frame"
+  );
+  expect(findCelestialNode("moon-solar-eccentric-frame").name).toBe(
+    "Solar-Coupled Lunar Frame"
   );
   expect(mars.parentId).toBe("sun");
   expect(mars.motion.parentRelativeCarrier.id).toBe("mars-deferent-e");

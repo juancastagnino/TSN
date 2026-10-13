@@ -25,8 +25,8 @@ jest.mock("leva", () => {
 const initialSettings = JSON.parse(
   JSON.stringify(useSettingsStore.getState().settings)
 );
-const initialMoonNode = initialSettings.find((s) => s.name === "Moon Node");
-const initialMoonPlane = initialSettings.find((s) => s.name === "Moon Plane");
+const initialMoonNode = initialSettings.find((s) => s.id === "moon-node");
+const initialMoonPlane = initialSettings.find((s) => s.id === "moon-plane");
 const initialMercury = initialSettings.find((s) => s.name === "Mercury");
 const initialMercuryPlane = initialSettings.find(
   (s) => s.name === "Mercury Plane"
@@ -60,14 +60,18 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
 
   const data = mockLevaStore.getData();
   expect(
-    data["Settings.Earth-Moon System.Moon.Node.Moon Nodespeed"]
+    data[
+      "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed"
+    ]
   ).toBeDefined();
   expect(
-    data["Settings.Earth-Moon System.Moon.Plane.Moon PlaneorbitTilta"]
+    data[
+      "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta"
+    ]
   ).toBeDefined();
   expect(data["Show / Hide settings.Moonvisible"].value).toBe(true);
-  expect(data["Show / Hide settings.Moon Nodevisible"]).toBeUndefined();
-  expect(data["Show / Hide settings.Moon Planevisible"]).toBeUndefined();
+  expect(data["Show / Hide settings.Lunar Nodal Deferentvisible"]).toBeUndefined();
+  expect(data["Show / Hide settings.Lunar Plane Deferentvisible"]).toBeUndefined();
   expect(
     Object.keys(data).some((path) => path.includes("Moon deferent B"))
   ).toBe(false);
@@ -75,9 +79,10 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
 
 test("edits, resets and reopens lunar controls without losing synchronization", () => {
   act(() => root.render(<EditSettings />));
-  const nodePath = "Settings.Earth-Moon System.Moon.Node.Moon Nodespeed";
+  const nodePath =
+    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed";
   const planePath =
-    "Settings.Earth-Moon System.Moon.Plane.Moon PlaneorbitTilta";
+    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta";
 
   act(() =>
     mockLevaStore.set(
@@ -89,10 +94,10 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
     )
   );
   expect(
-    Number(useSettingsStore.getState().getSetting("Moon Node").speed)
+    Number(useSettingsStore.getState().getSetting("moon-node").speed)
   ).toBe(-0.4);
   expect(
-    Number(useSettingsStore.getState().getSetting("Moon Plane").orbitTilta)
+    Number(useSettingsStore.getState().getSetting("moon-plane").orbitTilta)
   ).toBe(6);
 
   act(() => useSettingsStore.getState().resetSettings());
@@ -112,7 +117,8 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
 
 test("serializes the latest edited value rather than the menu's initial snapshot", () => {
   act(() => root.render(<EditSettings />));
-  const speedPath = "Settings.Earth-Moon System.Moon.Orbit.Moonspeed";
+  const speedPath =
+    "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Moon.Moonspeed";
 
   act(() =>
     mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
@@ -125,7 +131,8 @@ test("serializes the latest edited value rather than the menu's initial snapshot
 
 test("loads a saved unified model back into the store and visible controls", () => {
   act(() => root.render(<EditSettings />));
-  const speedPath = "Settings.Earth-Moon System.Moon.Orbit.Moonspeed";
+  const speedPath =
+    "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Moon.Moonspeed";
 
   act(() =>
     mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
@@ -149,6 +156,23 @@ test("loads a saved unified model back into the store and visible controls", () 
 
 test("editing Pluto does not restore a stale hidden state", () => {
   act(() => root.render(<EditSettings />));
+
+  const data = mockLevaStore.getData();
+  expect(
+    data[
+      "Settings.Sun-Hosted Outer Planets.Pluto.Pluto Deferent Frame.Pluto deferent.Pluto deferentspeed"
+    ]
+  ).toBeDefined();
+  expect(
+    data[
+      "Settings.Sun-Hosted Outer Planets.Pluto.Pluto Eccentric Frame.Pluto Eccentric.Pluto EccentricorbitRadius"
+    ]
+  ).toBeDefined();
+  expect(
+    data[
+      "Settings.Sun-Hosted Outer Planets.Pluto.Pluto Eccentric Frame.Pluto.Plutospeed"
+    ]
+  ).toBeDefined();
 
   const visibilityPath = "Show / Hide settings.Plutovisible";
   const speedPath = Object.keys(mockLevaStore.getData()).find((path) =>

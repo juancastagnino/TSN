@@ -36,8 +36,8 @@ const Pobj = ({ name, settingId, children }) => {
   // FIX: Scale the Moon's plot calculations so the Trace aligns with the visual Moon
   if (!actualPlanetSizes) {
     if (
-      s.name === "Moon" ||
-      s.name === "Moon deferent A"
+      s.id === "moon" ||
+      s.id === "moon-deferent-a"
     ) {
       orbitRadius = s.orbitRadius === 0 ? 0 : s.orbitRadius * 39.2078;
       orbitCentera = s.orbitCentera === 0 ? 0 : s.orbitCentera * 39.2078;

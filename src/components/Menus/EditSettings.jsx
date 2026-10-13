@@ -336,12 +336,27 @@ const EditSettingsPanel = () => {
       const groupControls = {};
       editorGroup.bodies.forEach((body) => {
         const bodyControls = {};
-        body.settings.forEach((setting) => {
-          bodyControls[componentLabel(setting.component)] = folder(
-            getControls(setting, updateSetting),
-            { collapsed: true }
-          );
-        });
+        if (body.frames.length > 0) {
+          body.frames.forEach((frame) => {
+            const frameControls = {};
+            frame.settings.forEach((setting) => {
+              frameControls[setting.name] = folder(
+                getControls(setting, updateSetting),
+                { collapsed: true }
+              );
+            });
+            bodyControls[frame.name] = folder(frameControls, {
+              collapsed: true,
+            });
+          });
+        } else {
+          body.settings.forEach((setting) => {
+            bodyControls[componentLabel(setting.component)] = folder(
+              getControls(setting, updateSetting),
+              { collapsed: true }
+            );
+          });
+        }
         groupControls[body.name] = folder(bodyControls, { collapsed: true });
       });
       settingsMenu[editorGroup.name] = folder(groupControls, {
