@@ -68,7 +68,39 @@ test("accepts former Moon component names while normalizing to the new frame voc
     expect.objectContaining({ name: "Lunar Plane Deferent", orbitTiltb: -5.3 })
   );
   expect(index.get("moon-deferent-a")).toEqual(
-    expect.objectContaining({ name: "Lunar Apsidal Deferent", startPos: 166 })
+    expect.objectContaining({ name: "Lunar Apsidal Geometry", startPos: 166 })
+  );
+});
+
+test("ignores retired lunar components when loading former settings", () => {
+  const native = normalizeCelestialSettings(celestialModel);
+  const merged = mergeCelestialSettings(native, [
+    {
+      id: "moon-anomalistic-tangent",
+      name: "Lunar Apsidal Tangential Action",
+      orbitRadius: 0.019,
+    },
+    {
+      id: "moon-solar-variation",
+      name: "Lunar Solar 2D Variation",
+      orbitRadius: 0.003,
+    },
+  ]);
+  const index = buildSettingsIndex(merged);
+  expect(index.get("moon-deferent-a").tangentialRadius).toBeUndefined();
+  expect(index.get("moon-anomalistic-tangent")).toBeUndefined();
+  expect(index.get("moon-solar-variation")).toBeUndefined();
+});
+
+test("round-trips both solar-coupled lunar amplitudes in one setting", () => {
+  const native = normalizeCelestialSettings(celestialModel);
+  const serialized = serializeCelestialSettings(native);
+  const roundTrip = buildSettingsIndex(normalizeCelestialSettings(serialized));
+  expect(roundTrip.get("moon-solar-eccentric")).toEqual(
+    expect.objectContaining({
+      orbitRadius: "-0.0055",
+      solarVariationRadius: "0.002168",
+    })
   );
 });
 

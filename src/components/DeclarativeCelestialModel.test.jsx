@@ -67,6 +67,7 @@ test("keeps Pluto eccentric geometry active without rendering its helper orbit",
   expect(eccentric.renderOrbit).toBe(false);
   expect(eccentric.children.map((child) => child.id)).toEqual(["pluto"]);
   expect(pluto.motion.eccentric.orbitRadius).toBe("134.260927266641");
+  expect(pluto.motion.eccentric.speed).toBe("0.0506606");
   expect(pluto.motion.eccentricCounterrotation).toBeUndefined();
   expect(pluto.motion.eccentric.children).toBeUndefined();
 });
@@ -79,14 +80,31 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
     "node",
     "plane",
     "deferentA",
+    "equant",
     "solarCoupledEccentric",
-    "solarVariation",
-    "anomalisticTangent",
     "orbit",
   ]);
+  expect(moon.motion.deferentA.tangentialRadius).toBeUndefined();
+  expect(moon.motion.plane.speed).toBe("0");
+  expect(moon.motion.deferentA.orbitRadius).toBe("0.01407");
+  expect(moon.motion.equant.orbitRadius).toBe("0.01407");
+  expect(moon.motion.solarCoupledEccentric.orbitRadius).toBe("-0.0055");
+  expect(moon.motion.solarCoupledEccentric.solarVariationRadius).toBe(
+    "0.002168"
+  );
+  expect(moon.motion.solarVariation).toBeUndefined();
+  expect(moon.motion.anomalisticTangent).toBeUndefined();
+  expect(findCelestialNode("moon-deferent-a").kind).toBe("motion-stage");
   expect(findCelestialNode("moon-solar-eccentric-frame")).toEqual(
     expect.objectContaining({
       kind: "moon-solar-eccentric",
+      targetName: "Moon",
+    })
+  );
+  expect(findCelestialNode("moon-apsidal-equant-frame")).toEqual(
+    expect.objectContaining({
+      kind: "moon-apsidal-equant",
+      settingId: "moon-apsidal-equant",
       targetName: "Moon",
     })
   );

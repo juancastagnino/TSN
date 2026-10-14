@@ -22,7 +22,14 @@ export function movePlotModel(plotObjects, plotPos) {
   });
 
   // Coordinate adapters depend on the final orbital rotations for this sample.
-  plotObjects.forEach((pObj) => pObj.updateAfterMotion?.(plotPos));
+  // Negative-priority geometry (currently the lunar equant) must settle first
+  // because later adapters use the resulting body directions.
+  plotObjects.forEach((pObj) => {
+    if (pObj.updatePriority < 0) pObj.updateAfterMotion?.(plotPos);
+  });
+  plotObjects.forEach((pObj) => {
+    if (!(pObj.updatePriority < 0)) pObj.updateAfterMotion?.(plotPos);
+  });
 
   return getPlotSunMarsBinaryState(plotObjects, plotBinaryState);
 }

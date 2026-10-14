@@ -102,6 +102,23 @@ const getControls = (s, updateSetting) => ({
       updateSettingField(s, "orbitRadius", value, updateSetting);
     },
   },
+  ...(s.solarVariationRadius !== undefined
+    ? {
+        [`${s.name}solarVariationRadius`]: {
+          label: "solarVariationRadius",
+          value: "\u200B" + s.solarVariationRadius,
+          editable: true,
+          onChange: (value) => {
+            updateSettingField(
+              s,
+              "solarVariationRadius",
+              value,
+              updateSetting
+            );
+          },
+        },
+      }
+    : {}),
   [`${s.name}orbitCentera`]: {
     label: "orbitCentera",
     value: "\u200B" + s.orbitCentera,
@@ -420,6 +437,10 @@ const EditSettingsPanel = () => {
         updatedValues[`${s.name}tiltb`] = "\u200B" + s.tiltb;
       }
       updatedValues[`${s.name}orbitRadius`] = "\u200B" + s.orbitRadius;
+      if (s.solarVariationRadius !== undefined) {
+        updatedValues[`${s.name}solarVariationRadius`] =
+          "\u200B" + s.solarVariationRadius;
+      }
       updatedValues[`${s.name}orbitCentera`] = "\u200B" + s.orbitCentera;
       updatedValues[`${s.name}orbitCenterb`] = "\u200B" + s.orbitCenterb;
       updatedValues[`${s.name}orbitCenterc`] = "\u200B" + s.orbitCenterc;

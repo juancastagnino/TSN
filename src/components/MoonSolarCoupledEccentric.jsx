@@ -30,6 +30,7 @@ export const deriveSolarCoupledLunarAngles = (
   const sunLongitude = signedAngleInEclipticXZ(earthToSunEcliptic);
   const elongation = wrapRadians(moonLongitude - sunLongitude);
   const inequalityArgument = wrapRadians(2 * elongation - anomalisticPhase);
+  const variationArgument = wrapRadians(2 * elongation);
 
   // 2D-M is the wanted longitude-correction argument, not the absolute
   // direction of the eccentric centre. A small centre displacement changes
@@ -37,10 +38,8 @@ export const deriveSolarCoupledLunarAngles = (
   const eccentricOrientation = wrapRadians(
     moonLongitude + inequalityArgument
   );
-  // A centre vector at lambdaMoon + 2D produces a geometrical half-synodic
-  // angular term. Its frequency comes from elongation, not a stored period.
   const variationOrientation = wrapRadians(
-    moonLongitude + 2 * elongation
+    moonLongitude + variationArgument
   );
   return {
     moonLongitude,
@@ -49,31 +48,9 @@ export const deriveSolarCoupledLunarAngles = (
     anomalisticPhase,
     inequalityArgument,
     eccentricOrientation,
+    variationArgument,
     variationOrientation,
   };
-};
-
-export const eclipticOffsetInParentFrame = (
-  orientation,
-  radius,
-  inverseParentQuaternion,
-  target = new Vector3()
-) =>
-  target
-    .set(Math.cos(orientation) * radius, 0, -Math.sin(orientation) * radius)
-    .applyQuaternion(inverseParentQuaternion);
-
-export const tangentialProjection = (
-  displacement,
-  radialDirection,
-  target = new Vector3()
-) => {
-  const radialLengthSq = radialDirection.lengthSq();
-  if (radialLengthSq === 0) return target.copy(displacement);
-  const radialScale = displacement.dot(radialDirection) / radialLengthSq;
-  return target
-    .copy(displacement)
-    .addScaledVector(radialDirection, -radialScale);
 };
 
 export const scaleRadialProjection = (
@@ -93,6 +70,30 @@ export const scaleRadialProjection = (
     );
 };
 
+export const composeSolarCoupledLunarOffset = (
+  angles,
+  radialDirection,
+  inequalityAmplitude,
+  variationAmplitude,
+  target = new Vector3(),
+  variation = new Vector3()
+) => {
+  target.set(
+    Math.cos(angles.eccentricOrientation) * inequalityAmplitude,
+    0,
+    -Math.sin(angles.eccentricOrientation) * inequalityAmplitude
+  );
+  scaleRadialProjection(target, radialDirection, -1, target);
+
+  variation.set(
+    Math.cos(angles.variationOrientation) * variationAmplitude,
+    0,
+    -Math.sin(angles.variationOrientation) * variationAmplitude
+  );
+  scaleRadialProjection(variation, radialDirection, -1, variation);
+  return target.add(variation);
+};
+
 const MoonSolarCoupledEccentric = ({
   children,
   targetName = "Moon",
@@ -103,20 +104,6 @@ const MoonSolarCoupledEccentric = ({
     useCallback(
       (state) =>
         findCelestialSetting(state.settings, "moon-solar-eccentric"),
-      []
-    )
-  );
-  const variationSetting = useSettingsStore(
-    useCallback(
-      (state) =>
-        findCelestialSetting(state.settings, "moon-solar-variation"),
-      []
-    )
-  );
-  const anomalisticTangentSetting = useSettingsStore(
-    useCallback(
-      (state) =>
-        findCelestialSetting(state.settings, "moon-anomalistic-tangent"),
       []
     )
   );
@@ -140,20 +127,14 @@ const MoonSolarCoupledEccentric = ({
   const parentQuaternionInverse = useMemo(() => new Quaternion(), []);
   const localOffset = useMemo(() => new Vector3(), []);
   const eccentricWorld = useMemo(() => new Vector3(), []);
-  const variationOffset = useMemo(() => new Vector3(), []);
-  const deferentPivotWorld = useMemo(() => new Vector3(), []);
-  const deferentContainerWorld = useMemo(() => new Vector3(), []);
-  const anomalisticWorld = useMemo(() => new Vector3(), []);
-  const anomalisticLocal = useMemo(() => new Vector3(), []);
+  const variationWorld = useMemo(() => new Vector3(), []);
 
   const physicalCoordinates = targetName.startsWith("Actual ");
   const distanceScale =
     actualPlanetSizes || physicalCoordinates ? 1 : DISPLAY_MOON_SCALE;
-  const amplitude = finite(setting?.orbitRadius) * distanceScale;
+  const inequalityAmplitude = finite(setting?.orbitRadius) * distanceScale;
   const variationAmplitude =
-    finite(variationSetting?.orbitRadius) * distanceScale;
-  const anomalisticTangentAmplitude =
-    finite(anomalisticTangentSetting?.orbitRadius) * distanceScale;
+    finite(setting?.solarVariationRadius) * distanceScale;
   const updaterName = `${MOON_SOLAR_ECCENTRIC_UPDATER}:${targetName}`;
 
   const update = useCallback(
@@ -204,66 +185,31 @@ const MoonSolarCoupledEccentric = ({
         anomalisticPhase
       );
       parent.getWorldQuaternion(parentQuaternionInverse).invert();
-      eccentricWorld.set(
-        Math.cos(angles.eccentricOrientation) * amplitude,
-        0,
-        -Math.sin(angles.eccentricOrientation) * amplitude
-      );
-      // Retain the angular action of the 2D-M geometry while reflecting its
-      // Earth-Moon radial action across the instantaneous lunar tangent.
-      scaleRadialProjection(
-        eccentricWorld,
+      // Both contributions remain translations of one solar-coupled lunar
+      // centre. The first follows 2D-M; the second follows the independently
+      // identified 2D geometry. Reflecting their radial projections preserves
+      // the tested angular sense without introducing a post-export correction.
+      composeSolarCoupledLunarOffset(
+        angles,
         earthToMoonEcliptic,
-        -1,
-        eccentricWorld
+        inequalityAmplitude,
+        variationAmplitude,
+        eccentricWorld,
+        variationWorld
       );
       localOffset
         .copy(eccentricWorld)
         .applyQuaternion(parentQuaternionInverse);
-      eclipticOffsetInParentFrame(
-        angles.variationOrientation,
-        variationAmplitude,
-        parentQuaternionInverse,
-        variationOffset
-      );
-      localOffset.add(variationOffset);
-
-      // Recover angular action from the former larger Deferent-A radius while
-      // rejecting its radial action. The Deferent pivot-to-container vector is
-      // the actual apsidal direction already generated by the hierarchy.
-      const deferentContainer = parent.parent?.parent;
-      if (deferentContainer && anomalisticTangentAmplitude !== 0) {
-        parent.getWorldPosition(deferentPivotWorld);
-        deferentContainer.getWorldPosition(deferentContainerWorld);
-        anomalisticWorld
-          .subVectors(deferentPivotWorld, deferentContainerWorld)
-          .normalize()
-          .multiplyScalar(anomalisticTangentAmplitude);
-        tangentialProjection(
-          anomalisticWorld,
-          earthToMoonEcliptic,
-          anomalisticWorld
-        );
-        anomalisticLocal
-          .copy(anomalisticWorld)
-          .applyQuaternion(parentQuaternionInverse);
-        localOffset.add(anomalisticLocal);
-      }
       offset.position.copy(localOffset);
       offset.updateWorldMatrix(true, true);
       return true;
     },
     [
-      amplitude,
-      anomalisticLocal,
-      anomalisticTangentAmplitude,
-      anomalisticWorld,
-      deferentContainerWorld,
-      deferentPivotWorld,
       eccentricWorld,
       earthToMoonEcliptic,
       earthToSunEcliptic,
       earthWorld,
+      inequalityAmplitude,
       localOffset,
       moon,
       moonWorld,
@@ -273,7 +219,7 @@ const MoonSolarCoupledEccentric = ({
       sunWorld,
       targetName,
       variationAmplitude,
-      variationOffset,
+      variationWorld,
     ]
   );
 
@@ -287,8 +233,6 @@ const MoonSolarCoupledEccentric = ({
 
   if (
     !setting ||
-    !variationSetting ||
-    !anomalisticTangentSetting ||
     !moon
   ) {
     return null;

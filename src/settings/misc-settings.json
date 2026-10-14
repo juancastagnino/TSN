@@ -23,7 +23,7 @@
     "horizonColor": "#000080"
   },
   {
-    "name": "Lunar Apsidal Deferent",
+    "name": "Lunar Apsidal Geometry",
     "color": "gray",
     "type": "deferent",
     "visible": false

@@ -54,7 +54,6 @@ const Ephemerides = () => {
       .map((s) => s.name);
     const binaryDiagnostics =
       formValues["Sun-Mars binary CSV"] === true;
-
     if (checkedPlanets.length === 0 && !binaryDiagnostics) {
       setGenerationError(
         "No output selected.\nSelect at least one planet or Sun-Mars binary CSV."

@@ -1,10 +1,9 @@
-import { Quaternion, Vector3 } from "three";
+import { Vector3 } from "three";
 import {
+  composeSolarCoupledLunarOffset,
   deriveSolarCoupledLunarAngles,
-  eclipticOffsetInParentFrame,
   scaleRadialProjection,
   signedAngleInEclipticXZ,
-  tangentialProjection,
   wrapRadians,
 } from "./MoonSolarCoupledEccentric";
 
@@ -16,7 +15,7 @@ test("recovers signed ecliptic longitude using the Three.js Y-rotation conventio
   expect(signedAngleInEclipticXZ(vectorAt(-1.1))).toBeCloseTo(-1.1, 12);
 });
 
-test("uses 2D-M as correction argument relative to lunar longitude", () => {
+test("derives the 2D-M and pure 2D arguments from the same solar geometry", () => {
   const moonLongitude = 1.2;
   const sunLongitude = 0.25;
   const anomalisticPhase = 0.35;
@@ -29,14 +28,16 @@ test("uses 2D-M as correction argument relative to lunar longitude", () => {
   const expectedArgument = wrapRadians(
     2 * expectedElongation - anomalisticPhase
   );
+  const expectedVariation = wrapRadians(2 * expectedElongation);
   expect(result.elongation).toBeCloseTo(expectedElongation, 12);
   expect(result.inequalityArgument).toBeCloseTo(expectedArgument, 12);
   expect(result.eccentricOrientation).toBeCloseTo(
     wrapRadians(moonLongitude + expectedArgument),
     12
   );
+  expect(result.variationArgument).toBeCloseTo(expectedVariation, 12);
   expect(result.variationOrientation).toBeCloseTo(
-    wrapRadians(moonLongitude + 2 * expectedElongation),
+    wrapRadians(moonLongitude + expectedVariation),
     12
   );
 });
@@ -50,29 +51,6 @@ test("wraps the elongation continuously across the plus/minus pi boundary", () =
   expect(result.elongation).toBeCloseTo(0.2, 12);
 });
 
-test("expresses a fixed-ecliptic offset in moving parent coordinates", () => {
-  const parentRotation = new Quaternion().setFromAxisAngle(
-    new Vector3(0, 1, 0),
-    0.4
-  );
-  const local = eclipticOffsetInParentFrame(
-    0.9,
-    2,
-    parentRotation.clone().invert()
-  );
-  const reconstructedWorld = local.applyQuaternion(parentRotation);
-  expect(reconstructedWorld.x).toBeCloseTo(vectorAt(0.9).x * 2, 12);
-  expect(reconstructedWorld.y).toBeCloseTo(0, 12);
-  expect(reconstructedWorld.z).toBeCloseTo(vectorAt(0.9).z * 2, 12);
-});
-
-test("removes the radial component from an anomalistic displacement", () => {
-  const radial = new Vector3(2, 1, -3).normalize();
-  const displacement = new Vector3(0.7, -0.2, 0.4);
-  const tangent = tangentialProjection(displacement, radial);
-  expect(tangent.dot(radial)).toBeCloseTo(0, 12);
-});
-
 test("reflects only the radial part of a solar variation displacement", () => {
   const radial = new Vector3(1, 0, 0);
   const displacement = new Vector3(2, 0, 3);
@@ -80,4 +58,27 @@ test("reflects only the radial part of a solar variation displacement", () => {
   expect(reflected.x).toBeCloseTo(-2, 12);
   expect(reflected.y).toBeCloseTo(0, 12);
   expect(reflected.z).toBeCloseTo(3, 12);
+});
+
+test("combines 2D-M and 2D as translations of one lunar centre", () => {
+  const moonLongitude = 0;
+  const sunLongitude = -Math.PI / 4;
+  const angles = deriveSolarCoupledLunarAngles(
+    vectorAt(moonLongitude),
+    vectorAt(sunLongitude),
+    0
+  );
+  const offset = composeSolarCoupledLunarOffset(
+    angles,
+    vectorAt(moonLongitude),
+    0,
+    0.002168
+  );
+
+  // At D=45 degrees, 2D is 90 degrees and the variation is entirely
+  // tangential. Positive amplitude advances lunar longitude in the model's
+  // +Y rotation convention.
+  expect(offset.x).toBeCloseTo(0, 12);
+  expect(offset.y).toBeCloseTo(0, 12);
+  expect(offset.z).toBeCloseTo(-0.002168, 12);
 });

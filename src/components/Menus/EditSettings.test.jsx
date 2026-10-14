@@ -69,6 +69,26 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
       "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta"
     ]
   ).toBeDefined();
+  expect(
+    data[
+      "Settings.Earth-Moon System.Moon.Lunar Apsidal Frame.Lunar Apsidal Geometry.Lunar Apsidal GeometryorbitRadius"
+    ]
+  ).toBeDefined();
+  expect(
+    data[
+      "Settings.Earth-Moon System.Moon.Lunar Apsidal Frame.Lunar Apsidal Equant.Lunar Apsidal EquantorbitRadius"
+    ]
+  ).toBeDefined();
+  expect(
+    data[
+      "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Lunar Solar-Coupled Geometry.Lunar Solar-Coupled GeometrysolarVariationRadius"
+    ]
+  ).toBeDefined();
+  expect(
+    Object.keys(data).some((path) =>
+      path.includes("Lunar Apsidal Tangential Action")
+    )
+  ).toBe(false);
   expect(data["Show / Hide settings.Moonvisible"].value).toBe(true);
   expect(data["Show / Hide settings.Lunar Nodal Deferentvisible"]).toBeUndefined();
   expect(data["Show / Hide settings.Lunar Plane Deferentvisible"]).toBeUndefined();

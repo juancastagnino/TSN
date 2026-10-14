@@ -89,12 +89,26 @@
         },
         "deferentA": {
           "id": "moon-deferent-a",
-          "name": "Lunar Apsidal Deferent",
+          "name": "Lunar Apsidal Geometry",
           "size": "0.6",
           "startPos": "167.51",
           "speed": "0.71015440177343",
           "tilt": "0",
-          "orbitRadius": "0.01131",
+          "orbitRadius": "0.01407",
+          "orbitCentera": "0",
+          "orbitCenterb": "0",
+          "orbitCenterc": "0",
+          "orbitTilta": "0",
+          "orbitTiltb": "0"
+        },
+        "equant": {
+          "id": "moon-apsidal-equant",
+          "name": "Lunar Apsidal Equant",
+          "size": "0",
+          "startPos": "0",
+          "speed": "0",
+          "tilt": "0",
+          "orbitRadius": "0.01407",
           "orbitCentera": "0",
           "orbitCenterb": "0",
           "orbitCenterc": "0",
@@ -103,40 +117,13 @@
         },
         "solarCoupledEccentric": {
           "id": "moon-solar-eccentric",
-          "name": "Lunar 2D-M Eccentric Action",
+          "name": "Lunar Solar-Coupled Geometry",
           "size": "0",
           "startPos": "0",
           "speed": "0",
           "tilt": "0",
           "orbitRadius": "-0.0055",
-          "orbitCentera": "0",
-          "orbitCenterb": "0",
-          "orbitCenterc": "0",
-          "orbitTilta": "0",
-          "orbitTiltb": "0"
-        },
-        "solarVariation": {
-          "id": "moon-solar-variation",
-          "name": "Lunar Solar 2D Variation",
-          "size": "0",
-          "startPos": "0",
-          "speed": "0",
-          "tilt": "0",
-          "orbitRadius": "0.002",
-          "orbitCentera": "0",
-          "orbitCenterb": "0",
-          "orbitCenterc": "0",
-          "orbitTilta": "0",
-          "orbitTiltb": "0"
-        },
-        "anomalisticTangent": {
-          "id": "moon-anomalistic-tangent",
-          "name": "Lunar Apsidal Tangential Action",
-          "size": "0",
-          "startPos": "0",
-          "speed": "0",
-          "tilt": "0",
-          "orbitRadius": "0.01655",
+          "solarVariationRadius": "0.002168",
           "orbitCentera": "0",
           "orbitCenterb": "0",
           "orbitCenterc": "0",
@@ -171,15 +158,14 @@
         {
           "name": "Lunar Apsidal Frame",
           "components": [
-            "deferentA"
+            "deferentA",
+            "equant"
           ]
         },
         {
           "name": "Solar-Coupled Lunar Frame",
           "components": [
             "solarCoupledEccentric",
-            "solarVariation",
-            "anomalisticTangent",
             "orbit"
           ]
         }
@@ -889,17 +875,29 @@
                         "role": "solar-coupled-lunar-frame",
                         "settingIds": [
                           "moon-solar-eccentric",
-                          "moon-solar-variation",
-                          "moon-anomalistic-tangent",
                           "moon"
                         ],
                         "targetName": "Moon",
                         "children": [
                           {
-                            "id": "moon",
-                            "kind": "object",
-                            "name": "Moon",
-                            "role": "earth-satellite"
+                            "id": "moon-apsidal-equant-frame",
+                            "kind": "moon-apsidal-equant",
+                            "name": "Lunar Apsidal Equant",
+                            "role": "lunar-apsidal-equant-geometry",
+                            "settingId": "moon-apsidal-equant",
+                            "settingIds": [
+                              "moon-apsidal-equant",
+                              "moon"
+                            ],
+                            "targetName": "Moon",
+                            "children": [
+                              {
+                                "id": "moon",
+                                "kind": "object",
+                                "name": "Moon",
+                                "role": "earth-satellite"
+                              }
+                            ]
                           }
                         ]
                       }
@@ -922,8 +920,6 @@
                         "role": "physical-coordinate-solar-lunar-inequality",
                         "settingIds": [
                           "moon-solar-eccentric",
-                          "moon-solar-variation",
-                          "moon-anomalistic-tangent",
                           "moon"
                         ],
                         "targetName": "Actual Moon",
@@ -932,13 +928,30 @@
                         ],
                         "children": [
                           {
-                            "id": "actual-moon",
-                            "kind": "object",
-                            "name": "Actual Moon",
-                            "settingId": "moon",
-                            "role": "physical-coordinate-moon",
+                            "id": "actual-moon-apsidal-equant-frame",
+                            "kind": "moon-apsidal-equant",
+                            "name": "Actual Lunar Apsidal Equant",
+                            "role": "physical-coordinate-lunar-equant",
+                            "settingId": "moon-apsidal-equant",
+                            "settingIds": [
+                              "moon-apsidal-equant",
+                              "moon"
+                            ],
+                            "targetName": "Actual Moon",
                             "modes": [
                               "live"
+                            ],
+                            "children": [
+                              {
+                                "id": "actual-moon",
+                                "kind": "object",
+                                "name": "Actual Moon",
+                                "settingId": "moon",
+                                "role": "physical-coordinate-moon",
+                                "modes": [
+                                  "live"
+                                ]
+                              }
                             ]
                           }
                         ]

@@ -12,13 +12,28 @@ const LEGACY_MODEL_IDS = new Set([
 const LEGACY_SETTING_NAMES_BY_ID = new Map([
   ["moon-node", new Set(["Moon Node"])],
   ["moon-plane", new Set(["Moon Plane"])],
-  ["moon-deferent-a", new Set(["Moon deferent A"])],
-  ["moon-solar-eccentric", new Set(["Moon Solar-Coupled Eccentric"])],
-  ["moon-solar-variation", new Set(["Moon Solar Variation"])],
   [
-    "moon-anomalistic-tangent",
-    new Set(["Moon Anomalistic Tangential Frame"]),
+    "moon-deferent-a",
+    new Set(["Moon deferent A", "Lunar Apsidal Deferent"]),
   ],
+  [
+    "moon-solar-eccentric",
+    new Set([
+      "Moon Solar-Coupled Eccentric",
+      "Lunar 2D-M Eccentric Action",
+    ]),
+  ],
+]);
+
+const RETIRED_LUNAR_SETTING_IDS = new Set([
+  "moon-anomalistic-tangent",
+  "moon-solar-variation",
+]);
+const RETIRED_LUNAR_SETTING_NAMES = new Set([
+  "Moon Anomalistic Tangential Frame",
+  "Lunar Apsidal Tangential Action",
+  "Moon Solar Variation",
+  "Lunar Solar 2D Variation",
 ]);
 
 const DIRECT_PARENT_RELATIVE_IDS = new Set([
@@ -40,6 +55,7 @@ export const SAVED_SETTING_PROPERTIES = [
   "tilt",
   "tiltb",
   "orbitRadius",
+  "solarVariationRadius",
   "orbitCentera",
   "orbitCenterb",
   "orbitCenterc",
@@ -116,7 +132,14 @@ export const normalizeCelestialSettings = (
   document,
   { requireComplete = true } = {}
 ) => {
-  const source = settingsArrayFromDocument(document);
+  const rawSource = settingsArrayFromDocument(document);
+  const source = rawSource
+    .filter(
+      (item) =>
+        !RETIRED_LUNAR_SETTING_IDS.has(item?.id) &&
+        !RETIRED_LUNAR_SETTING_NAMES.has(item?.name)
+    )
+    .map((item) => ({ ...item }));
   const ids = new Set();
   const names = new Set();
   const settings = source.map((item, index) => {
