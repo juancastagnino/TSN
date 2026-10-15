@@ -86,8 +86,8 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
   ]);
   expect(moon.motion.deferentA.tangentialRadius).toBeUndefined();
   expect(moon.motion.plane.speed).toBe("0");
-  expect(moon.motion.deferentA.orbitRadius).toBe("0.01407");
-  expect(moon.motion.equant.orbitRadius).toBe("0.01407");
+  expect(moon.motion.deferentA.orbitRadius).toBe("0.014073729727223986");
+  expect(moon.motion.equant.orbitRadius).toBe("0.014073729727223986");
   expect(moon.motion.solarCoupledEccentric.orbitRadius).toBe("-0.0055");
   expect(moon.motion.solarCoupledEccentric.solarVariationRadius).toBe(
     "0.002168"
