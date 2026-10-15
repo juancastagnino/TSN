@@ -104,20 +104,24 @@ test("round-trips both solar-coupled lunar amplitudes in one setting", () => {
   );
 });
 
-test("removes the common residual while retaining the Eros harmonic", () => {
+test("retains only active direct carriers and the Eros harmonic", () => {
   const native = normalizeCelestialSettings(celestialModel);
   const serialized = serializeCelestialSettings(native);
   const roundTrip = buildSettingsIndex(normalizeCelestialSettings(serialized));
 
-  [
-    "mars-deferent-e",
-    "mercury-deferent-a",
-    "venus-deferent-a",
-  ].forEach((id) => {
-    const carrier = roundTrip.get(id);
-    expect(carrier.orbitRadius).toBe(0);
-    expect(carrier.relativeAnnualSpeed).toBeUndefined();
-  });
+  const marsCarrier = roundTrip.get("mars-deferent-e");
+  expect(marsCarrier.orbitRadius).toBe(0);
+  expect(marsCarrier.relativeAnnualSpeed).toBeUndefined();
+  expect(roundTrip.get("mercury-deferent-a")).toBeUndefined();
+  expect(roundTrip.get("mercury-deferent-b")).toBeUndefined();
+  expect(roundTrip.get("venus-deferent-a")).toBeUndefined();
+  expect(roundTrip.get("venus-deferent-b")).toBeUndefined();
+  expect(roundTrip.get("mercury-deferent")).toEqual(
+    expect.objectContaining({ speed: -2 * Math.PI })
+  );
+  expect(roundTrip.get("venus-deferent")).toEqual(
+    expect.objectContaining({ speed: -2 * Math.PI, orbitRadius: 0.6 })
+  );
   expect(roundTrip.get("eros-deferent-a")).toEqual(
     expect.objectContaining({
       relativeAnnualSpeed: expect.any(Number),
@@ -127,17 +131,16 @@ test("removes the common residual while retaining the Eros harmonic", () => {
   );
 });
 
-test("rejects a former absolute carrier import in the unified model", () => {
+test("ignores retired Venus and Mercury carrier settings on import", () => {
   const native = normalizeCelestialSettings(celestialModel);
-  expect(() =>
-    mergeCelestialSettings(native, [
-      {
-        name: "Mercury deferent A",
-        orbitRadius: 100,
-        orbitCentera: -1.3,
-      },
-    ])
-  ).toThrow(/former absolute carrier format/);
+  const merged = mergeCelestialSettings(native, [
+    {
+      name: "Mercury deferent A",
+      orbitRadius: 100,
+      orbitCentera: -1.3,
+    },
+  ]);
+  expect(merged).toEqual(native);
 });
 
 test("declares every motion component exactly once in the body-aware editor", () => {

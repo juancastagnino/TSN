@@ -262,7 +262,7 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   // Preserve the calibrated split between each fixed plane and its planet.
   expect(Number(initialMercuryPlane.orbitCentera)).toBe(10.8);
   expect(Number(initialMercuryPlane.orbitCenterb)).toBe(4);
-  expect(Number(initialMercuryPlane.orbitCenterc)).toBe(0);
+  expect(Number(initialMercuryPlane.orbitCenterc)).toBe(-0.5);
   expect(Number(initialMercuryPlane.orbitTilta)).toBe(-4.5);
   expect(Number(initialMercuryPlane.orbitTiltb)).toBe(-2.5);
   expect(Number(initialMercury.orbitCentera)).toBe(-2);
@@ -271,8 +271,11 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   expect(Number(initialMercury.orbitTilta)).toBe(0);
   expect(Number(initialMercury.orbitTiltb)).toBe(0.5);
 
-  expect(Number(initialVenusPlane.orbitCentera)).toBe(1.8);
-  expect(Number(initialVenusPlane.orbitCenterb)).toBe(-0.4);
+  expect(Number(initialVenusPlane.orbitCentera)).toBe(-1.322868312130857);
+  expect(Number(initialVenusPlane.orbitCenterb)).toBe(0.846478306956517);
+  expect(Number(initialVenusPlane.orbitCenterc)).toBe(
+    0.0028256060705597465
+  );
   expect(Number(initialVenusPlane.orbitTilta)).toBe(3.4);
   expect(Number(initialVenusPlane.orbitTiltb)).toBe(0.2);
   expect(Number(initialVenus.orbitCenterb)).toBe(0);

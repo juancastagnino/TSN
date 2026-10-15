@@ -2,14 +2,12 @@ import React from "react";
 import celestialModel from "../settings/celestial-model.json";
 import { normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
-import MercurySunRelativeOrbit from "./MercurySunRelativeOrbit";
 import MoonApsidalEquant from "./MoonApsidalEquant";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
 import MoonSolarCoupledEccentric from "./MoonSolarCoupledEccentric";
 import PlutoEccentricFrame from "./PlutoEccentricFrame";
 import SunMarsBinaryTracker from "./SunMarsBinaryTracker";
 import SunMarsRelativeOrbit from "./SunMarsRelativeOrbit";
-import VenusSunRelativeOrbit from "./VenusSunRelativeOrbit";
 
 export const CELESTIAL_NODE_KINDS = new Set([
   "group",
@@ -21,8 +19,6 @@ export const CELESTIAL_NODE_KINDS = new Set([
   "moon-solar-eccentric",
   "pluto-eccentric-frame",
   "sun-mars-relative",
-  "venus-sun-relative",
-  "mercury-sun-relative",
   "eros-sun-relative",
   "sun-mars-binary-tracker",
 ]);
@@ -201,18 +197,6 @@ export const renderCelestialNode = (
     case "sun-mars-relative":
       return React.createElement(
         SunMarsRelativeOrbit,
-        { ...props, plotMode: mode === "plot" },
-        children
-      );
-    case "venus-sun-relative":
-      return React.createElement(
-        VenusSunRelativeOrbit,
-        { ...props, plotMode: mode === "plot" },
-        children
-      );
-    case "mercury-sun-relative":
-      return React.createElement(
-        MercurySunRelativeOrbit,
         { ...props, plotMode: mode === "plot" },
         children
       );

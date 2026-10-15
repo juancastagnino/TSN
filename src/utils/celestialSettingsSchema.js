@@ -36,10 +36,21 @@ const RETIRED_LUNAR_SETTING_NAMES = new Set([
   "Lunar Solar 2D Variation",
 ]);
 
+const RETIRED_SOLAR_COMPANION_SETTING_IDS = new Set([
+  "mercury-deferent-a",
+  "mercury-deferent-b",
+  "venus-deferent-a",
+  "venus-deferent-b",
+]);
+const RETIRED_SOLAR_COMPANION_SETTING_NAMES = new Set([
+  "Mercury deferent A",
+  "Mercury deferent B",
+  "Venus deferent A",
+  "Venus deferent B",
+]);
+
 const DIRECT_PARENT_RELATIVE_IDS = new Set([
   "mars-deferent-e",
-  "mercury-deferent-a",
-  "venus-deferent-a",
   "eros-deferent-a",
 ]);
 
@@ -137,7 +148,9 @@ export const normalizeCelestialSettings = (
     .filter(
       (item) =>
         !RETIRED_LUNAR_SETTING_IDS.has(item?.id) &&
-        !RETIRED_LUNAR_SETTING_NAMES.has(item?.name)
+        !RETIRED_LUNAR_SETTING_NAMES.has(item?.name) &&
+        !RETIRED_SOLAR_COMPANION_SETTING_IDS.has(item?.id) &&
+        !RETIRED_SOLAR_COMPANION_SETTING_NAMES.has(item?.name)
     )
     .map((item) => ({ ...item }));
   const ids = new Set();

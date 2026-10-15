@@ -70,36 +70,30 @@ test("keeps the Martian moons in the Mars companion branch", () => {
   );
 });
 
-test("keeps the accepted Venus companion beneath the Sun", () => {
+test("makes Venus a Sun-hosted deferent, plane and orbit", () => {
   const binaryFrame = SunMarsBinarySystem({ ObjectComponent: StubObject });
   const sunBranch = directChildNamed(binaryFrame, "Sun Primary Branch");
-  const venusBranch = descendantNamed(
-    sunBranch,
-    "Venus Senior Solar Moon Branch"
-  );
+  const venusPlane = descendantNamed(sunBranch, "Venus Plane");
+  const venusDeferent = descendantNamed(sunBranch, "Venus deferent");
 
-  expect(venusBranch).toBeDefined();
-  expect(descendantNames(venusBranch)).toContain("Venus");
-  expect(descendantNames(sunBranch)).toContain("Venus Native Relative Frame");
+  expect(venusDeferent).toBeDefined();
+  expect(venusPlane).toBeDefined();
+  expect(descendantNames(venusPlane)).toContain("Venus");
   expect(descendantNames(sunBranch)).not.toContain("Venus deferent A");
   expect(descendantNames(sunBranch)).not.toContain("Venus deferent B");
-  expect(descendantNames(sunBranch)).not.toContain("Venus Plane");
 });
 
-test("makes Mercury an explicit Sun-hosted companion", () => {
+test("makes Mercury a Sun-hosted deferent, plane and orbit", () => {
   const binaryFrame = SunMarsBinarySystem({ ObjectComponent: StubObject });
   const sunBranch = directChildNamed(binaryFrame, "Sun Primary Branch");
-  const mercuryBranch = descendantNamed(
-    sunBranch,
-    "Mercury Junior Solar Moon Branch"
-  );
+  const mercuryPlane = descendantNamed(sunBranch, "Mercury Plane");
+  const mercuryDeferent = descendantNamed(sunBranch, "Mercury deferent");
 
-  expect(mercuryBranch).toBeDefined();
-  expect(descendantNames(mercuryBranch)).toContain("Mercury");
-  expect(descendantNames(sunBranch)).toContain("Mercury Native Relative Frame");
+  expect(mercuryDeferent).toBeDefined();
+  expect(mercuryPlane).toBeDefined();
+  expect(descendantNames(mercuryPlane)).toContain("Mercury");
   expect(descendantNames(sunBranch)).not.toContain("Mercury deferent A");
   expect(descendantNames(sunBranch)).not.toContain("Mercury deferent B");
-  expect(descendantNames(sunBranch)).not.toContain("Mercury Plane");
   expect(directChildNamed(binaryFrame, "Solar Moon Carrier Branches")).toBeUndefined();
 });
 

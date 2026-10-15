@@ -75,6 +75,8 @@ test("keeps Pluto eccentric geometry active without rendering its helper orbit",
 test("declares real bodies once and keeps motion stages inside their owners", () => {
   const moon = celestialModel.bodies.find((body) => body.id === "moon");
   const mars = celestialModel.bodies.find((body) => body.id === "mars");
+  const venus = celestialModel.bodies.find((body) => body.id === "venus");
+  const mercury = celestialModel.bodies.find((body) => body.id === "mercury");
   expect(moon.parentId).toBe("earth");
   expect(Object.keys(moon.motion)).toEqual([
     "node",
@@ -119,6 +121,10 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
   );
   expect(mars.parentId).toBe("sun");
   expect(mars.motion.parentRelativeCarrier.id).toBe("mars-deferent-e");
+  expect(venus.parentId).toBe("sun");
+  expect(Object.keys(venus.motion)).toEqual(["deferent", "plane", "orbit"]);
+  expect(mercury.parentId).toBe("sun");
+  expect(Object.keys(mercury.motion)).toEqual(["deferent", "plane", "orbit"]);
   expect(celestialModel.bodies.some((body) => body.id.includes("deferent"))).toBe(
     false
   );
@@ -142,14 +148,14 @@ test("preserves the accepted parent path for every reparented body", () => {
   ]);
   expect(pathTo("venus")).toEqual([
     ...prefix,
-    "Venus Native Relative Frame",
-    "Venus Senior Solar Moon Branch",
+    "Venus deferent",
+    "Venus Plane",
     "Venus",
   ]);
   expect(pathTo("mercury")).toEqual([
     ...prefix,
-    "Mercury Native Relative Frame",
-    "Mercury Junior Solar Moon Branch",
+    "Mercury deferent",
+    "Mercury Plane",
     "Mercury",
   ]);
   expect(pathTo("eros")).toEqual([
