@@ -97,6 +97,30 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   ).toBe(false);
 });
 
+test("hides zero-valued parameters by default and reveals them on request", () => {
+  act(() => root.render(<EditSettings />));
+
+  const zeroPath =
+    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal DeferentorbitRadius";
+  const nonZeroPath =
+    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed";
+
+  expect(mockLevaStore.get("Show zero values")).toBe(false);
+  expect(mockLevaStore.getData()[zeroPath]).toBeDefined();
+  expect(mockLevaStore.getVisiblePaths()).not.toContain(zeroPath);
+  expect(mockLevaStore.getVisiblePaths()).toContain(nonZeroPath);
+
+  act(() =>
+    mockLevaStore.set({ "Show zero values": true }, true)
+  );
+  expect(mockLevaStore.getVisiblePaths()).toContain(zeroPath);
+
+  act(() =>
+    mockLevaStore.set({ "Show zero values": false }, true)
+  );
+  expect(mockLevaStore.getVisiblePaths()).not.toContain(zeroPath);
+});
+
 test("edits, resets and reopens lunar controls without losing synchronization", () => {
   act(() => root.render(<EditSettings />));
   const nodePath =

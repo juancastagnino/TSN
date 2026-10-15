@@ -13,177 +13,85 @@ const updateSettingField = (setting, property, value, updateSetting) => {
   updateSetting({ id: setting.id, [property]: cleanValue });
 };
 
-const getControls = (s, updateSetting) => ({
-  [`${s.name}size`]: {
-    label: "size",
-    value: "\u200B" + s.size,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "size", value, updateSetting);
-    },
-  },
-  ...(s.actualSize !== undefined
-    ? {
-        [`${s.name}actualSize`]: {
-          label: "actualSize",
-          value: "\u200B" + s.actualSize,
-          editable: true,
-          onChange: (value) => {
-            updateSettingField(s, "actualSize", value, updateSetting);
-          },
+const settingFields = [
+  "size",
+  "actualSize",
+  "startPos",
+  "speed",
+  "rotationStart",
+  "rotationSpeed",
+  "tilt",
+  "tiltb",
+  "orbitRadius",
+  "solarVariationRadius",
+  "orbitCentera",
+  "orbitCenterb",
+  "orbitCenterc",
+  "orbitTilta",
+  "orbitTiltb",
+  "relativeAnnualStart",
+  "relativeAnnualSpeed",
+  "relativeAnnualCosX",
+  "relativeAnnualCosY",
+  "relativeAnnualCosZ",
+  "relativeAnnualSinX",
+  "relativeAnnualSinY",
+  "relativeAnnualSinZ",
+];
+
+const optionalSettingFields = new Set([
+  "actualSize",
+  "rotationStart",
+  "rotationSpeed",
+  "tiltb",
+  "solarVariationRadius",
+  "relativeAnnualStart",
+  "relativeAnnualSpeed",
+  "relativeAnnualCosX",
+  "relativeAnnualCosY",
+  "relativeAnnualCosZ",
+  "relativeAnnualSinX",
+  "relativeAnnualSinY",
+  "relativeAnnualSinZ",
+]);
+
+const isZeroSettingValue = (value) => {
+  if (typeof value !== "number" && typeof value !== "string") return false;
+  const normalized = String(value).replace(/\u200B/g, "").trim();
+  if (normalized === "") return false;
+  const numericValue = Number(normalized);
+  return Number.isFinite(numericValue) && numericValue === 0;
+};
+
+const getControls = (s, updateSetting) => {
+  const fields = settingFields.filter(
+    (property) =>
+      !optionalSettingFields.has(property) || s[property] !== undefined
+  );
+
+  return Object.fromEntries(
+    fields.map((property) => [
+      `${s.name}${property}`,
+      {
+        label: property,
+        value: "\u200B" + s[property],
+        editable: true,
+        render: (get) => {
+          const currentSetting = useSettingsStore
+            .getState()
+            .getSetting(s.id);
+          return (
+            Boolean(get("Show zero values")) ||
+            !isZeroSettingValue(currentSetting?.[property] ?? s[property])
+          );
         },
-      }
-    : {}),
-  [`${s.name}startPos`]: {
-    label: "startPos",
-    value: "\u200B" + s.startPos,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "startPos", value, updateSetting);
-    },
-  },
-  [`${s.name}speed`]: {
-    label: "speed",
-    value: "\u200B" + s.speed,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "speed", value, updateSetting);
-    },
-  },
-  ...(s.rotationStart !== undefined
-    ? {
-        [`${s.name}rotationStart`]: {
-          label: "rotationStart",
-          value: "\u200B" + s.rotationStart,
-          editable: true,
-          onChange: (value) => {
-            updateSettingField(s, "rotationStart", value, updateSetting);
-          },
+        onChange: (value) => {
+          updateSettingField(s, property, value, updateSetting);
         },
-      }
-    : {}),
-  ...(s.rotationSpeed !== undefined
-    ? {
-        [`${s.name}rotationSpeed`]: {
-          label: "rotationSpeed",
-          value: "\u200B" + s.rotationSpeed,
-          editable: true,
-          onChange: (value) => {
-            updateSettingField(s, "rotationSpeed", value, updateSetting);
-          },
-        },
-      }
-    : {}),
-  [`${s.name}tilt`]: {
-    label: "tilt",
-    value: "\u200B" + s.tilt,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "tilt", value, updateSetting);
-    },
-  },
-  ...(s.tiltb !== undefined
-    ? {
-        [`${s.name}tiltb`]: {
-          label: "tiltb",
-          value: "\u200B" + s.tiltb,
-          editable: true,
-          onChange: (value) => {
-            updateSettingField(s, "tiltb", value, updateSetting);
-          },
-        },
-      }
-    : {}),
-  [`${s.name}orbitRadius`]: {
-    label: "orbitRadius",
-    value: "\u200B" + s.orbitRadius,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "orbitRadius", value, updateSetting);
-    },
-  },
-  ...(s.solarVariationRadius !== undefined
-    ? {
-        [`${s.name}solarVariationRadius`]: {
-          label: "solarVariationRadius",
-          value: "\u200B" + s.solarVariationRadius,
-          editable: true,
-          onChange: (value) => {
-            updateSettingField(
-              s,
-              "solarVariationRadius",
-              value,
-              updateSetting
-            );
-          },
-        },
-      }
-    : {}),
-  [`${s.name}orbitCentera`]: {
-    label: "orbitCentera",
-    value: "\u200B" + s.orbitCentera,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "orbitCentera", value, updateSetting);
-    },
-  },
-  [`${s.name}orbitCenterb`]: {
-    label: "orbitCenterb",
-    value: "\u200B" + s.orbitCenterb,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "orbitCenterb", value, updateSetting);
-    },
-  },
-  [`${s.name}orbitCenterc`]: {
-    label: "orbitCenterc",
-    value: "\u200B" + s.orbitCenterc,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "orbitCenterc", value, updateSetting);
-    },
-  },
-  [`${s.name}orbitTilta`]: {
-    label: "orbitTilta",
-    value: "\u200B" + s.orbitTilta,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "orbitTilta", value, updateSetting);
-    },
-  },
-  [`${s.name}orbitTiltb`]: {
-    label: "orbitTiltb",
-    value: "\u200B" + s.orbitTiltb,
-    editable: true,
-    onChange: (value) => {
-      updateSettingField(s, "orbitTiltb", value, updateSetting);
-    },
-  },
-  ...Object.fromEntries(
-    [
-      "relativeAnnualStart",
-      "relativeAnnualSpeed",
-      "relativeAnnualCosX",
-      "relativeAnnualCosY",
-      "relativeAnnualCosZ",
-      "relativeAnnualSinX",
-      "relativeAnnualSinY",
-      "relativeAnnualSinZ",
-    ]
-      .filter((property) => s[property] !== undefined)
-      .map((property) => [
-        `${s.name}${property}`,
-        {
-          label: property,
-          value: "\u200B" + s[property],
-          editable: true,
-          onChange: (value) => {
-            updateSettingField(s, property, value, updateSetting);
-          },
-        },
-      ])
-  ),
-});
+      },
+    ])
+  );
+};
 
 const componentLabel = (component) =>
   component
@@ -385,6 +293,10 @@ const EditSettingsPanel = () => {
       "Load settings": button(() => loadSettingsFromFile()),
       "Save settings": button(() => saveSettingsAsJson()),
       "Reset settings": button(() => resetSettings()),
+      "Show zero values": {
+        value: false,
+        label: "Show zero values",
+      },
       "Show / Hide Planets": {
         value: showPlanets,
         onChange: (v) => setShowPlanets(v),
