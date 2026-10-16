@@ -55,12 +55,12 @@ test.each([-100, -0.001, 0, 0.25, 3.75, 26, 100])(
       actual.centreDifference.distanceTo(changedParent.centreDifference)
     ).toBeLessThan(1e-12);
     expect(
-      actual.annualCarrierMismatch.distanceTo(
-        changedParent.annualCarrierMismatch
+      actual.annualFrameResidual.distanceTo(
+        changedParent.annualFrameResidual
       )
     ).toBeLessThan(1e-12);
     expect(
-      actual.deferentSHarmonic.distanceTo(changedParent.deferentSHarmonic)
+      actual.longPeriodPosition.distanceTo(changedParent.longPeriodPosition)
     ).toBeLessThan(1e-12);
     expect(actual.mainBasis.elements).toEqual(changedParent.mainBasis.elements);
   }

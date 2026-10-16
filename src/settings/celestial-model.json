@@ -323,9 +323,9 @@
       "parentId": "sun",
       "role": "junior-companion",
       "motion": {
-        "parentRelativeCarrier": {
+        "binaryAnnualFrame": {
           "id": "mars-deferent-e",
-          "name": "Mars deferent E",
+          "name": "Mars Binary Annual Frame",
           "size": 2,
           "startPos": 0,
           "speed": 6.283185307179586,
@@ -333,18 +333,18 @@
           "orbitRadius": 0,
           "orbitCentera": 7.62,
           "orbitCenterb": -20,
-          "orbitCenterc": 0,
+          "orbitCenterc": 0.232,
           "orbitTilta": 0,
           "orbitTiltb": 0
         },
-        "secondary": {
+        "longPeriodDeferent": {
           "id": "mars-deferent-s",
-          "name": "Mars deferent S",
+          "name": "Mars Long-Period Deferent",
           "size": 2,
-          "startPos": -114.9,
+          "startPos": -114.8723,
           "speed": 0.3974599,
           "tilt": 0,
-          "orbitRadius": 7.44385,
+          "orbitRadius": 7.12013,
           "orbitCentera": 0,
           "orbitCenterb": 0,
           "orbitCenterc": 0,
@@ -1056,7 +1056,7 @@
                               {
                                 "id": "mars-relative-orbit",
                                 "kind": "sun-mars-relative",
-                                "name": "Mars Native Relative Components",
+                                "name": "Mars Binary Geometry",
                                 "role": "native-junior-companion-orbit",
                                 "settingIds": [
                                   "mars-deferent-e",

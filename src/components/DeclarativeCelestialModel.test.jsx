@@ -120,7 +120,14 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
     "Solar-Coupled Lunar Frame"
   );
   expect(mars.parentId).toBe("sun");
-  expect(mars.motion.parentRelativeCarrier.id).toBe("mars-deferent-e");
+  expect(Object.keys(mars.motion)).toEqual([
+    "binaryAnnualFrame",
+    "longPeriodDeferent",
+    "orbit",
+  ]);
+  expect(mars.motion.binaryAnnualFrame.id).toBe("mars-deferent-e");
+  expect(mars.motion.binaryAnnualFrame.name).toBe("Mars Binary Annual Frame");
+  expect(mars.motion.longPeriodDeferent.id).toBe("mars-deferent-s");
   expect(venus.parentId).toBe("sun");
   expect(Object.keys(venus.motion)).toEqual(["deferent", "plane", "orbit"]);
   expect(mercury.parentId).toBe("sun");
@@ -142,7 +149,7 @@ test("preserves the accepted parent path for every reparented body", () => {
   ];
   expect(pathTo("mars")).toEqual([
     ...prefix,
-    "Mars Native Relative Components",
+    "Mars Binary Geometry",
     "Mars Binary Companion Branch",
     "Mars",
   ]);

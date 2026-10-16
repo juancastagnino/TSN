@@ -105,13 +105,13 @@
     "traceSettings": { "length": 5000, "step": 1, "stepFact": "sDay" }
   },
   {
-    "name": "Mars deferent E",
+    "name": "Mars Binary Annual Frame",
     "color": "gray",
     "type": "deferent",
     "visible": false
   },
   {
-    "name": "Mars deferent S",
+    "name": "Mars Long-Period Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false

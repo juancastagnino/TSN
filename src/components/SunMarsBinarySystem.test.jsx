@@ -54,7 +54,7 @@ test("models the Sun as primary and Mars as its junior companion branch", () => 
   expect(descendantNames(marsBranch)).toContain("Mars");
   expect(descendantNames(marsBranch)).not.toContain("Sun");
   expect(descendantNames(sunBranch)).toContain(
-    "Mars Native Relative Components"
+    "Mars Binary Geometry"
   );
 });
 

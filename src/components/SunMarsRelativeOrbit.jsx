@@ -10,7 +10,7 @@ import {
 
 export const SUN_MARS_FRAME_NAME = "Sun-Mars Binary Frame";
 export const SUN_MARS_RELATIVE_UPDATER_NAME =
-  "Mars Native Relative Components";
+  "Mars Binary Geometry";
 
 const D2R = Math.PI / 180;
 
@@ -37,22 +37,24 @@ const orbitalOrientation = (setting, position, target, scratch) => {
 
 export const createSunMarsRelativeComponents = () => ({
   centreDifference: new Vector3(),
-  annualCarrierMismatch: new Vector3(),
-  deferentSHarmonic: new Vector3(),
+  annualFrameResidual: new Vector3(),
+  longPeriodPosition: new Vector3(),
   mainBasis: new Matrix4(),
-  nativeCarrier: createNativeRelativeCarrierState(),
-  eOrientation: new Matrix4(),
-  sOrientation: new Matrix4(),
+  annualFrameState: createNativeRelativeCarrierState(),
+  annualOrientation: new Matrix4(),
+  longPeriodOrientation: new Matrix4(),
   scratchMatrix: new Matrix4(),
   scratchVectorA: new Vector3(),
 });
 
 /**
- * Evaluate the native Sun-relative Mars settings.
+ * Evaluate the native Sun-relative Mars geometry.
  *
- * Mars deferent E no longer carries an absolute radius-100 Earth-level orbit.
- * It stores the direct Sun-relative centre, annual residual harmonic and the
- * orientation basis required by the local S/main stages.
+ * The Binary Annual Frame establishes the fixed Sun-relative centre and annual
+ * orientation. The Long-Period Deferent then contributes its smaller rotating
+ * centre before the main Mars orbit is evaluated. Their stable historical IDs
+ * remain import-compatible even though the displayed names now describe their
+ * geometric roles.
  */
 export const updateSunMarsRelativeComponents = (
   target,
@@ -63,30 +65,37 @@ export const updateSunMarsRelativeComponents = (
     settingsByName instanceof Map
       ? settingsByName.get(id)
       : settingsByName[id];
-  const marsE = get("mars-deferent-e");
-  const marsS = get("mars-deferent-s");
+  // Stable IDs are retained for settings-file compatibility. In schema v3 the
+  // two stages are presented as the Binary Annual Frame and Long-Period
+  // Deferent rather than as the opaque historical E/S pair.
+  const binaryAnnualFrame = get("mars-deferent-e");
+  const longPeriodDeferent = get("mars-deferent-s");
 
-  updateNativeRelativeCarrier(target.nativeCarrier, marsE, position);
-  target.centreDifference.copy(target.nativeCarrier.centre);
-  target.annualCarrierMismatch.copy(target.nativeCarrier.annualResidual);
-  target.eOrientation.copy(target.nativeCarrier.orientation);
+  updateNativeRelativeCarrier(
+    target.annualFrameState,
+    binaryAnnualFrame,
+    position
+  );
+  target.centreDifference.copy(target.annualFrameState.centre);
+  target.annualFrameResidual.copy(target.annualFrameState.annualResidual);
+  target.annualOrientation.copy(target.annualFrameState.orientation);
   orbitalOrientation(
-    marsS,
+    longPeriodDeferent,
     position,
-    target.sOrientation,
+    target.longPeriodOrientation,
     target.scratchMatrix
   );
-  target.deferentSHarmonic
-    .set(number(marsS, "orbitRadius"), 0, 0)
-    .applyMatrix4(target.sOrientation);
-  settingCenter(marsS, target.scratchVectorA);
-  target.deferentSHarmonic
+  target.longPeriodPosition
+    .set(number(longPeriodDeferent, "orbitRadius"), 0, 0)
+    .applyMatrix4(target.longPeriodOrientation);
+  settingCenter(longPeriodDeferent, target.scratchVectorA);
+  target.longPeriodPosition
     .add(target.scratchVectorA)
-    .applyMatrix4(target.eOrientation);
+    .applyMatrix4(target.annualOrientation);
 
   target.mainBasis.multiplyMatrices(
-    target.eOrientation,
-    target.sOrientation
+    target.annualOrientation,
+    target.longPeriodOrientation
   );
   return target;
 };
@@ -117,8 +126,8 @@ export const updateSunRelativeFrame = (
 };
 
 /**
- * Native parent-relative Mars branch. The Mars leaf still supplies its configured
- * centre, tilt, phase and radius, so Phobos and Deimos inherit the final frame.
+ * Native binary-companion branch. Mars still supplies its main local orbit, so
+ * Phobos and Deimos inherit the completed Mars frame.
  */
 const SunMarsRelativeOrbit = ({ children, plotMode = false }) => {
   const settings = useSettingsStore((state) => state.settings);
@@ -126,8 +135,8 @@ const SunMarsRelativeOrbit = ({ children, plotMode = false }) => {
   const components = useMemo(createSunMarsRelativeComponents, []);
   const rootRef = useRef();
   const centreRef = useRef();
-  const carrierRef = useRef();
-  const harmonicRef = useRef();
+  const annualResidualRef = useRef();
+  const longPeriodPositionRef = useRef();
   const mainBasisRef = useRef();
   const inverseParent = useMemo(() => new Matrix4(), []);
   const desiredWorld = useMemo(() => new Matrix4(), []);
@@ -145,8 +154,10 @@ const SunMarsRelativeOrbit = ({ children, plotMode = false }) => {
         modelPosition
       );
       centreRef.current?.position.copy(components.centreDifference);
-      carrierRef.current?.position.copy(components.annualCarrierMismatch);
-      harmonicRef.current?.position.copy(components.deferentSHarmonic);
+      annualResidualRef.current?.position.copy(components.annualFrameResidual);
+      longPeriodPositionRef.current?.position.copy(
+        components.longPeriodPosition
+      );
       mainBasisRef.current?.quaternion.setFromRotationMatrix(
         components.mainBasis
       );
@@ -175,13 +186,19 @@ const SunMarsRelativeOrbit = ({ children, plotMode = false }) => {
   return (
     <group
       ref={rootRef}
-      name="Mars Native Relative Components"
+      name="Mars Binary Geometry"
       matrixAutoUpdate={false}
     >
-      <group ref={centreRef} name="Mars Parent-Relative Centre">
-        <group ref={carrierRef} name="Mars Direct Annual Residual">
-          <group ref={harmonicRef} name="Mars Deferent-S Harmonic">
-            <group ref={mainBasisRef} name="Mars Main-Orbit Basis">
+      <group ref={centreRef} name="Mars Binary Reference Centre">
+        <group ref={annualResidualRef} name="Mars Annual-Frame Residual">
+          <group
+            ref={longPeriodPositionRef}
+            name="Mars Long-Period Deferent Position"
+          >
+            <group
+              ref={mainBasisRef}
+              name="Mars Combined Orbital Orientation"
+            >
               {children}
             </group>
           </group>
