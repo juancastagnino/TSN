@@ -104,7 +104,7 @@ test("round-trips both solar-coupled lunar amplitudes in one setting", () => {
   );
 });
 
-test("retains only active direct carriers and the Eros harmonic", () => {
+test("retains only active direct carriers and Eros's declared annual geometry", () => {
   const native = normalizeCelestialSettings(celestialModel);
   const serialized = serializeCelestialSettings(native);
   const roundTrip = buildSettingsIndex(normalizeCelestialSettings(serialized));
@@ -122,11 +122,17 @@ test("retains only active direct carriers and the Eros harmonic", () => {
   expect(roundTrip.get("venus-deferent")).toEqual(
     expect.objectContaining({ speed: -2 * Math.PI, orbitRadius: 0.6 })
   );
-  expect(roundTrip.get("eros-deferent-a")).toEqual(
+  expect(roundTrip.get("eros-deferent-a")).not.toEqual(
     expect.objectContaining({
       relativeAnnualSpeed: expect.any(Number),
-      relativeAnnualCosY: expect.any(Number),
-      relativeAnnualSinY: expect.any(Number),
+    })
+  );
+  expect(roundTrip.get("eros-annual-centre-oscillation")).toEqual(
+    expect.objectContaining({
+      amplitude: expect.any(Number),
+      phase: expect.any(Number),
+      speed: expect.any(Number),
+      axisY: expect.any(Number),
     })
   );
 });

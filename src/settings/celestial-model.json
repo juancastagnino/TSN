@@ -368,7 +368,17 @@
           "orbitTilta": 0,
           "orbitTiltb": -2.109
         }
-      }
+      },
+      "editorFrames": [
+        {
+          "name": "Mars Binary Geometry",
+          "components": [
+            "binaryAnnualFrame",
+            "longPeriodDeferent",
+            "orbit"
+          ]
+        }
+      ]
     },
     {
       "id": "phobos",
@@ -696,15 +706,17 @@
           "orbitCenterb": 32.145,
           "orbitCenterc": -0.5,
           "orbitTilta": -7.3,
-          "orbitTiltb": 3.6,
-          "relativeAnnualStart": 0,
-          "relativeAnnualSpeed": 6.283185307179586,
-          "relativeAnnualCosX": -0.19732715717285032,
-          "relativeAnnualCosY": 6.228156736846667,
-          "relativeAnnualCosZ": -0.7978452787867659,
-          "relativeAnnualSinX": 0,
-          "relativeAnnualSinY": -13.188518932505565,
-          "relativeAnnualSinZ": 0.8093938343211988
+          "orbitTiltb": 3.6
+        },
+        "annualCentreOscillation": {
+          "id": "eros-annual-centre-oscillation",
+          "name": "Eros Annual Centre Oscillation",
+          "amplitude": 14.62481872,
+          "phase": -64.609,
+          "speed": 6.283185307179586,
+          "axisX": -0.00578548,
+          "axisY": 0.99728653,
+          "axisZ": -0.07339012
         },
         "localDeferent": {
           "id": "eros-deferent-b",
@@ -737,7 +749,18 @@
           "orbitTilta": 0,
           "orbitTiltb": 0
         }
-      }
+      },
+      "editorFrames": [
+        {
+          "name": "Eros Sun-Relative Geometry",
+          "components": [
+            "sunRelativeAnnualFrame",
+            "annualCentreOscillation",
+            "localDeferent",
+            "orbit"
+          ]
+        }
+      ]
     }
   ],
   "editorGroups": [
@@ -1145,6 +1168,7 @@
                                 "role": "native-solar-asteroid-orbit",
                                 "settingIds": [
                                   "eros-deferent-a",
+                                  "eros-annual-centre-oscillation",
                                   "eros-deferent-b",
                                   "eros"
                                 ],

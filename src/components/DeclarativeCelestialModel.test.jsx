@@ -131,10 +131,14 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
   const eros = celestialModel.bodies.find((body) => body.id === "eros");
   expect(Object.keys(eros.motion)).toEqual([
     "sunRelativeAnnualFrame",
+    "annualCentreOscillation",
     "localDeferent",
     "orbit",
   ]);
   expect(eros.motion.sunRelativeAnnualFrame.id).toBe("eros-deferent-a");
+  expect(eros.motion.annualCentreOscillation.id).toBe(
+    "eros-annual-centre-oscillation"
+  );
   expect(eros.motion.localDeferent.id).toBe("eros-deferent-b");
   expect(venus.parentId).toBe("sun");
   expect(Object.keys(venus.motion)).toEqual(["deferent", "plane", "orbit"]);

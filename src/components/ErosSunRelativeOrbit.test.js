@@ -27,20 +27,24 @@ test.each([-100, -0.001, 0, 0.25, 3.75, 26, 100])(
       carrier.orbitCenterb,
     ]);
     expect(
-      components.annualFrameResidual.toArray().every(Number.isFinite)
+      components.annualCentreOffset.toArray().every(Number.isFinite)
     ).toBe(true);
     expect(components.mainBasis.elements.every(Number.isFinite)).toBe(true);
   }
 );
 
-test("retains Eros's non-zero direct annual residual", () => {
+test("represents the retained Eros annual effect as a named axial centre oscillation", () => {
   const components = updateErosSunRelativeComponents(
     createErosSunRelativeComponents(),
     byName,
     4.25
   );
-  const carrier = byName.get("eros-deferent-a");
+  const oscillation = byName.get("eros-annual-centre-oscillation");
 
-  expect(carrier.orbitRadius).toBe(0);
-  expect(components.annualFrameResidual.length()).toBeGreaterThan(1);
+  expect(oscillation.amplitude).toBeGreaterThan(1);
+  expect(oscillation.speed).toBeCloseTo(2 * Math.PI, 12);
+  expect(components.annualCentreOffset.length()).toBeLessThanOrEqual(
+    oscillation.amplitude
+  );
+  expect(components.annualCentreOffset.length()).toBeGreaterThan(1);
 });

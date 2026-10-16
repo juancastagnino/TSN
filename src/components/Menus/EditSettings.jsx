@@ -29,31 +29,12 @@ const settingFields = [
   "orbitCenterc",
   "orbitTilta",
   "orbitTiltb",
-  "relativeAnnualStart",
-  "relativeAnnualSpeed",
-  "relativeAnnualCosX",
-  "relativeAnnualCosY",
-  "relativeAnnualCosZ",
-  "relativeAnnualSinX",
-  "relativeAnnualSinY",
-  "relativeAnnualSinZ",
+  "amplitude",
+  "phase",
+  "axisX",
+  "axisY",
+  "axisZ",
 ];
-
-const optionalSettingFields = new Set([
-  "actualSize",
-  "rotationStart",
-  "rotationSpeed",
-  "tiltb",
-  "solarVariationRadius",
-  "relativeAnnualStart",
-  "relativeAnnualSpeed",
-  "relativeAnnualCosX",
-  "relativeAnnualCosY",
-  "relativeAnnualCosZ",
-  "relativeAnnualSinX",
-  "relativeAnnualSinY",
-  "relativeAnnualSinZ",
-]);
 
 const isZeroSettingValue = (value) => {
   if (typeof value !== "number" && typeof value !== "string") return false;
@@ -64,10 +45,7 @@ const isZeroSettingValue = (value) => {
 };
 
 const getControls = (s, updateSetting) => {
-  const fields = settingFields.filter(
-    (property) =>
-      !optionalSettingFields.has(property) || s[property] !== undefined
-  );
+  const fields = settingFields.filter((property) => s[property] !== undefined);
 
   return Object.fromEntries(
     fields.map((property) => [
@@ -198,66 +176,35 @@ const EditSettingsPanel = () => {
   }, []);
 
   const settingsFolders = useMemo(() => {
-    const groups = {};
     const showHideMenu = {};
     const settingsMenu = {};
+    const editorGroups = getCelestialEditorGroups(settings);
 
-    settings.forEach((s) => {
-      let parent = s.name;
-      if (s.name.includes("deferent")) {
-        parent = s.name.split(" deferent")[0];
-      }
-
-      if (!groups[parent]) {
-        groups[parent] = { main: null, deferents: [] };
-      }
-
-      if (s.name.includes("deferent")) {
-        groups[parent].deferents.push(s);
-      } else {
-        groups[parent].main = s;
-      }
-    });
-
-    Object.keys(groups).forEach((parentName) => {
-      const group = groups[parentName];
-
-      // Geometry-only entries (such as Moon Node/Plane) have no visibility switch.
-      const visibility = group.main ? group.main.visible : true;
-      if (typeof visibility === "boolean") {
-        showHideMenu[`${parentName}visible`] = {
-          label: parentName,
-          value: visibility,
+    // Visibility belongs to a real celestial owner, never to one of its
+    // internal geometry stages. This avoids name-based grouping and keeps Mars
+    // and Eros stages below their bodies just like the Moon and Pluto stages.
+    editorGroups.forEach((editorGroup) => {
+      editorGroup.bodies.forEach((body) => {
+        const main = body.settings.find((setting) => setting.id === body.id);
+        if (typeof main?.visible !== "boolean") return;
+        showHideMenu[`${body.name}visible`] = {
+          label: body.name,
+          value: main.visible,
           editable: true,
           onChange: (value, path, context) => {
-            // Detect if this is Leva's automatic sync, or a real click from the user
-            const isInitialSync = context
-              ? context.initial
-              : group.main
-              ? group.main.visible === value
-              : group.deferents[0]?.visible === value;
-
-            if (group.main) {
-              updateSetting({ id: group.main.id, visible: value });
+            const isInitialSync = context ? context.initial : main.visible === value;
+            updateSetting({ id: main.id, visible: value });
+            if (!isInitialSync) {
+              initialDeferentStates.current[main.name] = value;
             }
-            group.deferents.forEach((def) => {
-              updateSetting({ id: def.id, visible: value });
-
-              // FIX: If the user explicitly clicked the toggle, save it as the new "initial state"
-              // so the cleanup effect doesn't erase their action!
-              if (!isInitialSync) {
-                initialDeferentStates.current[def.name] = value;
-              }
-            });
           },
         };
-      }
-
+      });
     });
 
     // The edit menu follows the declared astronomical system rather than
     // inferring parentage from display-name substrings.
-    getCelestialEditorGroups(settings).forEach((editorGroup) => {
+    editorGroups.forEach((editorGroup) => {
       const groupControls = {};
       editorGroup.bodies.forEach((body) => {
         const bodyControls = {};
@@ -328,46 +275,19 @@ const EditSettingsPanel = () => {
       "Show / Hide Planets": showPlanets,
       "Filled Orbits": shadeOrbits,
     };
+    const visibilitySettingIds = new Set(
+      getCelestialEditorGroups(settings).flatMap((editorGroup) =>
+        editorGroup.bodies
+          .map((body) => body.settings.find((setting) => setting.id === body.id))
+          .filter((setting) => typeof setting?.visible === "boolean")
+          .map((setting) => setting.id)
+      )
+    );
     settings.forEach((s) => {
-      if (!s.name.includes("deferent") && typeof s.visible === "boolean") {
+      if (visibilitySettingIds.has(s.id)) {
         updatedValues[`${s.name}visible`] = s.visible;
       }
-      updatedValues[`${s.name}size`] = "\u200B" + s.size;
-      if (s.actualSize !== undefined) {
-        updatedValues[`${s.name}actualSize`] = "\u200B" + s.actualSize;
-      }
-      updatedValues[`${s.name}startPos`] = "\u200B" + s.startPos;
-      updatedValues[`${s.name}speed`] = "\u200B" + s.speed;
-      if (s.rotationStart !== undefined) {
-        updatedValues[`${s.name}rotationStart`] = "\u200B" + s.rotationStart;
-      }
-      if (s.rotationSpeed !== undefined) {
-        updatedValues[`${s.name}rotationSpeed`] = "\u200B" + s.rotationSpeed;
-      }
-      updatedValues[`${s.name}tilt`] = "\u200B" + s.tilt;
-      if (s.tiltb !== undefined) {
-        updatedValues[`${s.name}tiltb`] = "\u200B" + s.tiltb;
-      }
-      updatedValues[`${s.name}orbitRadius`] = "\u200B" + s.orbitRadius;
-      if (s.solarVariationRadius !== undefined) {
-        updatedValues[`${s.name}solarVariationRadius`] =
-          "\u200B" + s.solarVariationRadius;
-      }
-      updatedValues[`${s.name}orbitCentera`] = "\u200B" + s.orbitCentera;
-      updatedValues[`${s.name}orbitCenterb`] = "\u200B" + s.orbitCenterb;
-      updatedValues[`${s.name}orbitCenterc`] = "\u200B" + s.orbitCenterc;
-      updatedValues[`${s.name}orbitTilta`] = "\u200B" + s.orbitTilta;
-      updatedValues[`${s.name}orbitTiltb`] = "\u200B" + s.orbitTiltb;
-      [
-        "relativeAnnualStart",
-        "relativeAnnualSpeed",
-        "relativeAnnualCosX",
-        "relativeAnnualCosY",
-        "relativeAnnualCosZ",
-        "relativeAnnualSinX",
-        "relativeAnnualSinY",
-        "relativeAnnualSinZ",
-      ].forEach((property) => {
+      settingFields.forEach((property) => {
         if (s[property] !== undefined) {
           updatedValues[`${s.name}${property}`] = "\u200B" + s[property];
         }

@@ -74,16 +74,11 @@ export const SAVED_SETTING_PROPERTIES = [
   "orbitCenterc",
   "orbitTilta",
   "orbitTiltb",
-  // Eros still uses a non-zero parent-relative annual harmonic. The common
-  // Mercury/Venus/Mars residual was deliberately removed from schema v3.
-  "relativeAnnualStart",
-  "relativeAnnualSpeed",
-  "relativeAnnualCosX",
-  "relativeAnnualCosY",
-  "relativeAnnualCosZ",
-  "relativeAnnualSinX",
-  "relativeAnnualSinY",
-  "relativeAnnualSinZ",
+  "amplitude",
+  "phase",
+  "axisX",
+  "axisY",
+  "axisZ",
 ];
 
 const motionEntries = (owner) =>

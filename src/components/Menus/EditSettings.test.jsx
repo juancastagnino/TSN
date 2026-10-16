@@ -97,6 +97,26 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   ).toBe(false);
 });
 
+test("groups Mars and Eros stages beneath their bodies and exposes one visibility toggle each", () => {
+  act(() => root.render(<EditSettings />));
+
+  const data = mockLevaStore.getData();
+  expect(
+    data[
+      "Settings.Mars Binary Companion.Mars.Mars Binary Geometry.Mars Binary Annual Frame.Mars Binary Annual Framespeed"
+    ]
+  ).toBeDefined();
+  expect(
+    data[
+      "Settings.Sun-Hosted Small Bodies.Eros.Eros Sun-Relative Geometry.Eros Annual Centre Oscillation.Eros Annual Centre Oscillationamplitude"
+    ]
+  ).toBeDefined();
+  expect(data["Show / Hide settings.Marsvisible"]).toBeDefined();
+  expect(data["Show / Hide settings.Erosvisible"]).toBeDefined();
+  expect(data["Show / Hide settings.Mars Binary Annual Framevisible"]).toBeUndefined();
+  expect(data["Show / Hide settings.Eros Local Deferentvisible"]).toBeUndefined();
+});
+
 test("hides zero-valued parameters by default and reveals them on request", () => {
   act(() => root.render(<EditSettings />));
 
