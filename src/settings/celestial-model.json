@@ -737,22 +737,7 @@
           "orbitTilta": 0,
           "orbitTiltb": 0
         }
-      },
-      "editorFrames": [
-        {
-          "name": "Eros Sun-Relative Frame",
-          "components": [
-            "sunRelativeAnnualFrame",
-            "localDeferent"
-          ]
-        },
-        {
-          "name": "Eros Orbit",
-          "components": [
-            "orbit"
-          ]
-        }
-      ]
+      }
     }
   ],
   "editorGroups": [
