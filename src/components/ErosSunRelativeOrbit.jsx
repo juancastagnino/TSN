@@ -13,7 +13,7 @@ import {
 } from "./SunMarsRelativeOrbit";
 
 export const EROS_SUN_RELATIVE_UPDATER_NAME =
-  "Eros Native Relative Components";
+  "Eros Sun-Relative Geometry";
 
 const D2R = Math.PI / 180;
 const number = (setting, key) => Number(setting?.[key] || 0);
@@ -39,20 +39,20 @@ const orbitalOrientation = (setting, position, target, scratch) => {
 
 export const createErosSunRelativeComponents = () => ({
   centreDifference: new Vector3(),
-  annualCarrierMismatch: new Vector3(),
-  deferentBStage: new Vector3(),
+  annualFrameResidual: new Vector3(),
+  localDeferentPosition: new Vector3(),
   mainBasis: new Matrix4(),
-  nativeCarrier: createNativeRelativeCarrierState(),
-  aOrientation: new Matrix4(),
-  bOrientation: new Matrix4(),
+  annualFrameState: createNativeRelativeCarrierState(),
+  annualOrientation: new Matrix4(),
+  localDeferentOrientation: new Matrix4(),
   scratchMatrix: new Matrix4(),
   scratchVector: new Vector3(),
 });
 
 /**
- * Evaluate the native Sun-relative Eros chain. Deferent A stores a direct
- * relative centre, annual residual and local orientation basis. Deferent B and
- * the Eros leaf remain local geometric stages.
+ * Evaluate the native Sun-relative Eros chain. The Sun-Relative Annual Frame
+ * stores a direct centre, the retained annual residual and its orientation.
+ * The Local Deferent and Eros orbit remain local geometric stages.
  */
 export const updateErosSunRelativeComponents = (
   target,
@@ -63,31 +63,35 @@ export const updateErosSunRelativeComponents = (
     settingsByName instanceof Map
       ? settingsByName.get(id)
       : settingsByName[id];
-  const erosA = get("eros-deferent-a");
-  const erosB = get("eros-deferent-b");
+  // Stable IDs preserve compatibility with historical settings exports.
+  const sunRelativeAnnualFrame = get("eros-deferent-a");
+  const localDeferent = get("eros-deferent-b");
 
-  updateNativeRelativeCarrier(target.nativeCarrier, erosA, position);
-  target.centreDifference.copy(target.nativeCarrier.centre);
-  target.annualCarrierMismatch.copy(target.nativeCarrier.annualResidual);
-  target.aOrientation.copy(target.nativeCarrier.orientation);
+  updateNativeRelativeCarrier(
+    target.annualFrameState,
+    sunRelativeAnnualFrame,
+    position
+  );
+  target.centreDifference.copy(target.annualFrameState.centre);
+  target.annualFrameResidual.copy(target.annualFrameState.annualResidual);
+  target.annualOrientation.copy(target.annualFrameState.orientation);
   orbitalOrientation(
-    erosB,
+    localDeferent,
     position,
-    target.bOrientation,
+    target.localDeferentOrientation,
     target.scratchMatrix
   );
-  // QA*(cB + QB*rB)
-  target.deferentBStage
-    .set(number(erosB, "orbitRadius"), 0, 0)
-    .applyMatrix4(target.bOrientation);
-  settingCenter(erosB, target.scratchVector);
-  target.deferentBStage
+  target.localDeferentPosition
+    .set(number(localDeferent, "orbitRadius"), 0, 0)
+    .applyMatrix4(target.localDeferentOrientation);
+  settingCenter(localDeferent, target.scratchVector);
+  target.localDeferentPosition
     .add(target.scratchVector)
-    .applyMatrix4(target.aOrientation);
+    .applyMatrix4(target.annualOrientation);
 
   target.mainBasis.multiplyMatrices(
-    target.aOrientation,
-    target.bOrientation
+    target.annualOrientation,
+    target.localDeferentOrientation
   );
   return target;
 };
@@ -99,8 +103,8 @@ const ErosSunRelativeOrbit = ({ children, plotMode = false }) => {
   const components = useMemo(createErosSunRelativeComponents, []);
   const rootRef = useRef();
   const centreRef = useRef();
-  const carrierRef = useRef();
-  const deferentBRef = useRef();
+  const annualResidualRef = useRef();
+  const localDeferentRef = useRef();
   const mainBasisRef = useRef();
   const inverseParent = useMemo(() => new Matrix4(), []);
   const desiredWorld = useMemo(() => new Matrix4(), []);
@@ -118,8 +122,10 @@ const ErosSunRelativeOrbit = ({ children, plotMode = false }) => {
         modelPosition
       );
       centreRef.current?.position.copy(components.centreDifference);
-      carrierRef.current?.position.copy(components.annualCarrierMismatch);
-      deferentBRef.current?.position.copy(components.deferentBStage);
+      annualResidualRef.current?.position.copy(components.annualFrameResidual);
+      localDeferentRef.current?.position.copy(
+        components.localDeferentPosition
+      );
       mainBasisRef.current?.quaternion.setFromRotationMatrix(
         components.mainBasis
       );
@@ -148,13 +154,13 @@ const ErosSunRelativeOrbit = ({ children, plotMode = false }) => {
   return (
     <group
       ref={rootRef}
-      name="Eros Native Relative Frame"
+      name="Eros Sun-Relative Geometry"
       matrixAutoUpdate={false}
     >
-      <group ref={centreRef} name="Eros Parent-Relative Centre">
-        <group ref={carrierRef} name="Eros Direct Annual Residual">
-          <group ref={deferentBRef} name="Eros Deferent-B Stage">
-            <group ref={mainBasisRef} name="Eros Main-Orbit Basis">
+      <group ref={centreRef} name="Eros Sun-Relative Centre">
+        <group ref={annualResidualRef} name="Eros Annual Residual">
+          <group ref={localDeferentRef} name="Eros Local Deferent Position">
+            <group ref={mainBasisRef} name="Eros Combined Orbital Orientation">
               {children}
             </group>
           </group>

@@ -684,9 +684,9 @@
       "parentId": "sun",
       "role": "sun-hosted-asteroid",
       "motion": {
-        "parentRelativeCarrier": {
+        "sunRelativeAnnualFrame": {
           "id": "eros-deferent-a",
-          "name": "Eros deferent A",
+          "name": "Eros Sun-Relative Annual Frame",
           "size": 2,
           "startPos": 0,
           "speed": 6.283185307179586,
@@ -706,9 +706,9 @@
           "relativeAnnualSinY": -13.188518932505565,
           "relativeAnnualSinZ": 0.8093938343211988
         },
-        "secondary": {
+        "localDeferent": {
           "id": "eros-deferent-b",
-          "name": "Eros deferent B",
+          "name": "Eros Local Deferent",
           "size": 2,
           "startPos": 0,
           "speed": -7.291563307179587,
@@ -737,7 +737,22 @@
           "orbitTilta": 0,
           "orbitTiltb": 0
         }
-      }
+      },
+      "editorFrames": [
+        {
+          "name": "Eros Sun-Relative Frame",
+          "components": [
+            "sunRelativeAnnualFrame",
+            "localDeferent"
+          ]
+        },
+        {
+          "name": "Eros Orbit",
+          "components": [
+            "orbit"
+          ]
+        }
+      ]
     }
   ],
   "editorGroups": [
@@ -1141,7 +1156,7 @@
                               {
                                 "id": "eros-relative-orbit",
                                 "kind": "eros-sun-relative",
-                                "name": "Eros Native Relative Frame",
+                                "name": "Eros Sun-Relative Geometry",
                                 "role": "native-solar-asteroid-orbit",
                                 "settingIds": [
                                   "eros-deferent-a",

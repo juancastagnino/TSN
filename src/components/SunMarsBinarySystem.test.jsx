@@ -104,7 +104,7 @@ test("makes Eros an explicit Sun-hosted asteroid", () => {
 
   expect(erosBranch).toBeDefined();
   expect(descendantNames(erosBranch)).toContain("Eros");
-  expect(descendantNames(sunBranch)).toContain("Eros Native Relative Frame");
+  expect(descendantNames(sunBranch)).toContain("Eros Sun-Relative Geometry");
   expect(descendantNames(sunBranch)).not.toContain("Eros deferent A");
   expect(descendantNames(sunBranch)).not.toContain("Eros deferent B");
 });

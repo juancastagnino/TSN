@@ -128,6 +128,14 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
   expect(mars.motion.binaryAnnualFrame.id).toBe("mars-deferent-e");
   expect(mars.motion.binaryAnnualFrame.name).toBe("Mars Binary Annual Frame");
   expect(mars.motion.longPeriodDeferent.id).toBe("mars-deferent-s");
+  const eros = celestialModel.bodies.find((body) => body.id === "eros");
+  expect(Object.keys(eros.motion)).toEqual([
+    "sunRelativeAnnualFrame",
+    "localDeferent",
+    "orbit",
+  ]);
+  expect(eros.motion.sunRelativeAnnualFrame.id).toBe("eros-deferent-a");
+  expect(eros.motion.localDeferent.id).toBe("eros-deferent-b");
   expect(venus.parentId).toBe("sun");
   expect(Object.keys(venus.motion)).toEqual(["deferent", "plane", "orbit"]);
   expect(mercury.parentId).toBe("sun");
@@ -167,7 +175,7 @@ test("preserves the accepted parent path for every reparented body", () => {
   ]);
   expect(pathTo("eros")).toEqual([
     ...prefix,
-    "Eros Native Relative Frame",
+    "Eros Sun-Relative Geometry",
     "Eros Solar Asteroid Branch",
     "Eros",
   ]);

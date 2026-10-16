@@ -27,7 +27,7 @@ test.each([-100, -0.001, 0, 0.25, 3.75, 26, 100])(
       carrier.orbitCenterb,
     ]);
     expect(
-      components.annualCarrierMismatch.toArray().every(Number.isFinite)
+      components.annualFrameResidual.toArray().every(Number.isFinite)
     ).toBe(true);
     expect(components.mainBasis.elements.every(Number.isFinite)).toBe(true);
   }
@@ -42,5 +42,5 @@ test("retains Eros's non-zero direct annual residual", () => {
   const carrier = byName.get("eros-deferent-a");
 
   expect(carrier.orbitRadius).toBe(0);
-  expect(components.annualCarrierMismatch.length()).toBeGreaterThan(1);
+  expect(components.annualFrameResidual.length()).toBeGreaterThan(1);
 });

@@ -23,6 +23,8 @@ const LEGACY_SETTING_NAMES_BY_ID = new Map([
       "Lunar 2D-M Eccentric Action",
     ]),
   ],
+  ["eros-deferent-a", new Set(["Eros deferent A"])],
+  ["eros-deferent-b", new Set(["Eros deferent B"])],
 ]);
 
 const RETIRED_LUNAR_SETTING_IDS = new Set([

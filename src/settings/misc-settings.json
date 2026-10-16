@@ -272,13 +272,13 @@
     "traceSettings": { "length": 5000, "step": 1, "stepFact": "sDay" }
   },
   {
-    "name": "Eros deferent A",
+    "name": "Eros Sun-Relative Annual Frame",
     "color": "gray",
     "type": "deferent",
     "visible": false
   },
   {
-    "name": "Eros deferent B",
+    "name": "Eros Local Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false
