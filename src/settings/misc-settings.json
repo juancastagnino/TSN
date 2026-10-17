@@ -23,13 +23,13 @@
     "horizonColor": "#000080"
   },
   {
-    "name": "Moon Node",
+    "name": "Lunar Nodal Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false
   },
   {
-    "name": "Moon Plane",
+    "name": "Lunar Plane Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false
@@ -41,7 +41,19 @@
     "visible": false
   },
   {
-    "name": "Moon deferent A",
+    "name": "Lunar Apsidal Geometry",
+    "color": "gray",
+    "type": "deferent",
+    "visible": false
+  },
+  {
+    "name": "Lunar Apsidal Equant",
+    "color": "gray",
+    "type": "deferent",
+    "visible": false
+  },
+  {
+    "name": "Lunar Solar-Coupled Geometry",
     "color": "gray",
     "type": "deferent",
     "visible": false
@@ -245,12 +257,6 @@
     "visible": false
   },
   {
-    "name": "Pluto Eccentric Counterrotation",
-    "color": "gray",
-    "type": "deferent",
-    "visible": false
-  },
-  {
     "name": "Pluto",
     "color": "#e3d2b4",
     "type": "planet",
@@ -266,13 +272,13 @@
     }
   },
   {
-    "name": "Mars deferent E",
+    "name": "Mars Binary Annual Frame",
     "color": "gray",
     "type": "deferent",
     "visible": false
   },
   {
-    "name": "Mars deferent S",
+    "name": "Mars Long-Period Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false
@@ -295,13 +301,7 @@
     }
   },
   {
-    "name": "Venus deferent A",
-    "color": "gray",
-    "type": "deferent",
-    "visible": false
-  },
-  {
-    "name": "Venus deferent B",
+    "name": "Venus deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false
@@ -330,13 +330,7 @@
     }
   },
   {
-    "name": "Mercury deferent A",
-    "color": "gray",
-    "type": "deferent",
-    "visible": false
-  },
-  {
-    "name": "Mercury deferent B",
+    "name": "Mercury deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false
@@ -366,13 +360,19 @@
     }
   },
   {
-    "name": "Eros deferent A",
+    "name": "Eros Sun-Relative Annual Frame",
     "color": "gray",
     "type": "deferent",
     "visible": false
   },
   {
-    "name": "Eros deferent B",
+    "name": "Eros Annual Centre Oscillation",
+    "color": "gray",
+    "type": "deferent",
+    "visible": false
+  },
+  {
+    "name": "Eros Local Deferent",
     "color": "gray",
     "type": "deferent",
     "visible": false

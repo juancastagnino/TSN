@@ -2,7 +2,7 @@
   "schemaVersion": 4,
   "id": "tychos-tsog-migration",
   "name": "TYCHOS TSOG migration experiment",
-  "description": "First-pass structural migration from full-send-binary-tychos.",
+  "description": "Structural migration from hierarchy-refinement; named operations await TSOG generic evaluators.",
   "objects": [
     {
       "id": "system-center",
@@ -45,7 +45,7 @@
     },
     {
       "id": "moon-node",
-      "name": "Moon Node",
+      "name": "Lunar Nodal Deferent",
       "size": 0,
       "startPos": -296,
       "speed": -0.33780566,
@@ -61,7 +61,7 @@
     },
     {
       "id": "moon-plane",
-      "name": "Moon Plane",
+      "name": "Lunar Plane Deferent",
       "size": 0,
       "startPos": 0,
       "speed": 0,
@@ -92,12 +92,12 @@
     },
     {
       "id": "moon-deferent-a",
-      "name": "Moon deferent A",
+      "name": "Lunar Apsidal Geometry",
       "size": 0.6,
-      "startPos": 157.3,
+      "startPos": 167.51,
       "speed": 0.71015440177343,
       "tilt": 0,
-      "orbitRadius": 0.0215,
+      "orbitRadius": 0.014073729727223986,
       "orbitCentera": 0,
       "orbitCenterb": 0,
       "orbitCenterc": 0,
@@ -107,12 +107,60 @@
       "carrier": true
     },
     {
+      "id": "moon-apsidal-equant",
+      "name": "Lunar Apsidal Equant",
+      "size": 0,
+      "startPos": 0,
+      "speed": 0,
+      "tilt": 0,
+      "orbitRadius": 0,
+      "orbitCentera": 0,
+      "orbitCenterb": 0,
+      "orbitCenterc": 0,
+      "orbitTilta": 0,
+      "orbitTiltb": 0,
+      "parentId": "moon-deferent-a",
+      "carrier": true,
+      "motionOperation": "off-centre-phase",
+      "targetId": "moon",
+      "operationParameters": {
+        "offset": 0.014073729727223986
+      }
+    },
+    {
+      "id": "moon-solar-eccentric",
+      "name": "Lunar Solar-Coupled Geometry",
+      "size": 0,
+      "startPos": 0,
+      "speed": 0,
+      "tilt": 0,
+      "orbitRadius": 0,
+      "solarVariationRadius": 0.002168,
+      "orbitCentera": 0,
+      "orbitCenterb": 0,
+      "orbitCenterc": 0,
+      "orbitTilta": 0,
+      "orbitTiltb": 0,
+      "parentId": "moon-apsidal-equant",
+      "carrier": true,
+      "motionOperation": "solar-coupled-centre-offset",
+      "targetId": "moon",
+      "referenceIds": {
+        "observer": "earth",
+        "reference": "sun"
+      },
+      "operationParameters": {
+        "inequalityRadius": -0.0055,
+        "variationRadius": 0.002168
+      }
+    },
+    {
       "id": "moon",
       "name": "Moon",
       "size": 1,
       "actualSize": 0.00116,
-      "startPos": 328,
-      "speed": 83.2851946,
+      "startPos": 318,
+      "speed": 83.28521004,
       "rotationSpeed": 0,
       "tilt": 0,
       "orbitRadius": 0.25695552897999907,
@@ -121,7 +169,7 @@
       "orbitCenterc": 0,
       "orbitTilta": 0,
       "orbitTiltb": 0,
-      "parentId": "moon-deferent-a"
+      "parentId": "moon-solar-eccentric"
     },
     {
       "id": "sun-mars-binary-frame",
@@ -278,7 +326,7 @@
       "size": 7.5,
       "actualSize": 0.0169,
       "startPos": 382.6,
-      "speed": 0.07501085,
+      "speed": 0.0750341,
       "tilt": 0,
       "rotationStart": 0,
       "rotationSpeed": 3239.2344713,
@@ -312,7 +360,7 @@
       "size": 7.5,
       "actualSize": 0.0164,
       "startPos": 329,
-      "speed": 0.03837314,
+      "speed": 0.03837312,
       "tilt": 0,
       "rotationStart": 0,
       "rotationSpeed": 3059.2770006,
@@ -391,22 +439,6 @@
       "carrier": true
     },
     {
-      "id": "pluto-eccentric-counterrotation",
-      "name": "Pluto Eccentric Counterrotation",
-      "size": 0,
-      "startPos": -189.34,
-      "speed": -0.0506606,
-      "tilt": 0,
-      "orbitRadius": 0,
-      "orbitCentera": 0,
-      "orbitCenterb": 0,
-      "orbitCenterc": 0,
-      "orbitTilta": 0,
-      "orbitTiltb": 0,
-      "parentId": "pluto-eccentric",
-      "carrier": true
-    },
-    {
       "id": "pluto",
       "name": "Pluto",
       "size": 0.9,
@@ -421,11 +453,11 @@
       "orbitCenterc": 0,
       "orbitTilta": 0,
       "orbitTiltb": 0,
-      "parentId": "pluto-eccentric-counterrotation"
+      "parentId": "pluto-eccentric"
     },
     {
       "id": "mars-deferent-e",
-      "name": "Mars deferent E",
+      "name": "Mars Binary Annual Frame",
       "size": 2,
       "startPos": 0,
       "speed": 6.283185307179586,
@@ -433,7 +465,7 @@
       "orbitRadius": 0,
       "orbitCentera": 7.62,
       "orbitCenterb": -20,
-      "orbitCenterc": 0,
+      "orbitCenterc": 0.232,
       "orbitTilta": 0,
       "orbitTiltb": 0,
       "parentId": "sun",
@@ -441,12 +473,12 @@
     },
     {
       "id": "mars-deferent-s",
-      "name": "Mars deferent S",
+      "name": "Mars Long-Period Deferent",
       "size": 2,
-      "startPos": -114.9,
+      "startPos": -114.8723,
       "speed": 0.3974599,
       "tilt": 0,
-      "orbitRadius": 7.44385,
+      "orbitRadius": 7.12013,
       "orbitCentera": 0,
       "orbitCenterb": 0,
       "orbitCenterc": 0,
@@ -474,24 +506,8 @@
       "parentId": "mars-deferent-s"
     },
     {
-      "id": "venus-deferent-a",
-      "name": "Venus deferent A",
-      "size": 2,
-      "startPos": 0,
-      "speed": 6.283185307179586,
-      "tilt": 0,
-      "orbitRadius": 0,
-      "orbitCentera": -3.3,
-      "orbitCenterb": 0.645,
-      "orbitCenterc": 0,
-      "orbitTilta": 0,
-      "orbitTiltb": 0,
-      "parentId": "sun",
-      "carrier": true
-    },
-    {
-      "id": "venus-deferent-b",
-      "name": "Venus deferent B",
+      "id": "venus-deferent",
+      "name": "Venus deferent",
       "size": 2,
       "startPos": 10.7,
       "speed": -6.283185307179586,
@@ -502,7 +518,7 @@
       "orbitCenterc": 0,
       "orbitTilta": 0,
       "orbitTiltb": 0.03,
-      "parentId": "venus-deferent-a",
+      "parentId": "sun",
       "carrier": true
     },
     {
@@ -513,12 +529,12 @@
       "speed": 0,
       "tilt": 0,
       "orbitRadius": 0,
-      "orbitCentera": 1.8,
-      "orbitCenterb": -0.4,
-      "orbitCenterc": 0,
+      "orbitCentera": -1.322868312130857,
+      "orbitCenterb": 0.846478306956517,
+      "orbitCenterc": 0.0028256060705597465,
       "orbitTilta": 3.4,
       "orbitTiltb": 0.2,
-      "parentId": "venus-deferent-b",
+      "parentId": "venus-deferent",
       "carrier": true
     },
     {
@@ -540,24 +556,8 @@
       "parentId": "venus-plane"
     },
     {
-      "id": "mercury-deferent-a",
-      "name": "Mercury deferent A",
-      "size": 0,
-      "startPos": 0,
-      "speed": 6.283185307179586,
-      "tilt": 0,
-      "orbitRadius": 0,
-      "orbitCentera": -1.3,
-      "orbitCenterb": 2.645,
-      "orbitCenterc": -0.5,
-      "orbitTilta": 0,
-      "orbitTiltb": 0,
-      "parentId": "sun",
-      "carrier": true
-    },
-    {
-      "id": "mercury-deferent-b",
-      "name": "Mercury deferent B",
+      "id": "mercury-deferent",
+      "name": "Mercury deferent",
       "size": 0,
       "startPos": 196,
       "speed": -6.283185307179586,
@@ -568,7 +568,7 @@
       "orbitCenterc": 0,
       "orbitTilta": 0,
       "orbitTiltb": -0.3,
-      "parentId": "mercury-deferent-a",
+      "parentId": "sun",
       "carrier": true
     },
     {
@@ -581,10 +581,10 @@
       "orbitRadius": 0,
       "orbitCentera": 10.8,
       "orbitCenterb": 4,
-      "orbitCenterc": 0,
+      "orbitCenterc": -0.5,
       "orbitTilta": -4.5,
       "orbitTiltb": -2.5,
-      "parentId": "mercury-deferent-b",
+      "parentId": "mercury-deferent",
       "carrier": true
     },
     {
@@ -607,7 +607,7 @@
     },
     {
       "id": "eros-deferent-a",
-      "name": "Eros deferent A",
+      "name": "Eros Sun-Relative Annual Frame",
       "size": 2,
       "startPos": 0,
       "speed": 6.283185307179586,
@@ -618,20 +618,37 @@
       "orbitCenterc": -0.5,
       "orbitTilta": -7.3,
       "orbitTiltb": 3.6,
-      "relativeAnnualStart": 0,
-      "relativeAnnualSpeed": 6.283185307179586,
-      "relativeAnnualCosX": -0.19732715717285032,
-      "relativeAnnualCosY": 6.228156736846667,
-      "relativeAnnualCosZ": -0.7978452787867659,
-      "relativeAnnualSinX": 0,
-      "relativeAnnualSinY": -13.188518932505565,
-      "relativeAnnualSinZ": 0.8093938343211988,
       "parentId": "sun",
       "carrier": true
     },
     {
+      "id": "eros-annual-centre-oscillation",
+      "name": "Eros Annual Centre Oscillation",
+      "amplitude": 14.62481872,
+      "phase": -64.609,
+      "speed": 6.283185307179586,
+      "axisX": -0.00578548,
+      "axisY": 0.99728653,
+      "axisZ": -0.07339012,
+      "parentId": "eros-deferent-a",
+      "carrier": true,
+      "motionOperation": "axial-annual-centre-oscillation",
+      "targetId": "eros",
+      "orbitRadius": 0,
+      "operationParameters": {
+        "id": 0,
+        "name": 0,
+        "amplitude": 14.62481872,
+        "phase": -64.609,
+        "speed": 6.283185307179586,
+        "axisX": -0.00578548,
+        "axisY": 0.99728653,
+        "axisZ": -0.07339012
+      }
+    },
+    {
       "id": "eros-deferent-b",
-      "name": "Eros deferent B",
+      "name": "Eros Local Deferent",
       "size": 2,
       "startPos": 0,
       "speed": -7.291563307179587,
@@ -642,7 +659,7 @@
       "orbitCenterc": 0,
       "orbitTilta": 0,
       "orbitTiltb": 0,
-      "parentId": "eros-deferent-a",
+      "parentId": "eros-annual-centre-oscillation",
       "carrier": true
     },
     {

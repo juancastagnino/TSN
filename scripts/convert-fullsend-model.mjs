@@ -1,6 +1,6 @@
 /**
  * Experimental, reproducible first-pass migration from the current
- * full-send declarative model (schema v3) to TSOG's flat objects[] tree.
+ * hierarchy-refinement declarative model (schema v3) to TSOG's flat objects[] tree.
  *
  * This intentionally translates only parent/child transform stages. It does
  * not claim numerical equivalence for specialised relative-frame or lunar
@@ -43,7 +43,8 @@ const frame = (id, name, parentId) => addStage({ id, name, parentId, carrier: tr
 const motion = (bodyId, key) => bodyById.get(bodyId).motion[key];
 const body = (bodyId, parentId, key = "orbit", extra = {}) =>
   addStage({ motion: motion(bodyId, key), parentId, carrier: false, extra });
-const carrier = (bodyId, parentId, key) => addStage({ motion: motion(bodyId, key), parentId });
+const carrier = (bodyId, parentId, key, extra = {}) =>
+  addStage({ motion: motion(bodyId, key), parentId, extra });
 
 const root = addStage({ motion: sourceModel.referenceFrame.motion.origin, parentId: null, carrier: false });
 const earth = body("earth", root, "orbit", { hosts: ["ecliptic-grid"] });
@@ -57,7 +58,26 @@ const moonCounter = addStage({ parentId: moonPlane, carrier: true, motion: {
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0, orbitTilta: 0, orbitTiltb: 0,
 } });
 const moonA = carrier("moon", moonCounter, "deferentA");
-body("moon", moonA);
+// These two named operations are declarative migration targets.  TSOG's base
+// circle evaluator does not yet interpret them: a later generic operator layer
+// must do so before this configuration can claim lunar equivalence.
+const moonEquant = carrier("moon", moonA, "equant", {
+  motionOperation: "off-centre-phase",
+  targetId: "moon",
+  orbitRadius: 0,
+  operationParameters: { offset: numeric(motion("moon", "equant").orbitRadius) },
+});
+const moonSolar = carrier("moon", moonEquant, "solarCoupledEccentric", {
+  motionOperation: "solar-coupled-centre-offset",
+  targetId: "moon",
+  referenceIds: { observer: "earth", reference: "sun" },
+  orbitRadius: 0,
+  operationParameters: {
+    inequalityRadius: numeric(motion("moon", "solarCoupledEccentric").orbitRadius),
+    variationRadius: numeric(motion("moon", "solarCoupledEccentric").solarVariationRadius),
+  },
+});
+body("moon", moonSolar);
 
 const binaryFrame = frame("sun-mars-binary-frame", "Sun-Mars Binary Frame", earth);
 const sunPrimaryFrame = frame("sun-primary-frame", "Sun Primary Frame", binaryFrame);
@@ -72,12 +92,22 @@ const addSunChain = (bodyId, keys) => {
   ["jupiter", ["deferent", "orbit"]], ["saturn", ["deferent", "orbit"]],
   ["uranus", ["deferent", "orbit"]], ["neptune", ["deferent", "orbit"]],
   ["halley", ["deferent", "orbit"]],
-  ["pluto", ["deferent", "eccentric", "eccentricCounterrotation", "orbit"]],
-  ["mars", ["parentRelativeCarrier", "secondary", "orbit"]],
-  ["venus", ["parentRelativeCarrier", "secondary", "plane", "orbit"]],
-  ["mercury", ["parentRelativeCarrier", "secondary", "plane", "orbit"]],
-  ["eros", ["parentRelativeCarrier", "secondary", "orbit"]],
+  ["pluto", ["deferent", "eccentric", "orbit"]],
+  ["mars", ["binaryAnnualFrame", "longPeriodDeferent", "orbit"]],
+  ["venus", ["deferent", "plane", "orbit"]],
+  ["mercury", ["deferent", "plane", "orbit"]],
 ].forEach(([bodyId, keys]) => addSunChain(bodyId, keys));
+// Eros keeps an explicit, named annual-centre operation rather than the former
+// hidden cosine/sine residual fields.
+const erosFrame = carrier("eros", sun, "sunRelativeAnnualFrame");
+const erosOscillation = carrier("eros", erosFrame, "annualCentreOscillation", {
+  motionOperation: "axial-annual-centre-oscillation",
+  targetId: "eros",
+  orbitRadius: 0,
+  operationParameters: copyMotion(motion("eros", "annualCentreOscillation")),
+});
+const erosLocal = carrier("eros", erosOscillation, "localDeferent");
+body("eros", erosLocal);
 const mars = objects.find((entry) => entry.id === "mars");
 body("phobos", mars.id);
 body("deimos", mars.id);
@@ -85,7 +115,7 @@ body("deimos", mars.id);
 const targetRoot = process.cwd();
 fs.writeFileSync(path.join(targetRoot, "src/settings/celestial-model.json"), `${JSON.stringify({
   schemaVersion: 4, id: "tychos-tsog-migration", name: "TYCHOS TSOG migration experiment",
-  description: "First-pass structural migration from full-send-binary-tychos.", objects,
+  description: "Structural migration from hierarchy-refinement; named operations await TSOG generic evaluators.", objects,
 }, null, 2)}\n`);
 fs.writeFileSync(path.join(targetRoot, "src/settings/misc-settings.json"), `${JSON.stringify(misc, null, 2)}\n`);
 console.log(`Wrote ${objects.length} structural stages to TSOG schema v4.`);
