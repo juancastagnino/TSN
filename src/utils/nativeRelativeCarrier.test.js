@@ -13,8 +13,19 @@ const settings = buildSettingsIndex(
   normalizeCelestialSettings(settingsDocument)
 );
 
-test("evaluates the stored cosine and sine vectors at quarter phases", () => {
-  const carrier = settings.get("eros-deferent-a");
+test("evaluates cosine and sine vectors at quarter phases", () => {
+  // Exercise the generic evaluator with an explicit fixture: the current Eros
+  // model no longer stores the former annual residual fields.
+  const carrier = {
+    ...settings.get("eros-deferent-a"),
+    relativeAnnualSpeed: 2 * Math.PI,
+    relativeAnnualCosX: 0.1,
+    relativeAnnualCosY: -0.2,
+    relativeAnnualCosZ: 0.3,
+    relativeAnnualSinX: -0.4,
+    relativeAnnualSinY: 0.5,
+    relativeAnnualSinZ: -0.6,
+  };
   const state = createNativeRelativeCarrierState();
   const quarter = Math.PI / (2 * carrier.relativeAnnualSpeed);
 

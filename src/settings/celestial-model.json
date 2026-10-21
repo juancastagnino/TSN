@@ -101,20 +101,6 @@
           "orbitTilta": "0",
           "orbitTiltb": "0"
         },
-        "equant": {
-          "id": "moon-apsidal-equant",
-          "name": "Lunar Apsidal Equant",
-          "size": "0",
-          "startPos": "0",
-          "speed": "0",
-          "tilt": "0",
-          "orbitRadius": "0",
-          "orbitCentera": "0",
-          "orbitCenterb": "0",
-          "orbitCenterc": "0",
-          "orbitTilta": "0",
-          "orbitTiltb": "0"
-        },
         "solarCoupledEccentric": {
           "id": "moon-solar-eccentric",
           "name": "Lunar Solar-Coupled Geometry",
@@ -158,8 +144,7 @@
         {
           "name": "Lunar Apsidal Frame",
           "components": [
-            "deferentA",
-            "equant"
+            "deferentA"
           ]
         },
         {
@@ -875,24 +860,10 @@
                         "targetName": "Moon",
                         "children": [
                           {
-                            "id": "moon-apsidal-equant-frame",
-                            "kind": "moon-apsidal-equant",
-                            "name": "Lunar Apsidal Equant",
-                            "role": "lunar-apsidal-equant-geometry",
-                            "settingId": "moon-apsidal-equant",
-                            "settingIds": [
-                              "moon-apsidal-equant",
-                              "moon"
-                            ],
-                            "targetName": "Moon",
-                            "children": [
-                              {
-                                "id": "moon",
-                                "kind": "object",
-                                "name": "Moon",
-                                "role": "earth-satellite"
-                              }
-                            ]
+                            "id": "moon",
+                            "kind": "object",
+                            "name": "Moon",
+                            "role": "earth-satellite"
                           }
                         ]
                       }
@@ -923,30 +894,13 @@
                         ],
                         "children": [
                           {
-                            "id": "actual-moon-apsidal-equant-frame",
-                            "kind": "moon-apsidal-equant",
-                            "name": "Actual Lunar Apsidal Equant",
-                            "role": "physical-coordinate-lunar-equant",
-                            "settingId": "moon-apsidal-equant",
-                            "settingIds": [
-                              "moon-apsidal-equant",
-                              "moon"
-                            ],
-                            "targetName": "Actual Moon",
+                            "id": "actual-moon",
+                            "kind": "object",
+                            "name": "Actual Moon",
+                            "settingId": "moon",
+                            "role": "physical-coordinate-moon",
                             "modes": [
                               "live"
-                            ],
-                            "children": [
-                              {
-                                "id": "actual-moon",
-                                "kind": "object",
-                                "name": "Actual Moon",
-                                "settingId": "moon",
-                                "role": "physical-coordinate-moon",
-                                "modes": [
-                                  "live"
-                                ]
-                              }
                             ]
                           }
                         ]

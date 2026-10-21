@@ -2,7 +2,6 @@ import React from "react";
 import celestialModel from "../settings/celestial-model.json";
 import { normalizeCelestialSettings } from "../utils/celestialSettingsSchema";
 import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
-import MoonApsidalEquant from "./MoonApsidalEquant";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
 import MoonSolarCoupledEccentric from "./MoonSolarCoupledEccentric";
 import PlutoEccentricFrame from "./PlutoEccentricFrame";
@@ -14,7 +13,6 @@ export const CELESTIAL_NODE_KINDS = new Set([
   "object",
   "motion-stage",
   "reference-frame",
-  "moon-apsidal-equant",
   "moon-orbital-plane",
   "moon-solar-eccentric",
   "pluto-eccentric-frame",
@@ -174,12 +172,6 @@ export const renderCelestialNode = (
       return React.createElement(
         MoonOrbitalPlane,
         { ...props, live: mode === "live" },
-        children
-      );
-    case "moon-apsidal-equant":
-      return React.createElement(
-        MoonApsidalEquant,
-        { ...props, plotMode: mode === "plot" },
         children
       );
     case "moon-solar-eccentric":

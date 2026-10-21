@@ -82,14 +82,13 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
     "node",
     "plane",
     "deferentA",
-    "equant",
     "solarCoupledEccentric",
     "orbit",
   ]);
   expect(moon.motion.deferentA.tangentialRadius).toBeUndefined();
   expect(moon.motion.plane.speed).toBe("0");
-  expect(moon.motion.deferentA.orbitRadius).toBe("0.014073729727223986");
-  expect(moon.motion.equant.orbitRadius).toBe("0.014073729727223986");
+  expect(moon.motion.deferentA.orbitRadius).toBe("0.028147459454447972");
+  expect(moon.motion.equant).toBeUndefined();
   expect(moon.motion.solarCoupledEccentric.orbitRadius).toBe("-0.0055");
   expect(moon.motion.solarCoupledEccentric.solarVariationRadius).toBe(
     "0.002168"
@@ -103,13 +102,9 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
       targetName: "Moon",
     })
   );
-  expect(findCelestialNode("moon-apsidal-equant-frame")).toEqual(
-    expect.objectContaining({
-      kind: "moon-apsidal-equant",
-      settingId: "moon-apsidal-equant",
-      targetName: "Moon",
-    })
-  );
+  expect(findCelestialNode("moon-apsidal-equant-frame")).toBeUndefined();
+  expect(findCelestialNode("moon-solar-eccentric-frame").children.map((child) => child.id)).toEqual(["moon"]);
+  expect(findCelestialNode("actual-moon-solar-eccentric-frame").children.map((child) => child.id)).toEqual(["actual-moon"]);
   expect(findCelestialNode("moon-orbital-frame").name).toBe(
     "Lunar Nodal / Plane Frame"
   );

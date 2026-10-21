@@ -22,8 +22,7 @@ export function movePlotModel(plotObjects, plotPos) {
   });
 
   // Coordinate adapters depend on the final orbital rotations for this sample.
-  // Negative-priority geometry (currently the lunar equant) must settle first
-  // because later adapters use the resulting body directions.
+  // Negative-priority geometry must settle before dependent adapters.
   plotObjects.forEach((pObj) => {
     if (pObj.updatePriority < 0) pObj.updateAfterMotion?.(plotPos);
   });

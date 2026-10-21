@@ -8,9 +8,9 @@ test("settles negative-priority geometry before dependent plot adapters", () => 
       updateAfterMotion: () => calls.push("dependent"),
     },
     {
-      name: "equant",
+      name: "early geometry",
       updatePriority: -1,
-      updateAfterMotion: () => calls.push("equant"),
+      updateAfterMotion: () => calls.push("early geometry"),
     },
     {
       name: "later dependent",
@@ -19,5 +19,5 @@ test("settles negative-priority geometry before dependent plot adapters", () => 
   ];
 
   movePlotModel(plotObjects, 0);
-  expect(calls).toEqual(["equant", "dependent", "later dependent"]);
+  expect(calls).toEqual(["early geometry", "dependent", "later dependent"]);
 });

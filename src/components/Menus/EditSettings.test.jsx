@@ -74,11 +74,7 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
       "Settings.Earth-Moon System.Moon.Lunar Apsidal Frame.Lunar Apsidal Geometry.Lunar Apsidal GeometryorbitRadius"
     ]
   ).toBeDefined();
-  expect(
-    data[
-      "Settings.Earth-Moon System.Moon.Lunar Apsidal Frame.Lunar Apsidal Equant.Lunar Apsidal EquantorbitRadius"
-    ]
-  ).toBeDefined();
+  expect(Object.keys(data).some((path) => path.includes("Lunar Apsidal Equant"))).toBe(false);
   expect(
     data[
       "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Lunar Solar-Coupled Geometry.Lunar Solar-Coupled GeometrysolarVariationRadius"
