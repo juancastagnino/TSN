@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import {
   composeSolarCoupledLunarOffset,
+  composePairedRadialOffset,
   deriveSolarCoupledLunarAngles,
   scaleRadialProjection,
   signedAngleInEclipticXZ,
@@ -9,6 +10,17 @@ import {
 
 const vectorAt = (angle) =>
   new Vector3(Math.cos(angle), 0, -Math.sin(angle));
+
+test("paired displacement matches the projected Python construction", () => {
+  const moon = vectorAt(0.7);
+  const apsis = vectorAt(0.2);
+  const radius = -0.007055;
+  const offset = composePairedRadialOffset(moon, apsis, radius);
+  expect(offset.x).toBeCloseTo(radius * (Math.cos(0.2) + Math.cos(1.2)), 12);
+  expect(offset.z).toBeCloseTo(-radius * (Math.sin(0.2) + Math.sin(1.2)), 12);
+  expect(offset.dot(new Vector3(-moon.z, 0, moon.x))).toBeCloseTo(0, 12);
+  expect(composePairedRadialOffset(moon, apsis, 0).length()).toBe(0);
+});
 
 test("recovers signed ecliptic longitude using the Three.js Y-rotation convention", () => {
   expect(signedAngleInEclipticXZ(vectorAt(0.7))).toBeCloseTo(0.7, 12);

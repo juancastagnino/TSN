@@ -116,6 +116,11 @@
           "orbitTilta": "0",
           "orbitTiltb": "0"
         },
+        "pairedRadial": {
+          "id": "moon-paired-radial",
+          "name": "Lunar Paired Radial Geometry",
+          "orbitRadius": "-0.007055"
+        },
         "orbit": {
           "id": "moon",
           "name": "Moon",
@@ -145,6 +150,12 @@
           "name": "Lunar Apsidal Frame",
           "components": [
             "deferentA"
+          ]
+        },
+        {
+          "name": "Lunar Paired Radial Frame",
+          "components": [
+            "pairedRadial"
           ]
         },
         {
@@ -855,6 +866,7 @@
                         "role": "solar-coupled-lunar-frame",
                         "settingIds": [
                           "moon-solar-eccentric",
+                          "moon-paired-radial",
                           "moon"
                         ],
                         "targetName": "Moon",
@@ -886,6 +898,7 @@
                         "role": "physical-coordinate-solar-lunar-inequality",
                         "settingIds": [
                           "moon-solar-eccentric",
+                          "moon-paired-radial",
                           "moon"
                         ],
                         "targetName": "Actual Moon",

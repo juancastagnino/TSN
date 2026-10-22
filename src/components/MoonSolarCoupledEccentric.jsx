@@ -94,6 +94,19 @@ export const composeSolarCoupledLunarOffset = (
   return target.add(variation);
 };
 
+// Python experiment: two equal world-XZ vectors at apsis and 2*Moon-apsis.
+// Their sum is radial only in the XZ projection, not necessarily in 3D.
+export const composePairedRadialOffset = (moonDirection, apsidalAxis, radius, target = new Vector3()) => {
+  const moonAngle = signedAngleInEclipticXZ(moonDirection);
+  const apsidalAngle = signedAngleInEclipticXZ(apsidalAxis);
+  const secondAngle = 2 * moonAngle - apsidalAngle;
+  return target.set(
+    radius * (Math.cos(apsidalAngle) + Math.cos(secondAngle)),
+    0,
+    -radius * (Math.sin(apsidalAngle) + Math.sin(secondAngle))
+  );
+};
+
 const MoonSolarCoupledEccentric = ({
   children,
   targetName = "Moon",
@@ -113,6 +126,9 @@ const MoonSolarCoupledEccentric = ({
       []
     )
   );
+  const pairedRadial = useSettingsStore(
+    useCallback((state) => findCelestialSetting(state.settings, "moon-paired-radial"), [])
+  );
   const actualPlanetSizes = useStore((state) => state.actualPlanetSizes);
   const posRef = useStore((state) => state.posRef);
   const addPlotObj = usePlotStore((state) => state.addPlotObj);
@@ -128,6 +144,9 @@ const MoonSolarCoupledEccentric = ({
   const localOffset = useMemo(() => new Vector3(), []);
   const eccentricWorld = useMemo(() => new Vector3(), []);
   const variationWorld = useMemo(() => new Vector3(), []);
+  const apsidalAxisWorld = useMemo(() => new Vector3(), []);
+  const pairedWorld = useMemo(() => new Vector3(), []);
+  const parentQuaternion = useMemo(() => new Quaternion(), []);
 
   const physicalCoordinates = targetName.startsWith("Actual ");
   const distanceScale =
@@ -135,6 +154,7 @@ const MoonSolarCoupledEccentric = ({
   const inequalityAmplitude = finite(setting?.orbitRadius) * distanceScale;
   const variationAmplitude =
     finite(setting?.solarVariationRadius) * distanceScale;
+  const pairedRadius = finite(pairedRadial?.orbitRadius) * distanceScale;
   const updaterName = `${MOON_SOLAR_ECCENTRIC_UPDATER}:${targetName}`;
 
   const update = useCallback(
@@ -184,7 +204,8 @@ const MoonSolarCoupledEccentric = ({
         earthToSunEcliptic,
         anomalisticPhase
       );
-      parent.getWorldQuaternion(parentQuaternionInverse).invert();
+      parent.getWorldQuaternion(parentQuaternion);
+      parentQuaternionInverse.copy(parentQuaternion).invert();
       // Both contributions remain translations of one solar-coupled lunar
       // centre. The first follows 2D-M; the second follows the independently
       // identified 2D geometry. Reflecting their radial projections preserves
@@ -197,6 +218,9 @@ const MoonSolarCoupledEccentric = ({
         eccentricWorld,
         variationWorld
       );
+      apsidalAxisWorld.set(1, 0, 0).applyQuaternion(parentQuaternion);
+      composePairedRadialOffset(earthToMoonEcliptic, apsidalAxisWorld, pairedRadius, pairedWorld);
+      eccentricWorld.add(pairedWorld);
       localOffset
         .copy(eccentricWorld)
         .applyQuaternion(parentQuaternionInverse);
@@ -206,6 +230,7 @@ const MoonSolarCoupledEccentric = ({
     },
     [
       eccentricWorld,
+      apsidalAxisWorld,
       earthToMoonEcliptic,
       earthToSunEcliptic,
       earthWorld,
@@ -214,6 +239,9 @@ const MoonSolarCoupledEccentric = ({
       moon,
       moonWorld,
       parentQuaternionInverse,
+      parentQuaternion,
+      pairedRadius,
+      pairedWorld,
       plotMode,
       scene,
       sunWorld,

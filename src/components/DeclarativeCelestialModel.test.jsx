@@ -83,6 +83,7 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
     "plane",
     "deferentA",
     "solarCoupledEccentric",
+    "pairedRadial",
     "orbit",
   ]);
   expect(moon.motion.deferentA.tangentialRadius).toBeUndefined();
