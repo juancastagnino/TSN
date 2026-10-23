@@ -156,9 +156,7 @@ const MoonSolarCoupledEccentric = ({
   const localOffset = useMemo(() => new Vector3(), []);
   const eccentricWorld = useMemo(() => new Vector3(), []);
   const variationWorld = useMemo(() => new Vector3(), []);
-  const apsidalAxisWorld = useMemo(() => new Vector3(), []);
   const pairedWorld = useMemo(() => new Vector3(), []);
-  const planePairedWorld = useMemo(() => new Vector3(), []);
   const parentQuaternion = useMemo(() => new Quaternion(), []);
 
   const physicalCoordinates = targetName.startsWith("Actual ");
@@ -168,8 +166,6 @@ const MoonSolarCoupledEccentric = ({
   const variationAmplitude =
     finite(setting?.solarVariationRadius) * distanceScale;
   const pairedRadius = finite(pairedRadial?.orbitRadius) * distanceScale;
-  // Missing property on imported older settings preserves the original method.
-  const lunarPlaneBlend = Math.max(0, Math.min(1, finite(pairedRadial?.lunarPlaneBlend)));
   const updaterName = `${MOON_SOLAR_ECCENTRIC_UPDATER}:${targetName}`;
 
   const update = useCallback(
@@ -233,12 +229,7 @@ const MoonSolarCoupledEccentric = ({
         eccentricWorld,
         variationWorld
       );
-      apsidalAxisWorld.set(1, 0, 0).applyQuaternion(parentQuaternion);
-      composePairedRadialOffset(earthToMoonEcliptic, apsidalAxisWorld, pairedRadius, pairedWorld);
-      if (lunarPlaneBlend > 0) {
-        composeLunarPlanePairedOffset(earthToMoonEcliptic, parentQuaternion, pairedRadius, planePairedWorld);
-        pairedWorld.lerp(planePairedWorld, lunarPlaneBlend);
-      }
+      composeLunarPlanePairedOffset(earthToMoonEcliptic, parentQuaternion, pairedRadius, pairedWorld);
       eccentricWorld.add(pairedWorld);
       localOffset
         .copy(eccentricWorld)
@@ -249,7 +240,6 @@ const MoonSolarCoupledEccentric = ({
     },
     [
       eccentricWorld,
-      apsidalAxisWorld,
       earthToMoonEcliptic,
       earthToSunEcliptic,
       earthWorld,
@@ -261,8 +251,6 @@ const MoonSolarCoupledEccentric = ({
       parentQuaternion,
       pairedRadius,
       pairedWorld,
-      planePairedWorld,
-      lunarPlaneBlend,
       plotMode,
       scene,
       sunWorld,

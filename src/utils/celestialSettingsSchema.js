@@ -69,7 +69,6 @@ export const SAVED_SETTING_PROPERTIES = [
   "tiltb",
   "orbitRadius",
   "solarVariationRadius",
-  "lunarPlaneBlend",
   "orbitCentera",
   "orbitCenterb",
   "orbitCenterc",
