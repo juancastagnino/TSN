@@ -236,7 +236,7 @@
           "tilt": 0,
           "orbitRadius": 0,
           "orbitCentera": 10.8,
-          "orbitCenterb": 4,
+          "orbitCenterb": 0.6,
           "orbitCenterc": -0.5,
           "orbitTilta": -4.5,
           "orbitTiltb": -2.5
