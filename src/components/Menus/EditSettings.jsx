@@ -24,6 +24,7 @@ const settingFields = [
   "tiltb",
   "orbitRadius",
   "solarVariationRadius",
+  "lunarPlaneBlend",
   "orbitCentera",
   "orbitCenterb",
   "orbitCenterc",

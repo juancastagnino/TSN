@@ -1,7 +1,8 @@
-import { Vector3 } from "three";
+import { Quaternion, Vector3 } from "three";
 import {
   composeSolarCoupledLunarOffset,
   composePairedRadialOffset,
+  composeLunarPlanePairedOffset,
   deriveSolarCoupledLunarAngles,
   scaleRadialProjection,
   signedAngleInEclipticXZ,
@@ -10,6 +11,27 @@ import {
 
 const vectorAt = (angle) =>
   new Vector3(Math.cos(angle), 0, -Math.sin(angle));
+
+test("lunar-plane pair follows an inclined rotating frame and stays in its plane", () => {
+  const frame = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 0.4)
+    .multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), 0.7));
+  const localMoon = vectorAt(0.8).multiplyScalar(0.25);
+  const moon = localMoon.clone().applyQuaternion(frame);
+  const expected = composePairedRadialOffset(localMoon, vectorAt(0), -0.007055).applyQuaternion(frame);
+  const actual = composeLunarPlanePairedOffset(moon, frame, -0.007055);
+  expect(actual.distanceTo(expected)).toBeLessThan(1e-12);
+  expect(actual.dot(new Vector3(0, 1, 0).applyQuaternion(frame))).toBeCloseTo(0, 12);
+  expect(actual.clone().cross(moon).length()).toBeLessThan(1e-12);
+});
+
+test("lunar-plane and world-XZ pairs agree for a flat Y-rotated plane", () => {
+  const frame = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), 1.1);
+  const moon = vectorAt(0.8).applyQuaternion(frame);
+  const apsis = vectorAt(0).applyQuaternion(frame);
+  const a = composePairedRadialOffset(moon, apsis, -0.007055);
+  const b = composeLunarPlanePairedOffset(moon, frame, -0.007055);
+  expect(a.distanceTo(b)).toBeLessThan(1e-12);
+});
 
 test("paired displacement matches the projected Python construction", () => {
   const moon = vectorAt(0.7);

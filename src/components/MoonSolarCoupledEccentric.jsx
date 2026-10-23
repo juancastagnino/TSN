@@ -107,6 +107,18 @@ export const composePairedRadialOffset = (moonDirection, apsidalAxis, radius, ta
   );
 };
 
+// Construct the same pair in the apsidal parent's local XZ orbital plane.
+// The parent quaternion carries that plane through nodal and apsidal motion.
+export const composeLunarPlanePairedOffset = (moonDirection, parentQuaternion, radius, target = new Vector3()) => {
+  const inverse = parentQuaternion.clone().invert();
+  const localMoon = moonDirection.clone().applyQuaternion(inverse);
+  if (localMoon.x * localMoon.x + localMoon.z * localMoon.z < 1e-24) {
+    return target.set(0, 0, 0);
+  }
+  composePairedRadialOffset(localMoon, new Vector3(1, 0, 0), radius, target);
+  return target.applyQuaternion(parentQuaternion);
+};
+
 const MoonSolarCoupledEccentric = ({
   children,
   targetName = "Moon",
@@ -146,6 +158,7 @@ const MoonSolarCoupledEccentric = ({
   const variationWorld = useMemo(() => new Vector3(), []);
   const apsidalAxisWorld = useMemo(() => new Vector3(), []);
   const pairedWorld = useMemo(() => new Vector3(), []);
+  const planePairedWorld = useMemo(() => new Vector3(), []);
   const parentQuaternion = useMemo(() => new Quaternion(), []);
 
   const physicalCoordinates = targetName.startsWith("Actual ");
@@ -155,6 +168,8 @@ const MoonSolarCoupledEccentric = ({
   const variationAmplitude =
     finite(setting?.solarVariationRadius) * distanceScale;
   const pairedRadius = finite(pairedRadial?.orbitRadius) * distanceScale;
+  // Missing property on imported older settings preserves the original method.
+  const lunarPlaneBlend = Math.max(0, Math.min(1, finite(pairedRadial?.lunarPlaneBlend)));
   const updaterName = `${MOON_SOLAR_ECCENTRIC_UPDATER}:${targetName}`;
 
   const update = useCallback(
@@ -220,6 +235,10 @@ const MoonSolarCoupledEccentric = ({
       );
       apsidalAxisWorld.set(1, 0, 0).applyQuaternion(parentQuaternion);
       composePairedRadialOffset(earthToMoonEcliptic, apsidalAxisWorld, pairedRadius, pairedWorld);
+      if (lunarPlaneBlend > 0) {
+        composeLunarPlanePairedOffset(earthToMoonEcliptic, parentQuaternion, pairedRadius, planePairedWorld);
+        pairedWorld.lerp(planePairedWorld, lunarPlaneBlend);
+      }
       eccentricWorld.add(pairedWorld);
       localOffset
         .copy(eccentricWorld)
@@ -242,6 +261,8 @@ const MoonSolarCoupledEccentric = ({
       parentQuaternion,
       pairedRadius,
       pairedWorld,
+      planePairedWorld,
+      lunarPlaneBlend,
       plotMode,
       scene,
       sunWorld,

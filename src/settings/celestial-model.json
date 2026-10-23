@@ -119,7 +119,8 @@
         "pairedRadial": {
           "id": "moon-paired-radial",
           "name": "Lunar Paired Radial Geometry",
-          "orbitRadius": "-0.007055"
+          "orbitRadius": "-0.007055",
+          "lunarPlaneBlend": "1"
         },
         "orbit": {
           "id": "moon",
