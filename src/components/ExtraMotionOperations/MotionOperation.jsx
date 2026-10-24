@@ -8,17 +8,6 @@ const D2R = Math.PI / 180;
 const number = (value) => Number(value) || 0;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 
-export function equantCorrection(angle, radius, offset, orientation = 0) {
-  radius = Math.abs(number(radius));
-  if (!radius || !offset) return 0;
-  const projection = offset * Math.cos(angle - orientation);
-  const discriminant = projection * projection + radius * radius - offset * offset;
-  if (discriminant < 0) return 0;
-  const distance = -projection + Math.sqrt(discriminant);
-  return wrap(Math.atan2(offset * Math.sin(orientation) + distance * Math.sin(angle),
-    offset * Math.cos(orientation) + distance * Math.cos(angle)) - angle);
-}
-
 const getSettingById = (id, settings) => {
   const modelObj = celestialModel.objects.find((o) => o.id === id);
   return modelObj ? settings.find((s) => s.name === modelObj.name) : null;
@@ -32,18 +21,6 @@ const Operations = {
       0, 
       -Math.sin(angle) * number(setting.orbitRadius)
     );
-  },
-
-  "off-centre-phase": (group, time, p, setting, settings) => {
-    const target = getSettingById(setting.targetId, settings);
-    if (!target) return;
-    group.rotation.y = equantCorrection(
-      number(target.speed) * time - number(target.startPos) * D2R,
-      target.orbitRadius, 
-      number(p.offset), 
-      number(setting.startPos) * D2R
-    );
-    group.updateWorldMatrix(true, true);
   },
 
   "axial-annual-centre-oscillation": (group, time, p, setting, settings, scratch) => {
@@ -109,6 +86,24 @@ const Operations = {
     reflected(longitude + 2 * elongation, number(p.variationRadius), scratch.part);
 
     scratch.offset.add(scratch.part);
+    // The paired radial action replaces the retired lunar equant. It is
+    // constructed in the apsidal parent's local XZ plane and transformed back
+    // to world space, so it follows the nodal/apsidal lunar plane rather than
+    // the fixed model XZ plane.
+    const pairedRadius = number(p.pairedRadialRadius);
+    if (pairedRadius && group.parent) {
+      group.parent.getWorldQuaternion(scratch.parentQuaternion);
+      scratch.localMoon.copy(scratch.direction)
+        .applyQuaternion(scratch.parentInverse.copy(scratch.parentQuaternion).invert());
+      const moonAngle = Math.atan2(-scratch.localMoon.z, scratch.localMoon.x);
+      const secondAngle = 2 * moonAngle;
+      scratch.paired.set(
+        pairedRadius * (1 + Math.cos(secondAngle)),
+        0,
+        -pairedRadius * Math.sin(secondAngle)
+      ).applyQuaternion(scratch.parentQuaternion);
+      scratch.offset.add(scratch.paired);
+    }
     group.parent.getWorldQuaternion(scratch.inverse).invert();
     group.position.copy(scratch.offset).applyQuaternion(scratch.inverse);
     group.updateWorldMatrix(true, true);
@@ -125,7 +120,9 @@ const MotionOperation = ({ name, operation, plotMode = false, children }) => {
   
   const scratch = useMemo(() => ({ 
     earth: new Vector3(), sun: new Vector3(), moon: new Vector3(),
-    direction: new Vector3(), offset: new Vector3(), part: new Vector3(), inverse: new Quaternion() 
+    direction: new Vector3(), offset: new Vector3(), part: new Vector3(),
+    paired: new Vector3(), localMoon: new Vector3(), inverse: new Quaternion(),
+    parentQuaternion: new Quaternion(), parentInverse: new Quaternion()
   }), []);
 
   const setting = settings.find((item) => item.name === name);
@@ -143,12 +140,12 @@ const MotionOperation = ({ name, operation, plotMode = false, children }) => {
 
   useFrame(() => { 
     if (!plotMode) update(position.current || 0); 
-  }, operation === "off-centre-phase" ? -1 : 0);
+  }, 0);
 
   useEffect(() => {
     if (!plotMode) return undefined;
     const updaterName = `Operation: ${name}`;
-    add({ name: updaterName, updateAfterMotion: update, updatePriority: operation === "off-centre-phase" ? -1 : 0 });
+    add({ name: updaterName, updateAfterMotion: update, updatePriority: 0 });
     return () => remove(updaterName);
   }, [add, remove, name, operation, plotMode, update]);
 

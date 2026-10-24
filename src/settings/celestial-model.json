@@ -2,7 +2,7 @@
   "schemaVersion": 4,
   "id": "tychos-tsog-migration",
   "name": "TYCHOS TSOG migration experiment",
-  "description": "Structural migration from hierarchy-refinement; named operations await TSOG generic evaluators.",
+  "description": "TSOG hierarchy with explicitly named non-epicyclic geometric operations.",
   "objects": [
     {
       "id": "system-center",
@@ -97,7 +97,7 @@
       "startPos": 167.51,
       "speed": 0.71015440177343,
       "tilt": 0,
-      "orbitRadius": 0.014073729727223986,
+      "orbitRadius": 0.028147459454447972,
       "orbitCenterx": 0,
       "orbitCenterz": 0,
       "orbitCentery": 0,
@@ -130,28 +130,9 @@
       },
       "operationParameters": {
         "inequalityRadius": -0.0055,
-        "variationRadius": 0.002168
-      }
-    },
-    {
-      "id": "moon-apsidal-equant",
-      "name": "Lunar Apsidal Equant",
-      "size": 0,
-      "startPos": 0,
-      "speed": 0,
-      "tilt": 0,
-      "orbitRadius": 0,
-      "orbitCenterx": 0,
-      "orbitCenterz": 0,
-      "orbitCentery": 0,
-      "orbitTiltx": 0,
-      "orbitTiltz": 0,
-      "parentId": "moon-solar-eccentric",
-      "carrier": true,
-      "motionOperation": "off-centre-phase",
-      "targetId": "moon",
-      "operationParameters": {
-        "offset": 0.014073729727223986
+        "variationRadius": 0.002168,
+        "pairedRadialRadius": -0.007055,
+        "pairedRadialPlane": "lunar-apsidal-plane"
       }
     },
     {
@@ -169,7 +150,7 @@
       "orbitCentery": 0,
       "orbitTiltx": 0,
       "orbitTiltz": 0,
-      "parentId": "moon-apsidal-equant"
+      "parentId": "moon-solar-eccentric"
     },
     {
       "id": "sun-mars-binary-frame",
@@ -583,7 +564,7 @@
       "tilt": 0,
       "orbitRadius": 0,
       "orbitCenterx": 10.8,
-      "orbitCenterz": 4,
+      "orbitCenterz": 0.6,
       "orbitCentery": -0.5,
       "orbitTiltx": -4.5,
       "orbitTiltz": -2.5,
@@ -672,7 +653,7 @@
       "name": "Eros",
       "size": 0.1,
       "actualSize": 0.00000563,
-      "startPos": 171.8,
+      "startPos": 171.95,
       "speed": 4.57668492,
       "tilt": 0,
       "rotationStart": 0,
