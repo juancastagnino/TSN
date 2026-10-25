@@ -77,7 +77,16 @@ export function getPlotSunMarsBinaryDiagnostics(
   const earthPivot = earthObj?.pivotRef?.current;
   const sunPivot = sunObj?.pivotRef?.current;
   const marsPivot = marsObj?.pivotRef?.current;
-  if (!systemCenterPivot || !earthPivot || !sunPivot || !marsPivot) {
+  const marsOrbit = marsObj?.orbitRef?.current;
+  const earthEquatorial = earthObj?.cSphereRef?.current;
+  if (
+    !systemCenterPivot ||
+    !earthPivot ||
+    !sunPivot ||
+    !marsPivot ||
+    !marsOrbit ||
+    !earthEquatorial
+  ) {
     target.valid = false;
     return target;
   }
@@ -86,6 +95,21 @@ export function getPlotSunMarsBinaryDiagnostics(
   earthPivot.getWorldPosition(target.sample.earthWorld);
   sunPivot.getWorldPosition(target.sample.sunWorld);
   marsPivot.getWorldPosition(target.sample.marsWorld);
+  marsOrbit.getWorldQuaternion(target.sample.marsOrbitQuaternion);
+  target.sample.marsOrbitNormalWorld
+    .set(0, 1, 0)
+    .applyQuaternion(target.sample.marsOrbitQuaternion)
+    .normalize();
+  earthEquatorial.getWorldQuaternion(target.sample.earthEquatorialQuaternion);
+  target.sample.earthEquatorialAxisX
+    .set(1, 0, 0)
+    .applyQuaternion(target.sample.earthEquatorialQuaternion);
+  target.sample.earthEquatorialAxisY
+    .set(0, 1, 0)
+    .applyQuaternion(target.sample.earthEquatorialQuaternion);
+  target.sample.earthEquatorialAxisZ
+    .set(0, 0, 1)
+    .applyQuaternion(target.sample.earthEquatorialQuaternion);
   return updateSunMarsBinaryDiagnostics(
     target,
     target.sample.earthWorld,

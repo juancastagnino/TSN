@@ -1,4 +1,4 @@
-import { Vector3 } from "three";
+import { Quaternion, Vector3 } from "three";
 
 const RAD_TO_DEG = 180 / Math.PI;
 const MIN_VECTOR_LENGTH_SQ = 1e-20;
@@ -41,6 +41,12 @@ export const createSunMarsBinaryDiagnostics = () => ({
     sunWorld: new Vector3(),
     marsWorld: new Vector3(),
     midpointWorld: new Vector3(),
+    marsOrbitNormalWorld: new Vector3(),
+    earthEquatorialAxisX: new Vector3(),
+    earthEquatorialAxisY: new Vector3(),
+    earthEquatorialAxisZ: new Vector3(),
+    marsOrbitQuaternion: new Quaternion(),
+    earthEquatorialQuaternion: new Quaternion(),
   },
 });
 

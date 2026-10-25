@@ -30,6 +30,18 @@ export const SUN_MARS_BINARY_CSV_FIELDS = [
   "mars_world_x",
   "mars_world_y",
   "mars_world_z",
+  "mars_orbit_normal_x",
+  "mars_orbit_normal_y",
+  "mars_orbit_normal_z",
+  "earth_equatorial_axis_x_x",
+  "earth_equatorial_axis_x_y",
+  "earth_equatorial_axis_x_z",
+  "earth_equatorial_axis_y_x",
+  "earth_equatorial_axis_y_y",
+  "earth_equatorial_axis_y_z",
+  "earth_equatorial_axis_z_x",
+  "earth_equatorial_axis_z_y",
+  "earth_equatorial_axis_z_z",
   "sun_mars_separation",
   ...CENTERS.flatMap(([prefix]) =>
     CENTER_FIELDS.map((field) => `${prefix}_${field}`)
@@ -67,6 +79,10 @@ export const sunMarsBinaryDiagnosticsToRow = (
   const row = { date, time };
   vectorFields(row, "sun", "world", diagnostics.sample.sunWorld);
   vectorFields(row, "mars", "world", diagnostics.sample.marsWorld);
+  vectorFields(row, "mars", "orbit_normal", diagnostics.sample.marsOrbitNormalWorld);
+  vectorFields(row, "earth", "equatorial_axis_x", diagnostics.sample.earthEquatorialAxisX);
+  vectorFields(row, "earth", "equatorial_axis_y", diagnostics.sample.earthEquatorialAxisY);
+  vectorFields(row, "earth", "equatorial_axis_z", diagnostics.sample.earthEquatorialAxisZ);
   row.sun_mars_separation = diagnostics.legacyEarthPivot.separation;
   CENTERS.forEach(([prefix, key]) => addCenter(row, prefix, diagnostics[key]));
   return row;
