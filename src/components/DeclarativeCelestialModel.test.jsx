@@ -113,7 +113,7 @@ test("declares real bodies once and keeps motion stages inside their owners", ()
     "Lunar Apsidal Frame"
   );
   expect(findCelestialNode("moon-solar-eccentric-frame").name).toBe(
-    "Solar-Coupled Lunar Frame"
+    "Geometry-Dependent Lunar Centre Displacement"
   );
   expect(mars.parentId).toBe("sun");
   expect(Object.keys(mars.motion)).toEqual([

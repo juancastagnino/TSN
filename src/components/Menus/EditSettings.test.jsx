@@ -77,7 +77,7 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   expect(Object.keys(data).some((path) => path.includes("Lunar Apsidal Equant"))).toBe(false);
   expect(
     data[
-      "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Lunar Solar-Coupled Geometry.Lunar Solar-Coupled GeometrysolarVariationRadius"
+      "Settings.Earth-Moon System.Moon.Geometry-Dependent Lunar Centre Displacement.Lunar Solar-Coupled Geometry.Lunar Solar-Coupled GeometrysolarVariationRadius"
     ]
   ).toBeDefined();
   expect(
@@ -178,7 +178,7 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
 test("serializes the latest edited value rather than the menu's initial snapshot", () => {
   act(() => root.render(<EditSettings />));
   const speedPath =
-    "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Moon.Moonspeed";
+    "Settings.Earth-Moon System.Moon.Geometry-Dependent Lunar Centre Displacement.Moon.Moonspeed";
 
   act(() =>
     mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
@@ -192,7 +192,7 @@ test("serializes the latest edited value rather than the menu's initial snapshot
 test("loads a saved unified model back into the store and visible controls", () => {
   act(() => root.render(<EditSettings />));
   const speedPath =
-    "Settings.Earth-Moon System.Moon.Solar-Coupled Lunar Frame.Moon.Moonspeed";
+    "Settings.Earth-Moon System.Moon.Geometry-Dependent Lunar Centre Displacement.Moon.Moonspeed";
 
   act(() =>
     mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
@@ -277,7 +277,7 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
 
   // Preserve the calibrated split between each fixed plane and its planet.
   expect(Number(initialMercuryPlane.orbitCentera)).toBe(10.8);
-  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(4);
+  expect(Number(initialMercuryPlane.orbitCenterb)).toBe(0.6);
   expect(Number(initialMercuryPlane.orbitCenterc)).toBe(-0.5);
   expect(Number(initialMercuryPlane.orbitTilta)).toBe(-4.5);
   expect(Number(initialMercuryPlane.orbitTiltb)).toBe(-2.5);

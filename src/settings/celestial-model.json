@@ -153,15 +153,10 @@
           ]
         },
         {
-          "name": "Lunar Paired Radial Frame",
-          "components": [
-            "pairedRadial"
-          ]
-        },
-        {
-          "name": "Solar-Coupled Lunar Frame",
+          "name": "Geometry-Dependent Lunar Centre Displacement",
           "components": [
             "solarCoupledEccentric",
+            "pairedRadial",
             "orbit"
           ]
         }
@@ -862,8 +857,8 @@
                       {
                         "id": "moon-solar-eccentric-frame",
                         "kind": "moon-solar-eccentric",
-                        "name": "Solar-Coupled Lunar Frame",
-                        "role": "solar-coupled-lunar-frame",
+                        "name": "Geometry-Dependent Lunar Centre Displacement",
+                        "role": "geometry-dependent-lunar-centre-displacement",
                         "settingIds": [
                           "moon-solar-eccentric",
                           "moon-paired-radial",
@@ -894,8 +889,8 @@
                       {
                         "id": "actual-moon-solar-eccentric-frame",
                         "kind": "moon-solar-eccentric",
-                        "name": "Actual Solar-Coupled Lunar Frame",
-                        "role": "physical-coordinate-solar-lunar-inequality",
+                        "name": "Actual Geometry-Dependent Lunar Centre Displacement",
+                        "role": "physical-coordinate-lunar-centre-displacement",
                         "settingIds": [
                           "moon-solar-eccentric",
                           "moon-paired-radial",
