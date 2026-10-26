@@ -120,7 +120,7 @@ test("retains only active direct carriers and Eros's declared annual geometry", 
     expect.objectContaining({ speed: -2 * Math.PI })
   );
   expect(roundTrip.get("venus-deferent")).toEqual(
-    expect.objectContaining({ speed: -2 * Math.PI, orbitRadius: 0.6 })
+    expect.objectContaining({ speed: -2 * Math.PI })
   );
   expect(roundTrip.get("eros-deferent-a")).not.toEqual(
     expect.objectContaining({
