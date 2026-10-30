@@ -6,74 +6,92 @@ import {
   saveSettingsAsJson,
   loadSettingsFromFile,
 } from "../../utils/saveAndLoadSettings";
-import { getStageInfo, isMainStage } from "../../utils/celestialModel";
+import {
+  getBodySettingNames,
+  getCelestialEditorGroups,
+} from "../../utils/celestialModel";
 
-const createTextControl = (s, key, label, hint, updateSetting) => {
-  return {
-    [`${s.name}_${key}`]: {
-      label: label,
-      value: "\u200B" + (s[key] ?? 0),
-      hint: hint, 
-      editable: true,
-      onChange: (value) => {
-        const cleanValue = String(value).replace(/\u200B/g, "");
-        s[key] = cleanValue;
-        updateSetting({ ...s, [key]: cleanValue });
-      },
-    },
-  };
+const SETTING_FIELDS = [
+  "size",
+  "actualSize",
+  "startPos",
+  "speed",
+  "rotationStart",
+  "rotationSpeed",
+  "tilt",
+  "tiltb",
+  "orbitRadius",
+  "solarVariationRadius",
+  "orbitCenterx",
+  "orbitCentery",
+  "orbitCenterz",
+  "orbitTiltx",
+  "orbitTilty",
+  "orbitTiltz",
+];
+
+const OPERATION_PARAMETER_LABELS = {
+  inequalityRadius: "2D−M centre displacement",
+  variationRadius: "2D solar-variation displacement",
+  pairedRadialRadius: "Paired radial displacement",
+};
+
+const EDITOR_LABELS = {
+  SystemCenter: "PVP / Observer Frame",
+  "Lunar Solar-Coupled Geometry": "Geometry-Dependent Lunar Centre Displacement",
+};
+
+const editorLabel = (name) => EDITOR_LABELS[name] || name;
+
+const isZeroValue = (value) => {
+  const number = Number(String(value).replace(/\u200B/g, "").trim());
+  return Number.isFinite(number) && number === 0;
 };
 
 const getControls = (s, updateSetting) => {
+  const standardControls = Object.fromEntries(
+    SETTING_FIELDS.filter((key) => s[key] !== undefined).map((key) => [
+      `${s.name}_${key}`,
+      {
+        label: key,
+        value: "\u200B" + s[key],
+        editable: true,
+        render: (get) => Boolean(get("Show zero values")) || !isZeroValue(s[key]),
+        onChange: (value) => {
+          const cleanValue = String(value).replace(/\u200B/g, "");
+          updateSetting({ ...s, [key]: cleanValue });
+        },
+      },
+    ])
+  );
+
+  const operationParameters = s.operationParameters || {};
+  const operationControls = Object.fromEntries(
+    Object.entries(operationParameters)
+      .filter(([, value]) => typeof value === "number" || typeof value === "string")
+      .map(([key, value]) => [
+        `${s.name}_operation_${key}`,
+        {
+          label: OPERATION_PARAMETER_LABELS[key] || key,
+          value: "\u200B" + value,
+          editable: true,
+          render: (get) => Boolean(get("Show zero values")) || !isZeroValue(value),
+          onChange: (nextValue) => {
+            const cleanValue = String(nextValue).replace(/\u200B/g, "");
+            updateSetting({
+              ...s,
+              operationParameters: { ...operationParameters, [key]: cleanValue },
+            });
+          },
+        },
+      ])
+  );
+
   return {
-    Appearance: folder(
-      {
-        ...createTextControl(s, "size", "Size", "Visual size multiplier (when Actual Sizes is OFF)", updateSetting),
-        ...(s.actualSize !== undefined
-          ? createTextControl(s, "actualSize", "Actual Size", "True physical radius in model units", updateSetting)
-          : {}),
-      },
-      { collapsed: false }
-    ),
-    Motion: folder(
-      {
-        ...createTextControl(s, "startPos", "Start Pos", "Starting position/angle on the orbital path (degrees)", updateSetting),
-        ...createTextControl(s, "speed", "Speed", "Velocity around the orbital path", updateSetting),
-        ...(s.rotationStart !== undefined
-          ? createTextControl(s, "rotationStart", "Rot Start", "Initial rotation around its own axis (degrees)", updateSetting)
-          : {}),
-        ...(s.rotationSpeed !== undefined
-          ? createTextControl(s, "rotationSpeed", "Rot Speed", "Speed of rotation around its own axis", updateSetting)
-          : {}),
-      },
-      { collapsed: false }
-    ),
-    Orientation: folder(
-      {
-        ...createTextControl(s, "tilt", "Tilt X/Z", "Axial tilt against the orbital plane", updateSetting),
-        ...(s.tiltb !== undefined
-          ? createTextControl(s, "tiltb", "Tilt Y", "Secondary axial tilt correction", updateSetting)
-          : {}),
-      },
-      { collapsed: false }
-    ),
-    "Orbit Path": folder(
-      {
-        ...createTextControl(s, "orbitRadius", "Radius", "Radius of the circular orbit", updateSetting),
-        ...createTextControl(s, "orbitCenterx", "Center X", "Displacement of the orbit center along the X axis", updateSetting),
-        ...createTextControl(s, "orbitCentery", "Center Y", "Displacement of the orbit center along the Y axis", updateSetting),
-        ...createTextControl(s, "orbitCenterz", "Center Z", "Displacement of the orbit center along the Z axis", updateSetting),
-      },
-      { collapsed: false }
-    ),
-    "Orbit Tilt": folder(
-      {
-        ...createTextControl(s, "orbitTiltx", "Tilt X", "Rotates the entire orbital plane around the X axis", updateSetting),
-        ...createTextControl(s, "orbitTilty", "Tilt Y", "Rotates the entire orbital plane around the Y axis", updateSetting),
-        ...createTextControl(s, "orbitTiltz", "Tilt Z", "Rotates the entire orbital plane around the Z axis", updateSetting),
-      },
-      { collapsed: false }
-    ),
+    ...standardControls,
+    ...(Object.keys(operationControls).length > 0
+      ? { "Geometry operation": folder(operationControls, { collapsed: false }) }
+      : {}),
   };
 };
 
@@ -138,85 +156,50 @@ const EditSettingsPanel = () => {
 
   useEffect(() => {
     settings.forEach((s) => {
-      if (!isMainStage(s.name) && initialDeferentStates.current[s.name] === undefined) {
+      if (initialDeferentStates.current[s.name] === undefined) {
         initialDeferentStates.current[s.name] = s.visible;
       }
     });
     return () => {
       const currentStoreSettings = useSettingsStore.getState().settings;
       currentStoreSettings.forEach((s) => {
-        if (!isMainStage(s.name)) {
-          const originalVisibility = initialDeferentStates.current[s.name];
-          if (originalVisibility !== undefined && s.visible !== originalVisibility) {
-            useSettingsStore.getState().updateSetting({ ...s, visible: originalVisibility });
-          }
+        const originalVisibility = initialDeferentStates.current[s.name];
+        if (originalVisibility !== undefined && s.visible !== originalVisibility) {
+          useSettingsStore.getState().updateSetting({ ...s, visible: originalVisibility });
         }
       });
     };
   }, []);
 
   const settingsFolders = useMemo(() => {
-    const groups = {};
     const celestialBodiesMenu = {};
-
-    settings.forEach((s) => {
-      const info = getStageInfo(s.name);
-      const parent = info ? info.bodyName : s.name;
-      const isCarrier = info ? !info.isMain : false;
-      
-      if (!groups[parent]) {
-        groups[parent] = { main: null, deferents: [] };
-      }
-      if (isCarrier) {
-        groups[parent].deferents.push(s);
-      } else {
-        groups[parent].main = s;
-      }
-    });
-
-    Object.keys(groups).forEach((parentName) => {
-      const group = groups[parentName];
-      const planetSubmenus = {};
-
-      planetSubmenus[`${parentName}_visible`] = {
-        label: "👁️ Visible",
-        value: group.main ? group.main.visible : true,
-        editable: true,
-        onChange: (value, path, context) => {
-          const isInitialSync = context
-            ? context.initial
-            : group.main
-            ? group.main.visible === value
-            : group.deferents[0]?.visible === value;
-            
-          if (group.main) {
-            group.main.visible = value;
-            updateSetting({ ...group.main, visible: value });
-          }
-          group.deferents.forEach((def) => {
-            def.visible = value;
-            updateSetting({ ...def, visible: value });
-            if (!isInitialSync) {
-              initialDeferentStates.current[def.name] = value;
-            }
+    const bodySettingNames = new Set(getBodySettingNames());
+    getCelestialEditorGroups(settings).forEach((editorGroup) => {
+      const groupControls = {};
+      editorGroup.bodies.forEach((body) => {
+        const bodyControls = {};
+        if (bodySettingNames.has(body.name) && typeof body.setting.visible === "boolean") {
+          bodyControls[`${body.name}_visible`] = {
+            label: "Visible",
+            value: body.setting.visible,
+            onChange: (value) => updateSetting({ ...body.setting, visible: value }),
+          };
+        }
+        body.frames.forEach((frame) => {
+          const frameControls = {};
+          frame.settings.forEach((setting) => {
+            frameControls[editorLabel(setting.name)] = folder(
+              getControls(setting, updateSetting),
+              { collapsed: true }
+            );
           });
-        },
-      };
-
-      if (group.main) {
-        planetSubmenus["Main Orbit"] = folder(
-          getControls(group.main, updateSetting), 
-          { collapsed: true }
-        );
-      }
-      group.deferents.forEach((def) => {
-        planetSubmenus[def.name] = folder(
-          getControls(def, updateSetting), 
-          { collapsed: true }
-        );
+          bodyControls[frame.name] = folder(frameControls, { collapsed: true });
+        });
+        groupControls[editorLabel(body.name)] = folder(bodyControls, { collapsed: true });
       });
-
-      celestialBodiesMenu[parentName] = folder(planetSubmenus, { collapsed: true });
+      celestialBodiesMenu[editorGroup.name] = folder(groupControls, {
+        collapsed: true,
+      });
     });
 
     return {
@@ -239,7 +222,11 @@ const EditSettingsPanel = () => {
           onChange: (v) => setShowOrbitLabels(v),
         }
       }),
-      "Celestial Bodies": folder(celestialBodiesMenu, { collapsed: false }),
+      "Show zero values": {
+        value: false,
+        label: "Show zero values",
+      },
+      Settings: folder(celestialBodiesMenu, { collapsed: false }),
     };
   }, [
     settings,
@@ -253,47 +240,15 @@ const EditSettingsPanel = () => {
   ]);
 
   const levaSettingsStore = useCreateStore();
-  const [, set] = useControls(() => settingsFolders, {
+  useControls(() => settingsFolders, {
     store: levaSettingsStore,
   });
 
-  useEffect(() => {
-    const updatedValues = {
-      "Show / Hide Planets": showPlanets,
-      "Filled Orbits": shadeOrbits,
-      "Orbit labels": showOrbitLabels,
-    };
-    
-    settings.forEach((s) => {
-      if (isMainStage(s.name)) {
-        updatedValues[`${s.name}_visible`] = s.visible;
-      }
-      
-      const syncVal = (key) => {
-        if (s[key] !== undefined) {
-          updatedValues[`${s.name}_${key}`] = "\u200B" + s[key];
-        }
-      };
-
-      syncVal("size");
-      syncVal("actualSize");
-      syncVal("startPos");
-      syncVal("speed");
-      syncVal("rotationStart");
-      syncVal("rotationSpeed");
-      syncVal("tilt");
-      syncVal("tiltb");
-      syncVal("orbitRadius");
-      syncVal("orbitCenterx");
-      syncVal("orbitCentery");
-      syncVal("orbitCenterz");
-      syncVal("orbitTiltx");
-      syncVal("orbitTilty");
-      syncVal("orbitTiltz");
-    });
-    
-    set(updatedValues);
-  }, [settings, set, showPlanets, shadeOrbits, showOrbitLabels]);
+  // Leva keeps a path index for its controls.  The menu is intentionally
+  // generated from a conceptual tree, so a programmatic bulk `set()` can try
+  // to address a path from the preceding tree and crash while folders are
+  // being rebuilt.  Direct user edits already update the settings store; a
+  // load/reset is safely reflected when the panel is reopened.
 
   return createPortal(
     <div

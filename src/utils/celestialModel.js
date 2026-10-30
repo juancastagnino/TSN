@@ -80,6 +80,102 @@ const bodyOf = (object) => {
 
 export const getCelestialSettings = () => objects.map(toSetting);
 
+// Editor presentation is intentionally separate from the physical parentId
+// graph.  TSOG still evaluates the flat objects[] model; these groups simply
+// give people a readable, TYCHOS-oriented way to navigate it.
+const EDITOR_GROUPS = [
+  {
+    name: "PVP / Observer Frame",
+    bodies: [{ id: "system-center", frames: [["System Center", ["system-center"]], ["Earth", ["earth"]]] }],
+  },
+  {
+    name: "Earth-Moon System",
+    bodies: [{
+      id: "moon",
+      frames: [
+        ["Lunar Nodal / Plane Frame", ["moon-node", "moon-plane", "moon-node-counterrotation"]],
+        ["Lunar Apsidal Frame", ["moon-deferent-a"]],
+        ["Geometry-Dependent Lunar Centre Displacement", ["moon-solar-eccentric", "moon"]],
+      ],
+    }],
+  },
+  {
+    name: "Sun Primary",
+    bodies: [{ id: "sun", frames: [["Sun-Mars Binary Frame", ["sun-mars-binary-frame"]], ["Sun Primary Frame", ["sun-primary-frame"]], ["Sun Deferent", ["sun-deferent"]], ["Sun", ["sun"]]] }],
+  },
+  {
+    name: "Mars Binary Companion",
+    bodies: [
+      { id: "mars", frames: [["Mars", ["mars-deferent-e", "mars-deferent-s", "mars"]]] },
+      { id: "phobos", frames: [["Phobos", ["phobos"]]] },
+      { id: "deimos", frames: [["Deimos", ["deimos"]]] },
+    ],
+  },
+  { name: "Venus Senior Solar Moon", bodies: [{ id: "venus", frames: [["Venus", ["venus-deferent", "venus-plane", "venus"]]] }] },
+  { name: "Mercury Junior Solar Moon", bodies: [{ id: "mercury", frames: [["Mercury", ["mercury-deferent", "mercury-plane", "mercury"]]] }] },
+  {
+    name: "Sun-Hosted Outer Planets",
+    bodies: [
+      { id: "jupiter", frames: [["Jupiter", ["jupiter-deferent", "jupiter"]]] },
+      { id: "saturn", frames: [["Saturn", ["saturn-deferent", "saturn"]]] },
+      { id: "uranus", frames: [["Uranus", ["uranus-deferent", "uranus"]]] },
+      { id: "neptune", frames: [["Neptune", ["neptune-deferent", "neptune"]]] },
+      { id: "pluto", frames: [["Pluto", ["pluto-deferent", "pluto-eccentric", "pluto"]]] },
+    ],
+  },
+  {
+    name: "Sun-Hosted Small Bodies",
+    bodies: [
+      { id: "halley", frames: [["Halleys", ["halley-deferent", "halley"]]] },
+      { id: "eros", frames: [["Eros", ["eros-deferent-a", "eros-annual-centre-oscillation", "eros-deferent-b", "eros"]]] },
+    ],
+  },
+];
+
+export const getCelestialEditorGroups = (settings = getCelestialSettings()) => {
+  const settingsByName = new Map(settings.map((setting) => [setting.name, setting]));
+  const getSetting = (id) => {
+    const object = byId.get(id);
+    if (!object) throw new Error(`Editor references unknown object '${id}'`);
+    const setting = settingsByName.get(object.name);
+    if (!setting) throw new Error(`Editor references missing setting '${object.name}'`);
+    return setting;
+  };
+
+  return EDITOR_GROUPS.map((group) => ({
+    ...group,
+    bodies: group.bodies.map((body) => {
+      const object = byId.get(body.id);
+      return {
+        id: body.id,
+        name: object?.name || body.id,
+        setting: getSetting(body.id),
+        frames: body.frames.map(([name, ids]) => ({
+          name,
+          settings: ids.map(getSetting),
+        })),
+      };
+    }),
+  }));
+};
+
+// Presentation-only tree for editors and inspectors.  The model remains a
+// flat objects[] array; this simply reconstructs its declared parentId graph.
+// Keeping this here means UI code never needs to infer hierarchy from names.
+export const getCelestialEditorTree = (settings = getCelestialSettings()) => {
+  const settingsByName = new Map(settings.map((setting) => [setting.name, setting]));
+
+  const buildEditorNode = (object) => ({
+    id: object.id,
+    name: object.name,
+    carrier: Boolean(object.carrier),
+    setting: settingsByName.get(object.name),
+    children: (childrenOf.get(object.id) || []).map(buildEditorNode),
+  });
+
+  return (childrenOf.get(null) || []).map(buildEditorNode);
+};
+
 const buildNode = (object) => ({
   key: object.id,
   kind: "object",
