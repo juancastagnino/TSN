@@ -61,23 +61,23 @@ test("opens with lunar geometry controls and only meaningful visibility toggles"
   const data = mockLevaStore.getData();
   expect(
     data[
-      "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed"
+      "Settings.Earth.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta"
+      "Settings.Earth.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Earth-Moon System.Moon.Lunar Apsidal Frame.Lunar Apsidal Geometry.Lunar Apsidal GeometryorbitRadius"
+      "Settings.Earth.Moon.Lunar Apsidal Frame.Lunar Apsidal Geometry.Lunar Apsidal GeometryorbitRadius"
     ]
   ).toBeDefined();
   expect(Object.keys(data).some((path) => path.includes("Lunar Apsidal Equant"))).toBe(false);
   expect(
     data[
-      "Settings.Earth-Moon System.Moon.Geometry-Dependent Lunar Centre Displacement.Lunar Solar-Coupled Geometry.Lunar Solar-Coupled GeometrysolarVariationRadius"
+      "Settings.Earth.Moon.Lunar Modulation Frame.Earth–Sun–Moon Modulations.Earth–Sun–Moon ModulationssolarVariationRadius"
     ]
   ).toBeDefined();
   expect(
@@ -99,12 +99,12 @@ test("groups Mars and Eros stages beneath their bodies and exposes one visibilit
   const data = mockLevaStore.getData();
   expect(
     data[
-      "Settings.Mars Binary Companion.Mars.Mars Binary Geometry.Mars Binary Annual Frame.Mars Binary Annual Framespeed"
+      "Settings.Mars.Mars Binary Geometry.Mars Binary Annual Frame.Mars Binary Annual Framespeed"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Sun-Hosted Small Bodies.Eros.Eros Sun-Relative Geometry.Eros Annual Centre Oscillation.Eros Annual Centre Oscillationamplitude"
+      "Settings.Small Bodies.Eros.Eros Sun-Relative Geometry.Eros Annual Centre Oscillation.Eros Annual Centre Oscillationamplitude"
     ]
   ).toBeDefined();
   expect(data["Show / Hide settings.Marsvisible"]).toBeDefined();
@@ -117,9 +117,9 @@ test("hides zero-valued parameters by default and reveals them on request", () =
   act(() => root.render(<EditSettings />));
 
   const zeroPath =
-    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal DeferentorbitRadius";
+    "Settings.Earth.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal DeferentorbitRadius";
   const nonZeroPath =
-    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed";
+    "Settings.Earth.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed";
 
   expect(mockLevaStore.get("Show zero values")).toBe(false);
   expect(mockLevaStore.getData()[zeroPath]).toBeDefined();
@@ -140,9 +140,9 @@ test("hides zero-valued parameters by default and reveals them on request", () =
 test("edits, resets and reopens lunar controls without losing synchronization", () => {
   act(() => root.render(<EditSettings />));
   const nodePath =
-    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed";
+    "Settings.Earth.Moon.Lunar Nodal / Plane Frame.Lunar Nodal Deferent.Lunar Nodal Deferentspeed";
   const planePath =
-    "Settings.Earth-Moon System.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta";
+    "Settings.Earth.Moon.Lunar Nodal / Plane Frame.Lunar Plane Deferent.Lunar Plane DeferentorbitTilta";
 
   act(() =>
     mockLevaStore.set(
@@ -178,7 +178,7 @@ test("edits, resets and reopens lunar controls without losing synchronization", 
 test("serializes the latest edited value rather than the menu's initial snapshot", () => {
   act(() => root.render(<EditSettings />));
   const speedPath =
-    "Settings.Earth-Moon System.Moon.Geometry-Dependent Lunar Centre Displacement.Moon.Moonspeed";
+    "Settings.Earth.Moon.Moon Orbit.Moon.Moonspeed";
 
   act(() =>
     mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
@@ -192,7 +192,7 @@ test("serializes the latest edited value rather than the menu's initial snapshot
 test("loads a saved unified model back into the store and visible controls", () => {
   act(() => root.render(<EditSettings />));
   const speedPath =
-    "Settings.Earth-Moon System.Moon.Geometry-Dependent Lunar Centre Displacement.Moon.Moonspeed";
+    "Settings.Earth.Moon.Moon Orbit.Moon.Moonspeed";
 
   act(() =>
     mockLevaStore.set({ [speedPath]: "\u200B83.2851946888" }, true)
@@ -220,17 +220,17 @@ test("editing Pluto does not restore a stale hidden state", () => {
   const data = mockLevaStore.getData();
   expect(
     data[
-      "Settings.Sun-Hosted Outer Planets.Pluto.Pluto Deferent Frame.Pluto deferent.Pluto deferentspeed"
+      "Settings.Outer Planets.Pluto.Pluto Deferent Frame.Pluto deferent.Pluto deferentspeed"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Sun-Hosted Outer Planets.Pluto.Pluto Eccentric Frame.Pluto Eccentric.Pluto EccentricorbitRadius"
+      "Settings.Outer Planets.Pluto.Pluto Eccentric Frame.Pluto Eccentric.Pluto EccentricorbitRadius"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Sun-Hosted Outer Planets.Pluto.Pluto Eccentric Frame.Pluto.Plutospeed"
+      "Settings.Outer Planets.Pluto.Pluto Eccentric Frame.Pluto.Plutospeed"
     ]
   ).toBeDefined();
 
@@ -258,12 +258,12 @@ test("exposes fixed solar-satellite planes without visibility toggles", () => {
   const data = mockLevaStore.getData();
   expect(
     data[
-      "Settings.Mercury Junior Solar Moon.Mercury.Plane.Mercury PlaneorbitTilta"
+      "Settings.Sun.Mercury.Plane.Mercury PlaneorbitTilta"
     ]
   ).toBeDefined();
   expect(
     data[
-      "Settings.Venus Senior Solar Moon.Venus.Plane.Venus PlaneorbitTilta"
+      "Settings.Sun.Venus.Plane.Venus PlaneorbitTilta"
     ]
   ).toBeDefined();
   expect(data["Show / Hide settings.Mercury Planevisible"]).toBeUndefined();

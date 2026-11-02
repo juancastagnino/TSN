@@ -103,7 +103,7 @@
         },
         "solarCoupledEccentric": {
           "id": "moon-solar-eccentric",
-          "name": "Lunar Solar-Coupled Geometry",
+          "name": "Earth–Sun–Moon Modulations",
           "size": "0",
           "startPos": "0",
           "speed": "0",
@@ -118,7 +118,7 @@
         },
         "pairedRadial": {
           "id": "moon-paired-radial",
-          "name": "Lunar Paired Radial Geometry",
+          "name": "Earth–Moon Modulation",
           "orbitRadius": "-0.007055"
         },
         "orbit": {
@@ -153,10 +153,15 @@
           ]
         },
         {
-          "name": "Geometry-Dependent Lunar Centre Displacement",
+          "name": "Lunar Modulation Frame",
           "components": [
             "solarCoupledEccentric",
-            "pairedRadial",
+            "pairedRadial"
+          ]
+        },
+        {
+          "name": "Moon Orbit",
+          "components": [
             "orbit"
           ]
         }
@@ -756,53 +761,46 @@
   ],
   "editorGroups": [
     {
-      "id": "pvp-frame",
-      "name": "PVP / Observer Frame",
+      "id": "earth",
+      "name": "Earth",
       "bodyIds": [
-        "system-center",
-        "earth"
-      ]
-    },
-    {
-      "id": "earth-moon",
-      "name": "Earth-Moon System",
-      "bodyIds": [
+        "earth",
         "moon"
-      ]
+      ],
+      "flattenBody": true,
+      "bodyTree": [{ "id": "earth", "children": [{ "id": "moon" }] }]
     },
     {
-      "id": "sun-primary",
-      "name": "Sun Primary",
+      "id": "sun",
+      "name": "Sun",
       "bodyIds": [
-        "sun"
-      ]
+        "sun",
+        "venus",
+        "mercury"
+      ],
+      "flattenBody": true,
+      "bodyTree": [{
+        "id": "sun",
+        "children": [{ "id": "venus" }, { "id": "mercury" }]
+      }]
     },
     {
-      "id": "mars-companion",
-      "name": "Mars Binary Companion",
+      "id": "mars",
+      "name": "Mars",
       "bodyIds": [
         "mars",
         "phobos",
         "deimos"
-      ]
-    },
-    {
-      "id": "venus-companion",
-      "name": "Venus Senior Solar Moon",
-      "bodyIds": [
-        "venus"
-      ]
-    },
-    {
-      "id": "mercury-companion",
-      "name": "Mercury Junior Solar Moon",
-      "bodyIds": [
-        "mercury"
-      ]
+      ],
+      "flattenBody": true,
+      "bodyTree": [{
+        "id": "mars",
+        "children": [{ "id": "phobos" }, { "id": "deimos" }]
+      }]
     },
     {
       "id": "outer-planets",
-      "name": "Sun-Hosted Outer Planets",
+      "name": "Outer Planets",
       "bodyIds": [
         "jupiter",
         "saturn",
@@ -813,7 +811,7 @@
     },
     {
       "id": "small-bodies",
-      "name": "Sun-Hosted Small Bodies",
+      "name": "Small Bodies",
       "bodyIds": [
         "halley",
         "eros"

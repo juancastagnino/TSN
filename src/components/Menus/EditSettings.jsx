@@ -44,6 +44,17 @@ const isZeroSettingValue = (value) => {
   return Number.isFinite(numericValue) && numericValue === 0;
 };
 
+const fieldLabel = (setting, property) => {
+  if (setting.id === "moon-solar-eccentric") {
+    if (property === "orbitRadius") return "2D−M solar modulation";
+    if (property === "solarVariationRadius") return "2D solar modulation";
+  }
+  if (setting.id === "moon-paired-radial" && property === "orbitRadius") {
+    return "Earth–Moon modulation";
+  }
+  return property;
+};
+
 const getControls = (s, updateSetting) => {
   const fields = settingFields.filter((property) => s[property] !== undefined);
 
@@ -51,7 +62,7 @@ const getControls = (s, updateSetting) => {
     fields.map((property) => [
       `${s.name}${property}`,
       {
-        label: property,
+        label: fieldLabel(s, property),
         value: "\u200B" + s[property],
         editable: true,
         render: (get) => {
@@ -179,12 +190,14 @@ const EditSettingsPanel = () => {
     const showHideMenu = {};
     const settingsMenu = {};
     const editorGroups = getCelestialEditorGroups(settings);
+    const flattenBodies = (bodies) =>
+      bodies.flatMap((body) => [body, ...flattenBodies(body.children || [])]);
 
     // Visibility belongs to a real celestial owner, never to one of its
     // internal geometry stages. This avoids name-based grouping and keeps Mars
     // and Eros stages below their bodies just like the Moon and Pluto stages.
     editorGroups.forEach((editorGroup) => {
-      editorGroup.bodies.forEach((body) => {
+      flattenBodies(editorGroup.bodies).forEach((body) => {
         const main = body.settings.find((setting) => setting.id === body.id);
         if (typeof main?.visible !== "boolean") return;
         showHideMenu[`${body.name}visible`] = {
@@ -205,8 +218,7 @@ const EditSettingsPanel = () => {
     // The edit menu follows the declared astronomical system rather than
     // inferring parentage from display-name substrings.
     editorGroups.forEach((editorGroup) => {
-      const groupControls = {};
-      editorGroup.bodies.forEach((body) => {
+      const buildBodyControls = (body) => {
         const bodyControls = {};
         if (body.frames.length > 0) {
           body.frames.forEach((frame) => {
@@ -229,8 +241,19 @@ const EditSettingsPanel = () => {
             );
           });
         }
-        groupControls[body.name] = folder(bodyControls, { collapsed: true });
-      });
+        (body.children || []).forEach((child) => {
+          bodyControls[child.name] = folder(buildBodyControls(child), {
+            collapsed: true,
+          });
+        });
+        return bodyControls;
+      };
+      const groupControls = editorGroup.flattenBody && editorGroup.bodies.length === 1
+        ? buildBodyControls(editorGroup.bodies[0])
+        : Object.fromEntries(editorGroup.bodies.map((body) => [
+            body.name,
+            folder(buildBodyControls(body), { collapsed: true }),
+          ]));
       settingsMenu[editorGroup.name] = folder(groupControls, {
         collapsed: true,
       });
@@ -266,35 +289,15 @@ const EditSettingsPanel = () => {
 
   const levaSettingsStore = useCreateStore();
 
-  const [, set] = useControls(() => settingsFolders, {
+  useControls(() => settingsFolders, {
     store: levaSettingsStore,
   });
 
-  useEffect(() => {
-    const updatedValues = {
-      "Show / Hide Planets": showPlanets,
-      "Filled Orbits": shadeOrbits,
-    };
-    const visibilitySettingIds = new Set(
-      getCelestialEditorGroups(settings).flatMap((editorGroup) =>
-        editorGroup.bodies
-          .map((body) => body.settings.find((setting) => setting.id === body.id))
-          .filter((setting) => typeof setting?.visible === "boolean")
-          .map((setting) => setting.id)
-      )
-    );
-    settings.forEach((s) => {
-      if (visibilitySettingIds.has(s.id)) {
-        updatedValues[`${s.name}visible`] = s.visible;
-      }
-      settingFields.forEach((property) => {
-        if (s[property] !== undefined) {
-          updatedValues[`${s.name}${property}`] = "\u200B" + s[property];
-        }
-      });
-    });
-    set(updatedValues);
-  }, [settings, set, showPlanets, shadeOrbits]);
+  // Do not call Leva's programmatic `set()` here. The editor tree is rebuilt
+  // from the declared model, and Leva can retain an obsolete path while that
+  // happens, causing its internal reducer to dereference `undefined.path`.
+  // Direct edits update the celestial store immediately; load/reset are
+  // reflected safely when the panel is reopened.
 
   return createPortal(
     <div

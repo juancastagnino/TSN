@@ -261,9 +261,9 @@ export const getCelestialEditorGroups = (settings) => {
   const owners = new Map(
     getCelestialOwners().map((owner) => [owner.id, owner])
   );
-  return celestialModel.editorGroups.map((group) => ({
-    ...group,
-    bodies: group.bodyIds.map((bodyId) => {
+  return celestialModel.editorGroups.map((group) => {
+    const buildBody = (bodyNode) => {
+      const bodyId = typeof bodyNode === "string" ? bodyNode : bodyNode.id;
       const owner = owners.get(bodyId);
       if (!owner) {
         throw new Error(`Editor references unknown body '${bodyId}'`);
@@ -294,13 +294,19 @@ export const getCelestialEditorGroups = (settings) => {
           }
           return { ...current, component };
         }),
+        children: (bodyNode.children || []).map(buildBody),
       };
-    }),
-    settings: group.bodyIds.flatMap((bodyId) => {
-      const owner = owners.get(bodyId);
-      return motionEntries(owner).map(({ setting }) => byId.get(setting.id));
-    }),
-  }));
+    };
+
+    return {
+      ...group,
+      bodies: (group.bodyTree || group.bodyIds).map(buildBody),
+      settings: group.bodyIds.flatMap((bodyId) => {
+        const owner = owners.get(bodyId);
+        return motionEntries(owner).map(({ setting }) => byId.get(setting.id));
+      }),
+    };
+  });
 };
 
 export const getCelestialSettingsCatalog = () =>
