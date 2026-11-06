@@ -52,6 +52,9 @@ const fieldLabel = (setting, property) => {
   if (setting.id === "moon-paired-radial" && property === "orbitRadius") {
     return "Earth–Moon modulation";
   }
+  if (setting.id === "pvp-solar-orientation" && property === "amplitude") {
+    return "Earth–Sun orientation amplitude (arcsec)";
+  }
   return property;
 };
 

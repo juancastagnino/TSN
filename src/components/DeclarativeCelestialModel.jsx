@@ -5,6 +5,7 @@ import ErosSunRelativeOrbit from "./ErosSunRelativeOrbit";
 import MoonOrbitalPlane from "./MoonOrbitalPlane";
 import MoonSolarCoupledEccentric from "./MoonSolarCoupledEccentric";
 import PlutoEccentricFrame from "./PlutoEccentricFrame";
+import PvpSolarOrientationFrame from "./PvpSolarOrientationFrame";
 import SunMarsBinaryTracker from "./SunMarsBinaryTracker";
 import SunMarsRelativeOrbit from "./SunMarsRelativeOrbit";
 
@@ -19,6 +20,7 @@ export const CELESTIAL_NODE_KINDS = new Set([
   "sun-mars-relative",
   "eros-sun-relative",
   "sun-mars-binary-tracker",
+  "pvp-solar-orientation",
 ]);
 
 const modeAllows = (node, mode) =>
@@ -183,6 +185,12 @@ export const renderCelestialNode = (
     case "pluto-eccentric-frame":
       return React.createElement(
         PlutoEccentricFrame,
+        { ...props, plotMode: mode === "plot" },
+        children
+      );
+    case "pvp-solar-orientation":
+      return React.createElement(
+        PvpSolarOrientationFrame,
         { ...props, plotMode: mode === "plot" },
         children
       );

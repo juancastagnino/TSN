@@ -149,6 +149,7 @@ test("preserves the accepted parent path for every reparented body", () => {
   const prefix = [
     "TYCHOS Celestial Model",
     "SystemCenter",
+    "Earth–Sun Orientation Frame",
     "Earth",
     "Sun-Mars Binary Frame",
     "Sun Primary Branch",

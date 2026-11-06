@@ -1,6 +1,7 @@
-import { folder } from "leva";
+import { button, folder } from "leva";
 import { useStore, useSettingsStore } from "../../store";
 import { useTraceStore } from "../Trace/traceStore";
+import { downloadPvpSolarOrientationFieldCsv } from "../../utils/pvpSolarOrientationFieldExport";
 
 export const useMainControlsConfig = () => {
   const {
@@ -273,6 +274,7 @@ export const useStarsHelpersConfig = () => {
     hScale,
     sethScale,
   } = useStore();
+  const settings = useSettingsStore((state) => state.settings);
 
   const setEquidistantStars = (value) => setOfficialStarDistances(!value);
 
@@ -312,5 +314,28 @@ export const useStarsHelpersConfig = () => {
       step: 0.5,
       onChange: sethScale,
     },
+    "Export PVP orientation field — zero (1856)": button(() => {
+      const sun = settings.find((setting) => setting.id === "sun");
+      if (sun) {
+        downloadPvpSolarOrientationFieldCsv({
+          sun,
+          amplitudeArcsec: 0,
+          filename: "zero",
+        });
+      }
+    }),
+    "Export PVP orientation field — current (1856)": button(() => {
+      const sun = settings.find((setting) => setting.id === "sun");
+      const orientation = settings.find(
+        (setting) => setting.id === "pvp-solar-orientation"
+      );
+      if (sun && orientation) {
+        downloadPvpSolarOrientationFieldCsv({
+          sun,
+          amplitudeArcsec: orientation.amplitude,
+          filename: String(orientation.amplitude).replace(/[^0-9-]/g, ""),
+        });
+      }
+    }),
   };
 };
