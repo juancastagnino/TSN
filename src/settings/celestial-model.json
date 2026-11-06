@@ -54,7 +54,7 @@
         "solarOrientation": {
           "id": "pvp-solar-orientation",
           "name": "Earth–Sun Orientation Frame",
-          "amplitude": "0"
+          "amplitude": "19.393"
         }
       },
       "editorFrames": [
