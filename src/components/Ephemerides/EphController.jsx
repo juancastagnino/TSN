@@ -44,6 +44,7 @@ const EphController = () => {
     checkedPlanets: [],
     data: {},
     binaryDiagnostics: false,
+    observerConfig: null,
     binaryRows: [],
     lastProgress: 0,
   });
@@ -83,6 +84,7 @@ const EphController = () => {
         checkedPlanets: params.checkedPlanets,
         data: initialData,
         binaryDiagnostics: params.binaryDiagnostics === true,
+        observerConfig: params.observerConfig || null,
         binaryRows: [],
         lastProgress: 0,
       };
@@ -162,7 +164,10 @@ const EphController = () => {
       }
 
       job.checkedPlanets.forEach((name) => {
-        const data = getPlotModelRaDecDistance(name, plotObjects, scene);
+        const data = getPlotModelRaDecDistance(name, plotObjects, {
+          ...job.observerConfig,
+          time: currentPos,
+        });
         if (data) {
           job.data[name].push({
             date: currentDate,

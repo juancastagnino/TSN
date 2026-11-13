@@ -177,7 +177,7 @@ export function rAandDecFromLocal(lat, lon, time, az, alt) {
   return { ra: toDegrees(ra) / 15, dec: toDegrees(decRad) };
 }
 
-export function getRaDecDistance(name, scene) {
+export function getRaDecDistance(name, scene, observerPosition = null) {
   const objectPos = new Vector3();
   let targetObject;
 
@@ -193,10 +193,14 @@ export function getRaDecDistance(name, scene) {
 
   targetObject.getWorldPosition(objectPos);
 
-  return getRaDecDistanceFromPosition(objectPos, scene);
+  return getRaDecDistanceFromPosition(objectPos, scene, observerPosition);
 }
 
-export function getRaDecDistanceFromPosition(position, scene) {
+export function getRaDecDistanceFromPosition(
+  position,
+  scene,
+  observerPosition = null
+) {
   const csPos = new Vector3();
   const sunPos = new Vector3();
   const sphericalPos = new Spherical();
@@ -213,11 +217,21 @@ export function getRaDecDistanceFromPosition(position, scene) {
   celestialSphere.getWorldPosition(csPos);
   sun.getWorldPosition(sunPos);
 
-  // Calculate RA and Dec
-  csLookAtObj.lookAt(position);
-  lookAtDir.applyQuaternion(csLookAtObj.quaternion);
-  lookAtDir.setLength(csPos.distanceTo(position));
-  sphericalPos.setFromVector3(lookAtDir);
+  // Calculate RA and Dec. In topocentric mode, express both the target and
+  // the observer in the same Earth-equatorial frame before taking the vector
+  // between them. The geocentric path retains the original scene behaviour.
+  if (observerPosition) {
+    const localTarget = celestialSphere.worldToLocal(position.clone());
+    const localObserver = celestialSphere.worldToLocal(
+      observerPosition.clone()
+    );
+    sphericalPos.setFromVector3(localTarget.sub(localObserver));
+  } else {
+    csLookAtObj.lookAt(position);
+    lookAtDir.applyQuaternion(csLookAtObj.quaternion);
+    lookAtDir.setLength(csPos.distanceTo(position));
+    sphericalPos.setFromVector3(lookAtDir);
+  }
 
   const ra = radToRa(sphericalPos.theta);
   const dec = radToDec(sphericalPos.phi);
@@ -227,8 +241,9 @@ export function getRaDecDistanceFromPosition(position, scene) {
   const distAU = radius.toFixed(2);
 
   // Calculate elongation
-  const earthSunDistance = csPos.distanceTo(sunPos);
-  const earthTargetPositionDistance = csPos.distanceTo(position);
+  const observationOrigin = observerPosition || csPos;
+  const earthSunDistance = observationOrigin.distanceTo(sunPos);
+  const earthTargetPositionDistance = observationOrigin.distanceTo(position);
   const sunTargetPositionDistance = sunPos.distanceTo(position);
 
   const numerator =

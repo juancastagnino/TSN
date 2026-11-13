@@ -1,7 +1,13 @@
 import { useRef, useEffect } from "react";
 import { useControls, useCreateStore, Leva, folder } from "leva";
 import { useStore } from "../store";
-import { speedFactOpts } from "../utils/time-date-functions";
+import {
+  posToDate,
+  posToTime,
+  speedFactOpts,
+} from "../utils/time-date-functions";
+import { useObserverStore } from "./Observer/observerStore";
+import { formatGlobalPosition } from "./Observer/observerPosition";
 import {
   useMainControlsConfig,
   useTraceConfig,
@@ -33,6 +39,14 @@ const LevaUI = () => {
   const traceControls = useTraceConfig();
   const planetOrbitsControls = usePlanetOrbitsConfig();
   const starsHelpersControls = useStarsHelpersConfig();
+  const currentGlobalPosition = useObserverStore(
+    (state) => state.currentGlobalPosition
+  );
+  const referenceGlobalPosition = useObserverStore(
+    (state) => state.referenceGlobalPosition
+  );
+  const referenceTime = useObserverStore((state) => state.referenceTime);
+  const displacementKm = useObserverStore((state) => state.displacementKm);
 
   const [, set1] = useControls(
     () => ({
@@ -73,6 +87,27 @@ const LevaUI = () => {
     ephimerides,
     showPositions,
     searchStars,
+    set2,
+  ]);
+
+  // These fields sit inside the nested Trace / Observer Leva folder. They
+  // must be refreshed explicitly: Leva otherwise retains the values that
+  // existed when its schema was first created.
+  useEffect(() => {
+    if (!set2) return;
+    set2({
+      "PVP XYZ (km)": formatGlobalPosition(currentGlobalPosition),
+      "Reference date":
+        referenceGlobalPosition && referenceTime !== null
+          ? `${posToDate(referenceTime)} ${posToTime(referenceTime)}`
+          : "not set",
+      "Displacement (km)": Number(displacementKm.toFixed(2)),
+    });
+  }, [
+    currentGlobalPosition,
+    referenceGlobalPosition,
+    referenceTime,
+    displacementKm,
     set2,
   ]);
 

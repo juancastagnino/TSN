@@ -1,5 +1,10 @@
 import { Vector3, Spherical } from "three";
-import { radToRa, radToDec } from "../utils/celestial-functions";
+import {
+  latToRad,
+  longToRad,
+  radToRa,
+  radToDec,
+} from "../utils/celestial-functions";
 import {
   createSunMarsBinaryDiagnostics,
   createSunMarsBinaryState,
@@ -145,16 +150,20 @@ export function getPlotSunMarsPrimaryCompanionState(
   );
 }
 
-export function getPlotModelRaDecDistance(name, plotObjects) {
+export function getPlotModelRaDecDistance(name, plotObjects, observer = null) {
   let targetName = name;
   if (name === "Moon") {
     const hasActualMoon = plotObjects.some((p) => p.name === "Actual Moon");
     if (hasActualMoon) targetName = "Actual Moon";
   }
-  return getPlotRaDecDistanceFromPosition(targetName, plotObjects);
+  return getPlotRaDecDistanceFromPosition(targetName, plotObjects, observer);
 }
 
-export function getPlotRaDecDistanceFromPosition(targetName, plotObjects) {
+export function getPlotRaDecDistanceFromPosition(
+  targetName,
+  plotObjects,
+  observer = null
+) {
   const earthObj = plotObjects.find((p) => p.name === "Earth");
   const sunObj = plotObjects.find((p) => p.name === "Sun");
   const targetObj = plotObjects.find((p) => p.name === targetName);
@@ -176,10 +185,28 @@ export function getPlotRaDecDistanceFromPosition(targetName, plotObjects) {
   // This automatically accounts for Earth's axial tilt without manual quaternion math.
   
   const localVec = targetPos.clone();
+  const observerWorld = new Vector3();
+  let isTopocentric = false;
   
   if (earthObj.cSphereRef?.current) {
     // Transforms from World Space -> Tilted Earth Space (Equatorial)
-    earthObj.cSphereRef.current.worldToLocal(localVec);
+    const earthFrame = earthObj.cSphereRef.current;
+    earthFrame.worldToLocal(localVec);
+
+    if (observer?.radius && Number.isFinite(observer.time)) {
+      const observerLocal = new Vector3(0, Number(observer.radius), 0)
+        .applyAxisAngle(new Vector3(1, 0, 0), latToRad(observer.latitude))
+        .applyAxisAngle(new Vector3(0, 1, 0), longToRad(observer.longitude))
+        .applyAxisAngle(
+          new Vector3(0, 1, 0),
+          Number(observer.rotationStart || 0) +
+            Number(observer.rotationSpeed || 0) * Number(observer.time)
+        );
+      localVec.sub(observerLocal);
+      observerWorld.copy(observerLocal);
+      earthFrame.localToWorld(observerWorld);
+      isTopocentric = true;
+    }
   }
 
   // 3. Convert Local Vector to Spherical Coordinates (RA/Dec)
@@ -192,9 +219,10 @@ export function getPlotRaDecDistanceFromPosition(targetName, plotObjects) {
   const radius = sphericalPos.radius / 100;
   
   // Calculate distances for Elongation formula
-  const earthSunDist = earthPos.distanceTo(sunPos);
   const sunTargetDist = sunPos.distanceTo(targetPos);
-  const earthTargetDist = earthPos.distanceTo(targetPos); // Same as sphericalPos.radius
+  const observationOrigin = isTopocentric ? observerWorld : earthPos;
+  const earthSunDist = observationOrigin.distanceTo(sunPos);
+  const earthTargetDist = observationOrigin.distanceTo(targetPos);
 
   // Cosine Rule for Elongation
   const numerator =

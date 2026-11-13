@@ -41,6 +41,8 @@ import PlanetCameraHelper from "./components/PlanetCamera/PlanetCameraHelper";
 import { VideoCanvas } from "./components/Recorder/r3f-video-recorder";
 import RecorderMenu from "./components/Menus/RecorderMenu";
 import RecorderController from "./components/Recorder/RecorderController";
+import ObserverMarker from "./components/Observer/ObserverMarker";
+import ObserverReferenceMarker from "./components/Observer/ObserverReferenceMarker";
 
 const isTouchDevice = () => {
   return (
@@ -137,6 +139,8 @@ const TSNext = () => {
           <CheckerController />
           <LightEffectsMenu />
           <SolarSystem />
+          <ObserverMarker />
+          <ObserverReferenceMarker />
           <PlotSolarSystem />
           <Stars />
           <LabeledStars />
