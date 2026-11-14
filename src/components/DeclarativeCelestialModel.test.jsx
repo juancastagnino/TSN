@@ -152,7 +152,6 @@ test("preserves the accepted parent path for every reparented body", () => {
     "Earth",
     "Sun-Mars Binary Frame",
     "Sun Primary Branch",
-    "Sun deferent",
     "Sun",
   ];
   expect(pathTo("mars")).toEqual([

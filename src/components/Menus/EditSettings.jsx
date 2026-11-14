@@ -87,16 +87,47 @@ const componentLabel = (component) =>
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/^./, (letter) => letter.toUpperCase());
 
-// Leva keeps its own mutable values after the schema has been created.  A
-// settings reset replaces the astronomical store wholesale, so rebuilding this
-// small, isolated editor is safer than calling Leva's path-based `set()` on a
-// hierarchy that may have changed.
-const SettingsLeva = ({ settingsFolders }) => {
+const editorValueUpdates = (settings, levaStore) => {
+  const data = levaStore?.getData?.();
+  if (!data) return {};
+
+  const updates = {};
+  settings.forEach((setting) => {
+    settingFields.forEach((property) => {
+      if (setting[property] === undefined) return;
+      const controlName = `${setting.name}${property}`;
+      const path = Object.keys(data).find((candidate) =>
+        candidate.endsWith(controlName)
+      );
+      if (path) updates[path] = `\u200B${setting[property]}`;
+    });
+  });
+  return updates;
+};
+
+// Leva keeps its own mutable values after the schema has been created. A full
+// settings-file load may change the declared hierarchy, while a reset only
+// changes values in an unchanged hierarchy.
+const SettingsLeva = ({ settingsFolders, settings, settingsResetRevision }) => {
   const levaSettingsStore = useCreateStore();
+  const lastResetRevision = useRef(settingsResetRevision);
 
   useControls(() => settingsFolders, {
     store: levaSettingsStore,
   });
+
+  useEffect(() => {
+    if (lastResetRevision.current === settingsResetRevision) return;
+    lastResetRevision.current = settingsResetRevision;
+
+    // The control paths already exist after a reset, so this is safe and does
+    // not collapse the folders that the user has opened. `false` avoids
+    // treating a display refresh as a new user edit.
+    const updates = editorValueUpdates(settings, levaSettingsStore);
+    if (Object.keys(updates).length > 0) {
+      levaSettingsStore.set(updates, false);
+    }
+  }, [levaSettingsStore, settings, settingsResetRevision]);
 
   return (
     <Leva
@@ -128,8 +159,13 @@ const EditSettingsPanel = () => {
   const setShadeOrbits = useStore((s) => s.setShadeOrbits);
   const setEditSettings = useStore((s) => s.setEditSettings); // NEW
   const positions = usePosStore((s) => s.positions);
-  const { settings, updateSetting, resetSettings, settingsRevision } =
-    useSettingsStore();
+  const {
+    settings,
+    updateSetting,
+    resetSettings,
+    settingsRevision,
+    settingsResetRevision,
+  } = useSettingsStore();
 
   const initialDeferentStates = useRef({});
 
@@ -331,7 +367,12 @@ const EditSettingsPanel = () => {
         zIndex: 2147483647,
       }}
     >
-      <SettingsLeva key={settingsRevision} settingsFolders={settingsFolders} />
+      <SettingsLeva
+        key={settingsRevision}
+        settingsFolders={settingsFolders}
+        settings={settings}
+        settingsResetRevision={settingsResetRevision}
+      />
     </div>,
     document.body
   );

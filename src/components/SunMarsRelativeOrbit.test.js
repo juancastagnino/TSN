@@ -14,7 +14,7 @@ const byName = buildSettingsIndex(normalizeCelestialSettings(settings));
 
 const alteredSunIndex = () => {
   const altered = normalizeCelestialSettings(settings).map((setting) =>
-    ["sun", "sun-deferent"].includes(setting.id)
+    setting.id === "sun"
       ? {
           ...setting,
           orbitRadius: 9876,

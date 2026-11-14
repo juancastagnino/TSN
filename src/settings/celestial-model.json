@@ -173,20 +173,6 @@
       "parentId": "earth",
       "role": "primary",
       "motion": {
-        "carrier": {
-          "id": "sun-deferent",
-          "name": "Sun deferent",
-          "size": "0",
-          "startPos": "0",
-          "speed": "0",
-          "tilt": "0",
-          "orbitRadius": "0",
-          "orbitCentera": "0",
-          "orbitCenterb": "0",
-          "orbitCenterc": "0",
-          "orbitTilta": "0",
-          "orbitTiltb": "0"
-        },
         "orbit": {
           "id": "sun",
           "name": "Sun",
@@ -927,18 +913,12 @@
                     "name": "Sun Primary Branch",
                     "role": "primary-branch",
                     "children": [
-                      {
-                        "id": "sun-deferent",
-                        "kind": "motion-stage",
-                        "name": "Sun deferent",
-                        "role": "sun-carrier",
-                        "children": [
-                          {
-                            "id": "sun",
-                            "kind": "object",
-                            "name": "Sun",
-                            "role": "primary",
-                            "children": [
+                    {
+                      "id": "sun",
+                      "kind": "object",
+                      "name": "Sun",
+                      "role": "primary",
+                      "children": [
                               {
                                 "id": "halley-deferent",
                                 "kind": "motion-stage",
@@ -1071,12 +1051,12 @@
                                             "name": "Deimos",
                                             "role": "mars-satellite"
                                           }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              },
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
                               {
                                 "id": "venus-deferent",
                                 "kind": "motion-stage",
@@ -1151,8 +1131,6 @@
                               }
                             ]
                           }
-                        ]
-                      }
                     ]
                   },
                   {

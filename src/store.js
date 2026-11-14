@@ -257,10 +257,12 @@ const createDefaultCelestialSettings = () =>
 
 export const useSettingsStore = create((set, get) => ({
   settings: createDefaultCelestialSettings(),
-  // Incremented only when the complete settings document is replaced.  The
-  // editor uses this to safely rebuild Leva's local control store after a
-  // load/reset, without remounting on every individual keystroke.
+  // Incremented only when a complete settings document is loaded. The editor
+  // uses it to rebuild Leva when the declared hierarchy itself may change.
   settingsRevision: 0,
+  // A reset keeps exactly the same editor schema.  It has its own revision so
+  // Leva can refresh values without collapsing the user's open folders.
+  settingsResetRevision: 0,
 
   getSetting: (identifier) =>
     findCelestialSetting(get().settings, identifier),
@@ -301,7 +303,7 @@ export const useSettingsStore = create((set, get) => ({
 
         return defaultSetting;
       }),
-      settingsRevision: state.settingsRevision + 1,
+      settingsResetRevision: state.settingsResetRevision + 1,
     })),
 }));
 

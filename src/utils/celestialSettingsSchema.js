@@ -50,6 +50,8 @@ const RETIRED_SOLAR_COMPANION_SETTING_NAMES = new Set([
   "Venus deferent A",
   "Venus deferent B",
 ]);
+const RETIRED_STRUCTURAL_SETTING_IDS = new Set(["sun-deferent"]);
+const RETIRED_STRUCTURAL_SETTING_NAMES = new Set(["Sun deferent"]);
 
 const DIRECT_PARENT_RELATIVE_IDS = new Set([
   "mars-deferent-e",
@@ -147,7 +149,9 @@ export const normalizeCelestialSettings = (
         !RETIRED_LUNAR_SETTING_IDS.has(item?.id) &&
         !RETIRED_LUNAR_SETTING_NAMES.has(item?.name) &&
         !RETIRED_SOLAR_COMPANION_SETTING_IDS.has(item?.id) &&
-        !RETIRED_SOLAR_COMPANION_SETTING_NAMES.has(item?.name)
+        !RETIRED_SOLAR_COMPANION_SETTING_NAMES.has(item?.name) &&
+        !RETIRED_STRUCTURAL_SETTING_IDS.has(item?.id) &&
+        !RETIRED_STRUCTURAL_SETTING_NAMES.has(item?.name)
     )
     .map((item) => ({ ...item }));
   const ids = new Set();
