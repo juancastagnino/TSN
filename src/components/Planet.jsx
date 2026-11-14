@@ -142,6 +142,7 @@ const Planet = memo(function Planet({ s, actualMoon, name }) {
             <PlanetRings
               innerRadius={s.rings.innerRadius + s.size}
               outerRadius={s.rings.outerRadius + s.size}
+              planetSize={s.size}
               texture={s.rings.texture}
               opacity={s.rings.opacity}
               actualSize={s.actualSize}
