@@ -140,9 +140,9 @@ const Planet = memo(function Planet({ s, actualMoon, name }) {
 
           {s.rings && (
             <PlanetRings
-              innerRadius={s.rings.innerRadius + s.size}
-              outerRadius={s.rings.outerRadius + s.size}
-              planetSize={s.size}
+              innerRadius={Number(s.rings.innerRadius) + Number(s.size)}
+              outerRadius={Number(s.rings.outerRadius) + Number(s.size)}
+              planetSize={Number(s.size)}
               texture={s.rings.texture}
               opacity={s.rings.opacity}
               actualSize={s.actualSize}
