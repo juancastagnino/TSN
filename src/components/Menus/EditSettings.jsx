@@ -87,6 +87,39 @@ const componentLabel = (component) =>
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/^./, (letter) => letter.toUpperCase());
 
+// Leva keeps its own mutable values after the schema has been created.  A
+// settings reset replaces the astronomical store wholesale, so rebuilding this
+// small, isolated editor is safer than calling Leva's path-based `set()` on a
+// hierarchy that may have changed.
+const SettingsLeva = ({ settingsFolders }) => {
+  const levaSettingsStore = useCreateStore();
+
+  useControls(() => settingsFolders, {
+    store: levaSettingsStore,
+  });
+
+  return (
+    <Leva
+      store={levaSettingsStore}
+      titleBar={{ drag: true, title: "Edit Settings", filter: false }}
+      fill={false}
+      hideCopyButton
+      theme={{
+        fontSizes: {
+          root: "12px",
+        },
+        fonts: {
+          mono: "",
+        },
+        colors: {
+          highlight1: "#FFFFFF",
+          highlight2: "#FFFFFF",
+        },
+      }}
+    />
+  );
+};
+
 // The inner component containing the hooks only mounts when the menu is active
 const EditSettingsPanel = () => {
   const showPlanets = useStore((s) => s.showPlanets);
@@ -95,7 +128,8 @@ const EditSettingsPanel = () => {
   const setShadeOrbits = useStore((s) => s.setShadeOrbits);
   const setEditSettings = useStore((s) => s.setEditSettings); // NEW
   const positions = usePosStore((s) => s.positions);
-  const { settings, updateSetting, resetSettings } = useSettingsStore();
+  const { settings, updateSetting, resetSettings, settingsRevision } =
+    useSettingsStore();
 
   const initialDeferentStates = useRef({});
 
@@ -287,18 +321,6 @@ const EditSettingsPanel = () => {
     setShadeOrbits,
   ]);
 
-  const levaSettingsStore = useCreateStore();
-
-  useControls(() => settingsFolders, {
-    store: levaSettingsStore,
-  });
-
-  // Do not call Leva's programmatic `set()` here. The editor tree is rebuilt
-  // from the declared model, and Leva can retain an obsolete path while that
-  // happens, causing its internal reducer to dereference `undefined.path`.
-  // Direct edits update the celestial store immediately; load/reset are
-  // reflected safely when the panel is reopened.
-
   return createPortal(
     <div
       className="settings-div"
@@ -309,24 +331,7 @@ const EditSettingsPanel = () => {
         zIndex: 2147483647,
       }}
     >
-      <Leva
-        store={levaSettingsStore}
-        titleBar={{ drag: true, title: "Edit Settings", filter: false }}
-        fill={false}
-        hideCopyButton
-        theme={{
-          fontSizes: {
-            root: "12px",
-          },
-          fonts: {
-            mono: "",
-          },
-          colors: {
-            highlight1: "#FFFFFF",
-            highlight2: "#FFFFFF",
-          },
-        }}
-      />
+      <SettingsLeva key={settingsRevision} settingsFolders={settingsFolders} />
     </div>,
     document.body
   );
